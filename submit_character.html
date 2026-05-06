@@ -1,115 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Submit Character | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --th-blue: #2c3e50; 
-            --th-border: #dcdcdc; 
-            --th-btn: #3498db;
-        }
-        body { 
-            margin: 0; 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
-            background: #f7f7f7; 
-            color: #333;
-        }
-        .navbar { 
-            background-color: var(--th-blue); 
-            color: white; 
-            padding: 10px 25px; 
-            display: flex; 
-            align-items: center; 
-        }
-        .nav-brand { 
-            font-weight: bold; 
-            text-decoration: none; 
-            color: white; 
-            font-size: 18px; 
-            margin-right: 20px; 
-        }
-        .container { 
-            max-width: 800px; 
-            margin: 40px auto; 
-            background: white; 
-            border: 1px solid var(--th-border); 
-            border-radius: 4px; 
-            padding: 30px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        h2 { 
-            border-bottom: 1px solid #eee; 
-            padding-bottom: 15px; 
-            margin-top: 0; 
-            color: var(--th-blue);
-            font-size: 1.5rem;
-        }
-        .form-group { margin-bottom: 20px; }
-        label { 
-            display: block; 
-            font-weight: bold; 
-            margin-bottom: 8px; 
-            font-size: 14px; 
-        }
-        input, textarea { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid var(--th-border); 
-            border-radius: 4px; 
-            box-sizing: border-box; 
-            font-size: 14px;
-        }
-        textarea { resize: vertical; min-height: 150px; }
-        .help-text { 
-            font-size: 12px; 
-            color: #777; 
-            margin-top: 5px; 
-        }
-        .btn-submit { 
-            background: var(--th-btn); 
-            color: white; 
-            border: none; 
-            padding: 15px 30px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 16px;
-            transition: background 0.2s;
-        }
-        .btn-submit:hover { background: #2980b9; }
-        #status { margin-top: 15px; font-weight: bold; }
+        :root { --th-teal: #5bc0de; --th-dark: #212529; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
+        body { margin: 0; font-family: Arial, sans-serif; background: var(--th-bg); color: #333; }
+        
+        .navbar { background: var(--th-dark); color: white; padding: 10px 20px; font-weight: bold; }
+        .container { max-width: 600px; margin: 50px auto; background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 30px; }
+        
+        h2 { border-bottom: 2px solid var(--th-teal); padding-bottom: 10px; margin-bottom: 20px; color: #444; }
+        
+        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #666; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        
+        .btn-submit { background: var(--th-teal); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-submit:hover { background: #46b8da; }
+        
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <a href="index.html" class="nav-brand">OCARMY</a>
-    <span style="font-size: 14px; color: #ddd;">Submit Character</span>
-</nav>
+<div class="navbar">OCARMY | Submission</div>
 
 <div class="container">
-    <h2><i class="fa fa-upload"></i> Basic Information</h2>
+    <h2><i class="fa fa-user-plus"></i> Submit Character</h2>
     
-    <div class="form-group">
-        <label for="charName">Character Name</label>
-        <input type="text" id="charName" placeholder="Enter name...">
-    </div>
-
-    <div class="form-group">
-        <label for="charImg">Image URL</label>
-        <input type="text" id="charImg" placeholder="https://example.com/my-art.png">
-        <div class="help-text">Direct link to an image hosted on Imgur, Discord, or similar.</div>
-    </div>
-
-    <div class="form-group">
-        <label for="charDesc">Biography / Description</label>
-        <textarea id="charDesc" placeholder="Tell us about your OC..."></textarea>
-    </div>
-
-    <button id="submit-btn" class="btn-submit">Upload Character</button>
-    <p id="status"></p>
+    <label>Character Name</label>
+    <input type="text" id="char-name" placeholder="Enter character name...">
+    
+    <label>Character Image URL</label>
+    <input type="text" id="char-img" placeholder="Paste link (Imgur, Discord, etc.)">
+    
+    <button class="btn-submit" onclick="submitOC()">Upload to Army</button>
+    
+    <a href="dashboard.html" class="back-link">← Cancel and return to profile</a>
 </div>
 
 <script type="module">
@@ -121,36 +48,46 @@
     apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
     authDomain: "ocarmy-db.firebaseapp.com",
     projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.appspot.com",
+    storageBucket: "ocarmy-db.firebasestorage.app",
     messagingSenderId: "848883355194",
-    appId: "1:848883355194:web:51254de3c4992d7750af03"
+    appId: "1:848883355194:web:361e9fe8eb9e01f350af03",
+    measurementId: "G-9G2WV3NXV1"
   };
 
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
   const auth = getAuth();
-  let currentUser = null;
+  const db = getFirestore(app);
 
-  // Protect the page: If not logged in, boot to register
+  // Ensure user is logged in
   onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.href = "register.html";
-    } else {
-      currentUser = user;
-    }
+    if (!user) window.location.href = "index.html";
   });
 
-  document.getElementById('submit-btn').onclick = async () => {
-    const name = document.getElementById('charName').value;
-    const img = document.getElementById('charImg').value;
-    const desc = document.getElementById('charDesc').value;
-    const status = document.getElementById('status');
+  window.submitOC = async () => {
+    const name = document.getElementById('char-name').value;
+    const img = document.getElementById('char-img').value;
+    const user = auth.currentUser;
 
     if (!name || !img) {
-      status.style.color = "red";
-      status.innerText = "Error: Name and Image URL are required!";
-      return;
+        alert("Please provide both a name and an image link!");
+        return;
     }
 
-    status.style.color = "orange";
-    status.innerText
+    try {
+        // Save character with INDEPENDENT ownerID
+        await addDoc(collection(db, "characters"), {
+            name: name,
+            image: img,
+            ownerID: user.uid,
+            timestamp: serverTimestamp()
+        });
+        
+        alert(name + " has joined the army!");
+        window.location.href = "dashboard.html";
+    } catch (e) {
+        alert("Error: " + e.message);
+    }
+  };
+</script>
+</body>
+</html>
