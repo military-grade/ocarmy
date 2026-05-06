@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Character | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --th-blue: #2c3e50; 
+            --th-border: #dcdcdc; 
+            --th-btn: #3498db;
+        }
+        body { 
+            margin: 0; 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            background: #f7f7f7; 
+            color: #333;
+        }
+        .navbar { 
+            background-color: var(--th-blue); 
+            color: white; 
+            padding: 10px 25px; 
+            display: flex; 
+            align-items: center; 
+        }
+        .nav-brand { 
+            font-weight: bold; 
+            text-decoration: none; 
+            color: white; 
+            font-size: 18px; 
+            margin-right: 20px; 
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 40px auto; 
+            background: white; 
+            border: 1px solid var(--th-border); 
+            border-radius: 4px; 
+            padding: 30px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        h2 { 
+            border-bottom: 1px solid #eee; 
+            padding-bottom: 15px; 
+            margin-top: 0; 
+            color: var(--th-blue);
+            font-size: 1.5rem;
+        }
+        .form-group { margin-bottom: 20px; }
+        label { 
+            display: block; 
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            font-size: 14px; 
+        }
+        input, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid var(--th-border); 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+            font-size: 14px;
+        }
+        textarea { resize: vertical; min-height: 150px; }
+        .help-text { 
+            font-size: 12px; 
+            color: #777; 
+            margin-top: 5px; 
+        }
+        .btn-submit { 
+            background: var(--th-btn); 
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover { background: #2980b9; }
+        #status { margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="nav-brand">OCARMY</a>
+    <span style="font-size: 14px; color: #ddd;">Submit Character</span>
+</nav>
+
+<div class="container">
+    <h2><i class="fa fa-upload"></i> Basic Information</h2>
+    
+    <div class="form-group">
+        <label for="charName">Character Name</label>
+        <input type="text" id="charName" placeholder="Enter name...">
+    </div>
+
+    <div class="form-group">
+        <label for="charImg">Image URL</label>
+        <input type="text" id="charImg" placeholder="https://example.com/my-art.png">
+        <div class="help-text">Direct link to an image hosted on Imgur, Discord, or similar.</div>
+    </div>
+
+    <div class="form-group">
+        <label for="charDesc">Biography / Description</label>
+        <textarea id="charDesc" placeholder="Tell us about your OC..."></textarea>
+    </div>
+
+    <button id="submit-btn" class="btn-submit">Upload Character</button>
+    <p id="status"></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
+    authDomain: "ocarmy-db.firebaseapp.com",
+    projectId: "ocarmy-db",
+    storageBucket: "ocarmy-db.appspot.com",
+    messagingSenderId: "848883355194",
+    appId: "1:848883355194:web:51254de3c4992d7750af03"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth();
+  let currentUser = null;
+
+  // Protect the page: If not logged in, boot to register
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "register.html";
+    } else {
+      currentUser = user;
+    }
+  });
+
+  document.getElementById('submit-btn').onclick = async () => {
+    const name = document.getElementById('charName').value;
+    const img = document.getElementById('charImg').value;
+    const desc = document.getElementById('charDesc').value;
+    const status = document.getElementById('status');
+
+    if (!name || !img) {
+      status.style.color = "red";
+      status.innerText = "Error: Name and Image URL are required!";
+      return;
+    }
+
+    status.style.color = "orange";
+    status.innerText
