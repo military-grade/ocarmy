@@ -3,57 +3,168 @@
 <head>
     <title>OCARMY | Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --th-dark: #212529; --th-blue: #008eb0; --th-border: #dcdcdc; --th-nav-blue: #5bc0de; }
-        body { margin: 0; font-family: Arial, sans-serif; background: #fff; }
-        .navbar { background: var(--th-dark); color: white; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; }
-        .nav-left, .nav-right { display: flex; align-items: center; gap: 12px; }
-        .nav-brand { font-weight: bold; font-size: 18px; color: white; text-decoration: none; }
-        .nav-link { color: #aaa; text-decoration: none; font-size: 13px; cursor: pointer; position: relative; }
-        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #333; min-width: 150px; z-index: 10; border: 1px solid #444; }
-        .nav-link:hover .dropdown { display: block; }
-        .drop-item { display: block; padding: 10px; color: #ccc; text-decoration: none; border-bottom: 1px solid #444; }
-        .notif-box { background: var(--th-nav-blue); color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; text-decoration: none; }
+    <style id="custom-css-holder">
+        /* This is where your custom CSS from settings will be injected */
+        :root { --th-blue: #008eb0; --th-dark-sidebar: #3b2a51; --th-border: #dcdcdc; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #fff; color: #333; }
+        
+        /* Navbar */
+        .navbar { background: #212529; color: white; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; }
+        .nav-link { color: #aaa; text-decoration: none; font-size: 13px; margin-right: 15px; cursor: pointer; }
+        .nav-link:hover { color: white; }
+
         .container { display: flex; min-height: calc(100vh - 50px); }
-        .sidebar { width: 180px; background: var(--th-blue); color: white; }
-        .sidebar-user { background: rgba(0,0,0,0.1); padding: 15px; display: flex; align-items: center; }
-        .avatar { width: 40px; height: 40px; background: #eee; border-radius: 2px; margin-right: 10px; background-size: cover; }
-        .side-item { display: block; padding: 10px 15px; color: #e0f4f9; text-decoration: none; font-size: 13px; }
-        .main-content { flex-grow: 1; padding: 30px; }
-        .crown-icon { color: #f1c40f; margin-left: 5px; }
+
+        /* Full Toyhouse Sidebar */
+        .sidebar { width: 180px; background: var(--th-blue); color: white; min-height: 100vh; }
+        .sidebar-header { background: rgba(0,0,0,0.1); padding: 10px; font-weight: bold; font-size: 13px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .avatar { width: 40px; height: 40px; background: #eee; border-radius: 2px; margin-right: 10px; background-size: cover; border: 1px solid rgba(0,0,0,0.2); }
+        
+        .side-nav-link { display: block; padding: 8px 15px; color: #e0f4f9; text-decoration: none; font-size: 12px; transition: 0.2s; }
+        .side-nav-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        .side-nav-link i { width: 18px; margin-right: 5px; opacity: 0.7; }
+        .side-label { padding: 10px 15px 5px; font-size: 10px; font-weight: bold; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+
+        /* Main Profile Content */
+        .main-content { flex-grow: 1; padding: 20px 40px; background: #fdfdfd; }
+        .profile-blurb { text-align: center; margin-bottom: 30px; font-size: 14px; padding: 20px; color: #555; }
+        
+        .profile-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        
+        /* Character Card Style (Matches sparkelpuss_ example) */
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .char-card { background: white; border: 1px solid var(--th-border); border-radius: 4px; overflow: hidden; position: relative; }
+        .char-card img { width: 100%; height: 140px; object-fit: cover; }
+        .char-info { background: var(--th-blue); color: white; padding: 8px; text-align: center; font-size: 11px; font-weight: bold; }
+        .char-stats { background: rgba(0,0,0,0.05); font-size: 10px; padding: 5px; color: #777; display: flex; justify-content: center; gap: 10px; }
+
+        .card-title { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2rem; color: #444; }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-left">
-            <a href="index.html" class="nav-brand">OCARMY</a>
-            <a href="dashboard.html" class="nav-link"><i class="fa fa-home"></i> Profile</a>
-            <div class="nav-link"><i class="fa fa-plus"></i> Submit
-                <div class="dropdown">
-                    <a href="submit_character.html" class="drop-item">Character</a>
-                    <a href="#" class="drop-item">Folder</a>
-                    <a href="#" class="drop-item">Adoptable</a>
-                    <a href="#" class="drop-item">Commission</a>
-                </div>
+
+<nav class="navbar">
+    <div style="display:flex; align-items:center;">
+        <span style="font-weight:bold; margin-right:20px; letter-spacing:1px;">OCARMY</span>
+        <a href="dashboard.html" class="nav-link"><i class="fa fa-home"></i> Profile</a>
+        <a href="#" class="nav-link"><i class="fa fa-comments"></i> Forums</a>
+        <a href="submit_character.html" class="nav-link"><i class="fa fa-plus"></i> Submit</a>
+    </div>
+    <div id="user-nav"></div>
+</nav>
+
+<div class="container">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="avatar" id="sidebar-avatar"></div>
+            <div>
+                <span id="sidebar-username">User</span>
+                <span id="owner-crown"></span>
             </div>
         </div>
-        <div class="nav-right" id="notif-container">
-            </div>
-    </nav>
-    <div class="container">
-        <div class="sidebar">
-            <div class="sidebar-user">
-                <div class="avatar" id="sidebar-avatar"></div>
-                <div><b id="side-username">User</b><span id="owner-crown"></span></div>
-            </div>
-            <a href="#" class="side-item">Bulletins</a>
-            <a href="#" class="side-item">Characters</a>
-            <a href="settings.html" class="side-item">Settings</a>
-        </div>
-        <div class="main-content">
-            <h2 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Recent Characters & Designs</h2>
-            <div id="char-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:15px;"></div>
+        
+        <div class="side-nav">
+            <a href="#" class="side-nav-link"><i class="fa fa-newspaper"></i> Bulletins</a>
+            <a href="#" class="side-nav-link"><i class="fa fa-users"></i> Characters</a>
+            <a href="#" class="side-nav-link"><i class="fa fa-link"></i> Links</a>
+            <a href="#" class="side-nav-link"><i class="fa fa-earth-americas"></i> Worlds</a>
+            <a href="#" class="side-nav-link"><i class="fa fa-star"></i> Favorites</a>
+            
+            <div class="side-label">Portfolio</div>
+            <a href="#" class="side-nav-link"><i class="fa fa-palette"></i> Designs</a>
+            <a href="#" class="side-nav-link"><i class="fa fa-paint-brush"></i> Art</a>
+            <a href="#" class="side-nav-link"><i class="fa fa-book"></i> Library</a>
+            
+            <div class="side-label">Account</div>
+            <a href="settings.html" class="side-nav-link"><i class="fa fa-cog"></i> Settings</a>
+            <a href="#" id="logout-btn" class="side-nav-link"><i class="fa fa-sign-out-alt"></i> Logout</a>
         </div>
     </div>
+
+    <div class="main-content">
+        <div class="profile-blurb" id="profile-blurb">
+            <i>Welcome to my profile! I'm currently setting things up.</i>
+        </div>
+
+        <div class="profile-grid">
+            <div class="characters-col">
+                <h3 class="card-title">Recent Characters & Designs</h3>
+                <div class="char-grid" id="main-char-grid">
+                    </div>
+            </div>
+            
+            <div class="comments-col">
+                <h3 class="card-title">Latest Comments</h3>
+                <p style="color: #999; font-size: 13px;">No comments found.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
+    authDomain: "ocarmy-db.firebaseapp.com",
+    projectId: "ocarmy-db",
+    storageBucket: "ocarmy-db.appspot.com",
+    messagingSenderId: "848883355194",
+    appId: "1:848883355194:web:51254de3c4992d7750af03"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const db = getFirestore(app);
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "index.html";
+    } else {
+      const userRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        document.getElementById('sidebar-username').innerText = data.username;
+        
+        // Load Customization
+        if (data.pfp) document.getElementById('sidebar-avatar').style.backgroundImage = `url('${data.pfp}')`;
+        if (data.customCode) {
+            const styleElement = document.createElement('div');
+            styleElement.innerHTML = data.customCode;
+            document.head.appendChild(styleElement);
+        }
+        
+        // Owner Crown
+        if (data.username.toLowerCase() === "military grade") {
+            document.getElementById('owner-crown').innerHTML = '<i class="fa fa-crown" style="color:#f1c40f; margin-left:5px;"></i>';
+        }
+      }
+
+      document.getElementById('logout-btn').onclick = () => signOut(auth);
+
+      // Load Characters with the new style
+      onSnapshot(query(collection(db, "characters"), orderBy("timestamp", "desc")), (snap) => {
+        const grid = document.getElementById('main-char-grid');
+        grid.innerHTML = '';
+        snap.forEach(doc => {
+          const char = doc.data();
+          grid.innerHTML += `
+            <div class="char-card">
+                <img src="${char.image}">
+                <div class="char-info">${char.name}</div>
+                <div class="char-stats">
+                    <span><i class="fa fa-star"></i> 0</span>
+                    <span><i class="fa fa-image"></i> 1</span>
+                </div>
+            </div>`;
+        });
+      });
+    }
+  });
+</script>
 </body>
 </html>
