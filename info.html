@@ -15,7 +15,12 @@
         
         .highlight { color: var(--th-blue); font-weight: bold; }
         .btn-fund { display: inline-block; background: var(--th-blue); color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-top: 10px; }
-        .btn-fund:hover { background: #007692; }
+        
+        /* Review Styling */
+        .review-input { width: 100%; height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; font-family: inherit; }
+        .review-item { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .review-user { font-weight: bold; color: var(--th-blue); font-size: 14px; }
+        .review-text { margin: 5px 0 0 0; font-size: 14px; color: #555; }
     </style>
 </head>
 <body>
@@ -26,8 +31,7 @@
     <div class="info-card">
         <div class="info-header">WHATS DIFFERENT?</div>
         <div class="info-body">
-            <p>Unlike other websites, we don't make you pay for <span class="highlight">customization</span>! We are made by artists, and funded by artists. Customization is always a need for our characters, and we had found it so aggravating how <i>we can't even make our characters feel like themselves due to paywalls!</i></p>
-            <p>Funding us is <b>completely optional</b>, but it really helps us make improvements to our site.</p>
+            <p>Unlike other websites, we don't make you pay for <span class="highlight">customization</span>! We are made by artists, and funded by artists.</p>
             <a href="fundus.html" class="btn-fund">Learn how to support us here!</a>
         </div>
     </div>
@@ -35,22 +39,73 @@
     <div class="info-card">
         <div class="info-header">MODERATION</div>
         <div class="info-body">
-            <p>We find moderation key, and we want to keep our site as safe as possible. We have various moderators, a key ticket and feedback system, and no unfair practices. We want to trust our community, and this includes keeping online threats away from <b>OC ARMY</b>!</p>
-            <p>Our moderators keep a close eye on the website. You can reach out to us via a ticket, or at <span class="highlight">ocarmy@gmail.com</span>.</p>
+            <p>We keep our site as safe as possible with various moderators and a key ticket system.</p>
         </div>
     </div>
 
     <div class="info-card">
-        <div class="info-header">CHARACTERS AND ORIGINALITY</div>
+        <div class="info-header">MEMBER REVIEWS</div>
         <div class="info-body">
-            <p>We love all characters of any kind! Part of this is understanding <b>kinsonas, cbcs, and other inspired OCs</b>. We don't think any characters are uncreative, and we fully support any and all inspired characters—as long as the original creators of the inspiration are okay with it, of course!</p>
-            <p>Character originality is also important, so we will make sure any potential copies or reuploads of your original characters are taken care of properly in a timely manner.</p>
+            <div id="auth-check-msg" style="margin-bottom: 10px; font-size: 13px; color: #888;">Log in to leave a review!</div>
+            <textarea id="rev-text" class="review-input" placeholder="What do you think of OCARMY?"></textarea>
+            <button class="btn-fund" id="post-rev" style="border:none; cursor:pointer;">Post Review</button>
+            
+            <div style="margin-top: 30px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 5px;">Recent Feedback</div>
+            <div id="review-list">
+                </div>
         </div>
     </div>
-
-    <p style="text-align: center; color: #888; font-style: italic;">We are a small and growing community, and you joining us helps a lot!</p>
-    <p style="text-align: center;"><a href="index.html" style="color: var(--th-blue); text-decoration: none;">&larr; Back to Home</a></p>
 </div>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
+    authDomain: "ocarmy-db.firebaseapp.com",
+    projectId: "ocarmy-db",
+    storageBucket: "ocarmy-db.appspot.com",
+    messagingSenderId: "848883355194",
+    appId: "1:848883355194:web:51254de3c4992d7750af03"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth();
+  let currentUsername = "Guest";
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUsername = user.email.split('@')[0];
+        document.getElementById('auth-check-msg').innerText = "Posting as: " + currentUsername;
+    }
+  });
+
+  document.getElementById('post-rev').onclick = async () => {
+    const text = document.getElementById('rev-text').value;
+    if(!text) return;
+    await addDoc(collection(db, "reviews"), { 
+        text: text, 
+        user: currentUsername, 
+        timestamp: serverTimestamp() 
+    });
+    document.getElementById('rev-text').value = '';
+  };
+
+  onSnapshot(query(collection(db, "reviews"), orderBy("timestamp", "desc")), (snap) => {
+    const list = document.getElementById('review-list');
+    list.innerHTML = '';
+    snap.forEach(doc => {
+      const rev = doc.data();
+      list.innerHTML += `
+        <div class="review-item">
+            <div class="review-user">${rev.user}</div>
+            <p class="review-text">${rev.text}</p>
+        </div>`;
+    });
+  });
+</script>
 </body>
 </html>
