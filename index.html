@@ -3,7 +3,7 @@
 <head>
     <title>OCARMY | Welcome</title>
     <style>
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #222; color: white; display: flex; flex-direction: column; min-height: 100vh; }
+        body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: #222; color: white; display: flex; flex-direction: column; min-height: 100vh; }
         
         /* The Big Dark Banner */
         .hero { background: #333; padding: 100px 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
@@ -14,42 +14,40 @@
             margin: 0; 
             text-transform: uppercase; 
             color: #fff;
-            text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.5);
+            text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.4);
         }
         .sub-text { color: #888; margin-top: 15px; font-size: 14px; }
 
         /* The Button Bar */
-        .auth-bar { background: #1a1a1a; padding: 20px; text-align: center; border-bottom: 4px solid #2c3e50; }
-        .auth-bar a { color: #eee; text-decoration: none; margin: 0 20px; font-size: 14px; transition: 0.3s; }
-        .auth-bar a:hover { color: #3498db; text-shadow: 0 0 5px #3498db; }
-        .auth-bar strong { color: #fff; }
+        .auth-bar { background: #1a1a1a; padding: 25px; text-align: center; border-bottom: 4px solid #2c3e50; }
+        .auth-bar a { color: #eee; text-decoration: none; margin: 0 30px; font-size: 15px; transition: 0.3s; }
+        .auth-bar a:hover { color: #3498db; text-shadow: 0 0 8px #3498db; }
 
         /* Policies Section */
-        .policy-container { max-width: 900px; margin: 40px auto; text-align: center; padding: 20px; }
-        .policy-title { color: #666; font-size: 12px; letter-spacing: 2px; margin-bottom: 20px; }
-        .policy-grid { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; }
-        .policy-link { color: #3498db; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .policy-container { background: #222; padding: 50px 20px; text-align: center; }
+        .policy-title { color: #666; font-size: 12px; letter-spacing: 2px; margin-bottom: 25px; font-weight: bold; }
+        .policy-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; max-width: 900px; margin: 0 auto; }
+        .policy-link { color: #3498db; text-decoration: none; font-size: 14px; font-weight: bold; }
         .policy-link:hover { text-decoration: underline; }
 
-        /* Recent Activity Glimpse */
-        .recent-section { background: #f7f7f7; color: #333; padding: 40px 20px; text-align: center; }
-        .grid { max-width: 1000px; margin: 20px auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
-        .mini-card { background: white; border: 1px solid #ddd; padding: 5px; border-radius: 4px; }
-        .mini-card img { width: 100%; height: 120px; object-fit: cover; }
+        /* Recent Activity Glimpse (Light Section at the bottom) */
+        .recent-section { background: #f7f7f7; color: #333; padding: 50px 20px; text-align: center; }
+        .grid { max-width: 1000px; margin: 30px auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+        .mini-card { background: white; border: 1px solid #ddd; padding: 8px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .mini-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 2px; }
     </style>
 </head>
 <body>
 
-<div id="intro-content">
     <div class="hero">
         <h1 class="glow-text">OCARMY</h1>
-        <p class="sub-text">... is in private beta. Welcome to the archive.</p>
+        <p class="sub-text">... is in invite beta. Check back later!</p>
     </div>
 
     <div class="auth-bar">
-        <a href="#">Check out our site!</a>
-        <a href="login.html">Have an account? <strong>Login</strong></a>
-        <a href="register.html">Read our terms of service!</a>
+        <a href="#">Have a look around</a>
+        <a href="login.html">Have an account? <strong>Login.</strong></a>
+        <a href="register.html">Have an invite code? <strong>Register here.</strong></a>
     </div>
 
     <div class="policy-container">
@@ -65,11 +63,10 @@
     </div>
 
     <div class="recent-section">
-        <div style="font-weight: bold; color: #666; margin-bottom: 20px;">RECENTLY UPLOADED CHARACTERS</div>
+        <div style="font-weight: bold; color: #888; letter-spacing: 1px; margin-bottom: 25px;">RECENTLY UPLOADED CHARACTERS</div>
         <div class="grid" id="recent-grid">
             </div>
     </div>
-</div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -89,20 +86,18 @@
   const auth = getAuth();
   const db = getFirestore(app);
 
-  // REDIRECT IF LOGGED IN
+  // If already logged in, send them to the actual archive dashboard
   onAuthStateChanged(auth, (user) => {
-    if (user) {
-      window.location.href = "dashboard.html";
-    }
+    if (user) { window.location.href = "dashboard.html"; }
   });
 
-  // LOAD RECENT CHARS
-  onSnapshot(query(collection(db, "characters"), orderBy("timestamp", "desc"), limit(6)), (snap) => {
+  // Load characters for the preview grid
+  onSnapshot(query(collection(db, "characters"), orderBy("timestamp", "desc"), limit(10)), (snap) => {
     const grid = document.getElementById('recent-grid');
     grid.innerHTML = '';
     snap.forEach(doc => {
-      const data = doc.data();
-      grid.innerHTML += `<div class="mini-card"><img src="${data.image}"><div style="font-size:10px; margin-top:5px; font-weight:bold;">${data.name}</div></div>`;
+      const char = doc.data();
+      grid.innerHTML += `<div class="mini-card"><img src="${char.image}"><div style="font-size:11px; margin-top:8px; font-weight:bold;">${char.name}</div></div>`;
     });
   });
 </script>
