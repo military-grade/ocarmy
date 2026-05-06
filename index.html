@@ -1,105 +1,84 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>OCARMY | Archive</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --th-blue: #2c3e50; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f7f7f7; color: #333; }
-        
-        /* The Big Landing Banner */
-        .landing-header { background: #333; color: white; text-align: center; padding: 100px 20px; position: relative; }
-        .landing-header h1 { font-size: 3.5rem; margin: 0; letter-spacing: 5px; text-transform: uppercase; }
-        .landing-header p { color: #aaa; margin-top: 10px; }
-        
-        .auth-bar { background: #222; padding: 15px; text-align: center; border-bottom: 5px solid var(--th-blue); }
-        .auth-bar a { color: white; text-decoration: none; margin: 0 15px; font-size: 14px; }
-        .auth-bar a:hover { text-decoration: underline; }
+<style>
+    :root { --th-blue: #2c3e50; --th-border: #dcdcdc; --th-text: #333; }
+    body { background: #f7f7f7; font-family: Arial, sans-serif; margin: 0; }
 
-        /* The Info Section */
-        .info-grid { max-width: 1100px; margin: 50px auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; padding: 0 20px; }
-        .info-col { text-align: center; }
-        .info-col h3 { border-bottom: 1px solid #ddd; padding-bottom: 10px; color: #666; font-weight: normal; }
-        .info-col p { font-size: 13px; color: #777; line-height: 1.6; }
-
-        /* Dashboard (Hidden by default) */
-        #dashboard { display: none; padding: 20px; }
-        .navbar { background: var(--th-blue); color: white; padding: 10px 20px; display: flex; justify-content: space-between; }
-        .container { max-width: 1200px; margin: 20px auto; display: flex; gap: 20px; }
-        .main-wall { flex: 3; background: white; border: 1px solid var(--th-border); padding: 20px; border-radius: 4px; }
-    </style>
-</head>
-<body>
-
-<div id="landing-view">
-    <div class="landing-header">
-        <h1>OCARMY</h1>
-        <p>...is a private character repository. Welcome!</p>
-    </div>
-    
-    <div class="auth-bar">
-        <a href="index.html">Have a look around</a>
-        <a href="login.html">Have an account? <strong>Login</strong></a>
-        <a href="register.html">Need an account? <strong>Register here</strong></a>
-    </div>
-
-    <div class="info-grid">
-        <div class="info-col">
-            <h3>Character Repository</h3>
-            <p>Store characters, set up profiles and upload image galleries. Organize characters into folders, tags or worlds.</p>
-        </div>
-        <div class="info-col">
-            <h3>Adoptable Trading</h3>
-            <p>Transfer characters on-site. View a gallery of all characters you've created and who their current owners are.</p>
-        </div>
-        <div class="info-col">
-            <h3>Roleplay Community</h3>
-            <p>Invite users and characters to your worlds for easy grouping. Make posts or comment on profiles.</p>
-        </div>
-    </div>
-</div>
-
-<div id="dashboard">
-    <nav class="navbar">
-        <div style="font-weight:bold;">OCARMY</div>
-        <div id="user-info"></div>
-    </nav>
-    <div class="container">
-        <div class="main-wall">
-            <h2 style="border-bottom: 1px solid #eee; padding-bottom:10px;">Recently Uploaded</h2>
-            <div id="oc-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                </div>
-        </div>
-    </div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
-    authDomain: "ocarmy-db.firebaseapp.com",
-    projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.appspot.com",
-    messagingSenderId: "848883355194",
-    appId: "1:848883355194:web:51254de3c4992d7750af03"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      document.getElementById('landing-view').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      document.getElementById('user-info').innerHTML = `${user.email} | <a href="#" id="logout" style="color:white;">Logout</a>`;
-      document.getElementById('logout').onclick = () => signOut(auth);
-    } else {
-      document.getElementById('landing-view').style.display = 'block';
-      document.getElementById('dashboard').style.display = 'none';
+    /* Center the whole site */
+    .container { 
+        max-width: 1000px; 
+        margin: 30px auto; 
+        display: flex; 
+        gap: 20px; 
+        padding: 0 15px; 
     }
-  });
-</script>
-</body>
-</html>
+
+    /* Sidebar Styles */
+    .sidebar { width: 240px; }
+    .card { background: white; border: 1px solid var(--th-border); border-radius: 4px; margin-bottom: 20px; }
+    .card-header { background: #fff; padding: 10px 15px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; }
+    .card-body { padding: 15px; }
+
+    /* Main Wall Styles */
+    .main-wall { flex-grow: 1; }
+    
+    /* Policy Links Block */
+    .policy-box { 
+        float: right; 
+        width: 200px; 
+        background: #fcfcfc; 
+        border: 1px solid #eee; 
+        padding: 15px; 
+        margin-left: 20px;
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+    .policy-box h4 { margin: 0 0 10px 0; font-size: 12px; color: #999; letter-spacing: 1px; }
+    .policy-link { display: block; color: #3498db; text-decoration: none; margin-bottom: 5px; }
+    .policy-link:hover { text-decoration: underline; }
+
+    /* Character Grid */
+    .char-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+        gap: 15px; 
+        clear: left;
+    }
+</style>
+
+<div class="container">
+    <div class="sidebar">
+        <div class="card">
+            <div class="card-header">MENU</div>
+            <div class="card-body">
+                <p><i class="fa fa-user"></i> Characters</p>
+                <p><i class="fa fa-folder"></i> Folders</p>
+                <p><i class="fa fa-link"></i> Commissions</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-wall">
+        <div class="card">
+            <div class="card-header">RECENT ACTIVITY</div>
+            <div class="card-body">
+                
+                <div class="policy-box">
+                    <h4>OUR POLICIES</h4>
+                    <a href="tos.html" class="policy-link">Terms of Service</a>
+                    <a href="adopts.html" class="policy-link">Adoptables</a>
+                    <a href="commissions.html" class="policy-link">Commissions</a>
+                    <a href="rights.html" class="policy-link">Character Rights</a>
+                    <a href="extra.html" class="policy-link">Extra Information</a>
+                    <a href="contact.html" class="policy-link">Contact</a>
+                </div>
+
+                <p style="margin-top: 0;">Welcome to OCARMY. Here are the latest additions to the archive:</p>
+                
+                <div class="char-grid" id="oc-grid">
+                    <p style="color:#aaa; font-style:italic;">No characters found...</p>
+                </div>
+
+                <div style="clear:both;"></div>
+            </div>
+        </div>
+    </div>
+</div>
