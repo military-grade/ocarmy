@@ -9,9 +9,16 @@
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #fff; color: #333; }
         
         /* Navbar */
-        .navbar { background: #212529; color: white; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; }
-        .nav-link { color: #aaa; text-decoration: none; font-size: 13px; margin-right: 15px; cursor: pointer; }
-        .nav-link:hover { color: white; }
+        <div class="nav-link">
+    <i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i>
+    <div class="dropdown">
+        <a href="submit_character.html" class="drop-item"><i class="fa fa-user"></i> Character</a>
+        <a href="#" class="drop-item"><i class="fa fa-newspaper"></i> Bulletin</a>
+        <a href="#" class="drop-item"><i class="fa fa-image"></i> Image</a>
+        <a href="#" class="drop-item"><i class="fa fa-book"></i> Literature</a>
+        <a href="#" class="drop-item"><i class="fa fa-globe"></i> World</a>
+    </div>
+</div>
 
         .container { display: flex; min-height: calc(100vh - 50px); }
 
