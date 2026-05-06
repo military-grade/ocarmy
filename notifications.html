@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OCARMY | Notifications</title>
+    <title>Alerts | OCARMY</title>
     <style>
         body { font-family: Arial; background: #f7f7f7; margin: 0; }
-        .nav { background: #212529; padding: 10px; color: white; }
-        .container { max-width: 800px; margin: 40px auto; background: white; border: 1px solid #dcdcdc; border-radius: 4px; padding: 20px; }
-        .notif-item { border-bottom: 1px solid #eee; padding: 15px; display: flex; align-items: center; }
-        .notif-icon { width: 30px; margin-right: 15px; color: #5bc0de; }
+        .nav { background: #212529; padding: 15px; color: white; font-weight: bold; }
+        .container { max-width: 800px; margin: 50px auto; background: white; border: 1px solid #dcdcdc; border-radius: 4px; min-height: 200px; }
+        .header { padding: 15px; border-bottom: 2px solid #008eb0; font-weight: bold; color: #555; }
+        .status-msg { padding: 40px; text-align: center; color: #888; font-size: 18px; }
     </style>
 </head>
 <body>
-    <div class="nav"><b>OCARMY</b> | Inbox</div>
+    <div class="nav">OCARMY</div>
     <div class="container">
-        <h2 style="border-bottom: 2px solid #008eb0; padding-bottom: 10px;">Recent Activity</h2>
-        <div class="notif-item"><i class="fa fa-star notif-icon"></i> Welcome to the army! No new alerts yet.</div>
-        <a href="dashboard.html" style="display:block; margin-top: 20px; color: #008eb0; text-decoration: none;">&larr; Back to Profile</a>
+        <div class="header">Character Management</div>
+        <div class="status-msg" id="alert-count">You have (0) new alerts.</div>
     </div>
 </body>
 </html>
