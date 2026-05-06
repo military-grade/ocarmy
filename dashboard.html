@@ -7,29 +7,37 @@
         :root { --th-dark: #212529; --th-blue: #008eb0; --th-border: #dcdcdc; --th-nav-blue: #5bc0de; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #fff; }
 
-        /* THE TOP BANNER (Screenshot Style) */
-        .navbar { background: var(--th-dark); color: white; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; }
-        .nav-left, .nav-right { display: flex; align-items: center; gap: 15px; }
-        .nav-brand { font-weight: bold; font-size: 18px; letter-spacing: 1px; color: white; text-decoration: none; }
-        .nav-link { color: #aaa; text-decoration: none; font-size: 13px; display: flex; align-items: center; gap: 5px; }
+        /* NAVBAR & NOTIFICATIONS */
+        .navbar { background: var(--th-dark); color: white; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; position: sticky; top: 0; z-index: 1000; }
+        .nav-left, .nav-right { display: flex; align-items: center; gap: 12px; }
+        .nav-brand { font-weight: bold; font-size: 18px; color: white; text-decoration: none; margin-right: 10px; }
+        
+        .nav-link { color: #aaa; text-decoration: none; font-size: 13px; display: flex; align-items: center; gap: 5px; position: relative; }
         .nav-link:hover { color: white; }
 
-        /* Blue Stat Boxes */
-        .nav-stat { background: var(--th-nav-blue); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; display: flex; align-items: center; gap: 4px; font-weight: bold; }
-        .crown-icon { color: #f1c40f; margin-left: 5px; text-shadow: 0 0 5px rgba(241, 196, 15, 0.5); }
+        /* Notification Icons (Linked to notifications.html) */
+        .notif-box { background: var(--th-nav-blue); color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 4px; transition: 0.2s; }
+        .notif-box:hover { background: #46b8da; box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
 
-        /* Sidebar & Layout */
+        /* Submit Dropdown */
+        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #333; border: 1px solid #444; border-radius: 0 0 4px 4px; min-width: 150px; z-index: 2000; }
+        .nav-link:hover .dropdown { display: block; }
+        .drop-item { display: block; padding: 10px 15px; color: #ccc; text-decoration: none; font-size: 13px; border-bottom: 1px solid #444; }
+        .drop-item:hover { background: #444; color: white; }
+
+        /* LAYOUT & SIDEBAR */
         .container { display: flex; min-height: calc(100vh - 50px); }
-        .sidebar { width: 200px; background: var(--th-blue); color: white; padding-top: 10px; }
-        .side-item { display: block; padding: 10px 20px; color: #e0f4f9; text-decoration: none; font-size: 13px; }
-        .side-item:hover { background: rgba(255,255,255,0.1); color: white; }
-
-        .main-content { flex-grow: 1; padding: 30px; max-width: 1000px; }
-        .card { border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; margin-bottom: 20px; }
+        .sidebar { width: 180px; background: var(--th-blue); color: white; }
         
-        /* Profile Settings Box */
-        .settings-box { background: #f9f9f9; border: 1px solid #ddd; padding: 20px; border-radius: 4px; display: none; }
-        textarea { width: 100%; height: 150px; font-family: monospace; margin-top: 10px; border: 1px solid #ccc; padding: 10px; }
+        .sidebar-user { background: rgba(0,0,0,0.1); padding: 15px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .avatar { width: 40px; height: 40px; background: #eee; border-radius: 2px; margin-right: 10px; border: 1px solid rgba(0,0,0,0.2); background-size: cover; background-position: center; }
+        
+        .side-item { display: block; padding: 10px 15px; color: #e0f4f9; text-decoration: none; font-size: 13px; }
+        .side-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .crown-icon { color: #f1c40f; text-shadow: 0 0 5px rgba(241, 196, 15, 0.5); font-size: 10px; margin-left: 2px; }
+
+        .main-content { flex-grow: 1; padding: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -39,49 +47,49 @@
         <a href="index.html" class="nav-brand">OCARMY</a>
         <a href="dashboard.html" class="nav-link"><i class="fa fa-home"></i> Profile</a>
         <a href="#" class="nav-link"><i class="fa fa-comments"></i> Forums</a>
-        <a href="#" class="nav-link">Browse <i class="fa fa-caret-down"></i></a>
-        <a href="submit_character.html" class="nav-link"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></a>
+        <div class="nav-link">Browse <i class="fa fa-caret-down"></i></div>
+        <div class="nav-link">
+            <i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i>
+            <div class="dropdown">
+                <a href="submit_character.html" class="drop-item">Character</a>
+                <a href="#" class="drop-item">Folder</a>
+                <a href="#" class="drop-item">Adoptable</a>
+                <a href="#" class="drop-item">Commission</a>
+            </div>
+        </div>
     </div>
 
     <div class="nav-right">
-        <div class="nav-stat"><i class="fa fa-heart"></i> 2</div>
-        <div class="nav-stat"><i class="fa fa-star"></i> 449</div>
-        <div class="nav-stat"><i class="fa fa-bars"></i> 28</div>
-        <div class="nav-stat"><i class="fa fa-comment"></i> 2</div>
-        <div class="nav-link" id="user-display">
-            <span id="username-text">User</span>
-            <span id="owner-crown"></span>
-            <i class="fa fa-caret-down"></i>
+        <a href="notifications.html" class="notif-box"><i class="fa fa-heart"></i> 0</a>
+        <a href="notifications.html" class="notif-box"><i class="fa fa-star"></i> 0</a>
+        <a href="notifications.html" class="notif-box"><i class="fa fa-envelope"></i> 0</a>
+        <a href="notifications.html" class="notif-box"><i class="fa fa-bell"></i> 0</a>
+        <div class="nav-link">
+            <span id="nav-username">User</span> <i class="fa fa-caret-down"></i>
         </div>
     </div>
 </nav>
 
 <div class="container">
     <div class="sidebar">
-        <div style="padding: 15px; font-weight: bold; background: rgba(0,0,0,0.1);">
-            <i class="fa fa-user"></i> <span id="sidebar-name">User</span>
+        <div class="sidebar-user">
+            <div class="avatar" id="sidebar-avatar"></div>
+            <div style="font-size: 13px; font-weight: bold;">
+                <span id="side-username">User</span>
+                <span id="owner-crown"></span>
+            </div>
         </div>
-        <a href="#" class="side-item">Bulletins</a>
-        <a href="#" class="side-item">Characters</a>
-        <a href="#" class="side-item">Links</a>
-        <a href="#" class="side-item">Worlds</a>
-        <a href="javascript:void(0)" onclick="openSettings()" class="side-item" style="color: #fff; font-weight: bold;"><i class="fa fa-cog"></i> Profile Settings</a>
-        <a href="#" id="logout-btn" class="side-item">Logout</a>
+        <a href="#" class="side-item"><i class="fa fa-newspaper"></i> Bulletins</a>
+        <a href="#" class="side-item"><i class="fa fa-user"></i> Characters</a>
+        <a href="#" class="side-item"><i class="fa fa-link"></i> Links</a>
+        <a href="#" class="side-item"><i class="fa fa-cog"></i> Settings</a>
+        <a href="#" id="logout-btn" class="side-item"><i class="fa fa-sign-out-alt"></i> Logout</a>
     </div>
 
     <div class="main-content">
-        <div id="settings-area" class="settings-box">
-            <h3><i class="fa fa-paint-brush"></i> Profile Customization</h3>
-            <p style="font-size: 13px; color: #666;">Enter your Custom CSS or HTML below to change your profile's look.</p>
-            <textarea id="custom-code" placeholder="/* CSS goes here */"></textarea>
-            <button onclick="saveStyles()" style="background: var(--th-blue); color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-top: 10px; cursor: pointer;">Save Settings</button>
-        </div>
-
-        <div id="activity-area">
-            <h2 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Recent Characters & Designs</h2>
-            <div id="char-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px;">
-                </div>
-        </div>
+        <h2 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Recent Characters & Designs</h2>
+        <div class="grid" id="char-grid">
+            </div>
     </div>
 </div>
 
@@ -110,33 +118,26 @@
       const userDoc = await getDoc(doc(db, "users", user.uid));
       if (userDoc.exists()) {
         const username = userDoc.data().username;
-        document.getElementById('username-text').innerText = username;
-        document.getElementById('sidebar-name').innerText = username;
+        document.getElementById('nav-username').innerText = username;
+        document.getElementById('side-username').innerText = username;
 
-        // OWNER CROWN CHECK
         if (username.toLowerCase() === "military grade") {
-            document.getElementById('owner-crown').innerHTML = '<i class="fa fa-crown crown-icon" title="Site Owner"></i>';
+            document.getElementById('owner-crown').innerHTML = '<i class="fa fa-crown crown-icon"></i>';
         }
       }
-      
       document.getElementById('logout-btn').onclick = () => signOut(auth);
       
-      // Load Characters
+      // Pull characters
       onSnapshot(query(collection(db, "characters"), orderBy("timestamp", "desc")), (snap) => {
         const grid = document.getElementById('char-grid');
         grid.innerHTML = '';
         snap.forEach(doc => {
           const char = doc.data();
-          grid.innerHTML += `<div style="border:1px solid #ddd; border-radius:4px; text-align:center; padding:5px;"><img src="${char.image}" style="width:100%; height:150px; object-fit:cover;"><div style="background:var(--th-blue); color:white; font-size:11px; padding:5px; font-weight:bold;">${char.name}</div></div>`;
+          grid.innerHTML += `<div style="border:1px solid #ddd; text-align:center; padding:5px;"><img src="${char.image}" style="width:100%; height:150px; object-fit:cover;"><div style="background:var(--th-blue); color:white; font-size:11px; padding:5px; font-weight:bold;">${char.name}</div></div>`;
         });
       });
     }
   });
-
-  window.openSettings = () => {
-    document.getElementById('settings-area').style.display = 'block';
-    document.getElementById('activity-area').style.display = 'none';
-  };
 </script>
 </body>
 </html>
