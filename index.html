@@ -1,133 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OCARMY | Archive</title>
+    <title>OC ARMY | Archive</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --th-blue: #2c3e50; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f7f7f7; color: #333; }
+        :root { --th-blue: #2c3e50; --th-light-bg: #f7f7f7; --th-border: #dcdcdc; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-light-bg); }
         
-        /* Centering the site */
-        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        /* THE OG NAVBAR */
+        .navbar { background-color: var(--th-blue); color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-item { margin-right: 20px; cursor: pointer; color: #ddd; text-decoration: none; font-size: 14px; position: relative; }
+        .nav-item:hover { color: white; }
 
-        /* The Big Landing Banner */
-        .landing-header { background: #333; color: white; text-align: center; padding: 80px 20px; border-bottom: 5px solid var(--th-blue); }
-        .landing-header h1 { font-size: 3.5rem; margin: 0; letter-spacing: 5px; text-transform: uppercase; }
+        /* THE DROPDOWN */
+        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid var(--th-border); min-width: 180px; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 4px; }
+        .nav-item:hover .dropdown { display: block; }
+        .drop-item { display: block; padding: 12px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; }
+        .drop-item:hover { background: #f0f0f0; }
+
+        /* CENTERED CONTAINER */
+        .container { max-width: 1200px; margin: 30px auto; display: flex; gap: 20px; padding: 0 15px; }
         
-        /* Button Bar */
-        .auth-bar { background: #222; padding: 15px; text-align: center; margin-bottom: 40px; }
-        .auth-bar a { color: white; text-decoration: none; margin: 0 15px; font-size: 14px; }
-        .auth-bar a:hover { text-decoration: underline; }
+        /* SIDEBAR CARD */
+        .sidebar { width: 250px; background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 15px; height: fit-content; }
+        
+        /* MAIN CONTENT CARD */
+        .main-wall { flex-grow: 1; background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; min-height: 400px; position: relative; }
+        .section-header { border-bottom: 1px solid var(--th-border); padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; color: #555; text-transform: uppercase; }
 
-        /* The Policy Section (Replacing the 3 Columns) */
-        .policy-section { text-align: center; margin-bottom: 50px; }
-        .policy-section h3 { font-size: 14px; color: #999; letter-spacing: 2px; margin-bottom: 20px; }
-        .policy-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
-        .policy-link { color: #3498db; text-decoration: none; font-weight: bold; font-size: 15px; }
+        /* POLICY BOX (Tucked in the corner above recent chars) */
+        .policy-box { float: right; width: 200px; background: #fcfcfc; border: 1px solid #eee; padding: 15px; margin-left: 20px; margin-bottom: 20px; font-size: 13px; }
+        .policy-box h4 { margin: 0 0 10px 0; font-size: 11px; color: #999; letter-spacing: 1px; }
+        .policy-link { display: block; color: #3498db; text-decoration: none; margin-bottom: 5px; }
         .policy-link:hover { text-decoration: underline; }
 
-        /* Recent Characters Feed */
-        .section-header { border-bottom: 1px solid var(--th-border); padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; color: #666; }
-        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
-        .char-card { background: white; border: 1px solid var(--th-border); padding: 10px; border-radius: 4px; text-align: center; }
-        .char-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 2px; }
-
-        /* Hide dashboard initially */
-        #dashboard { display: none; }
-    </style>
-</head>
-<body>
-
-<div id="landing-view">
-    <div class="landing-header">
-        <h1>OCARMY</h1>
-        <p>...is a private character repository.</p>
-    </div>
-    
-    <div class="auth-bar">
-        <a href="index.html">Check out our site!</a>
-        <a href="login.html">Have an account? <strong>Login</strong></a>
-        <a href="tos.html">Read our terms of service!</a>
-    </div>
-
-    <div class="container">
-        <div class="policy-section">
-            <h3>OUR POLICIES</h3>
-            <div class="policy-grid">
-                <a href="tos.html" class="policy-link">Terms of Service</a>
-                <a href="adopts.html" class="policy-link">Adoptables</a>
-                <a href="commissions.html" class="policy-link">Commissions</a>
-                <a href="rights.html" class="policy-link">Character Rights</a>
-                <a href="extra.html" class="policy-link">Extra Information</a>
-                <a href="contact.html" class="policy-link">Contact</a>
-            </div>
-        </div>
-
-        <div class="section-header">RECENTLY UPLOADED CHARACTERS</div>
-        <div id="char-feed" class="char-grid">
-            <p style="color: #aaa;">Loading the army...</p>
-        </div>
-    </div>
-</div>
-
-<div id="dashboard">
-    <div class="auth-bar">
-        <span id="user-display" style="color:white; margin-right:20px;"></span>
-        <a href="#" id="logout-btn">Logout</a>
-    </div>
-    <div class="container">
-        <h2>Welcome to the Dashboard</h2>
-        <p>Use the Submit menu at the top to add to your archive.</p>
-    </div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
-    authDomain: "ocarmy-db.firebaseapp.com",
-    projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.appspot.com",
-    messagingSenderId: "848883355194",
-    appId: "1:848883355194:web:51254de3c4992d7750af03"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getFirestore(app);
-
-  // AUTH LOGIC
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      document.getElementById('landing-view').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      document.getElementById('user-display').innerText = `Logged in as ${user.email}`;
-      document.getElementById('logout-btn').onclick = () => signOut(auth);
-    } else {
-      document.getElementById('landing-view').style.display = 'block';
-      document.getElementById('dashboard').style.display = 'none';
-    }
-  });
-
-  // RECENT CHARACTERS FEED LOGIC
-  const q = query(collection(db, "characters"), orderBy("timestamp", "desc"), limit(8));
-  onSnapshot(q, (snapshot) => {
-    const feed = document.getElementById('char-feed');
-    feed.innerHTML = '';
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      feed.innerHTML += `
-        <div class="char-card">
-            <img src="${data.image}">
-            <div style="margin-top:10px; font-weight:bold; font-size:13px;">${data.name}</div>
-        </div>
-      `;
-    });
-  });
-</script>
-
-</body>
-</html>
+        /* CHAR GRID
