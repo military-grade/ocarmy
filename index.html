@@ -6,22 +6,44 @@
     <style>
         :root { --th-blue: #2c3e50; --th-light-bg: #f7f7f7; --th-border: #dcdcdc; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-light-bg); }
+        
+        /* Navbar Styles */
         .navbar { background-color: var(--th-blue); color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .nav-item { margin-right: 20px; cursor: pointer; color: #ddd; text-decoration: none; font-size: 14px; }
+        .nav-item { margin-right: 20px; cursor: pointer; color: #ddd; text-decoration: none; font-size: 14px; position: relative; }
         .nav-item:hover { color: white; }
+
+        /* NEW: Dropdown Menu Logic */
+        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid var(--th-border); min-width: 180px; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 4px; }
+        .nav-item:hover .dropdown { display: block; }
+        .drop-item { display: block; padding: 12px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; }
+        .drop-item:hover { background: #f0f0f0; }
+
         .container { max-width: 1200px; margin: 30px auto; display: flex; gap: 20px; }
         .sidebar { width: 250px; background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 15px; }
         .main-wall { flex-grow: 1; background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; min-height: 400px; }
         .section-header { border-bottom: 1px solid var(--th-border); padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; color: #555; }
+        
+        /* OC Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
     <div class="nav-left" style="display:flex; align-items:center;">
-        <a href="index.html" class="nav-item" style="font-weight: bold; color: white; font-size: 18px;">OC ARMY</a>
-        <div class="nav-item"><i class="fa fa-plus"></i> Upload</div>
+        <a href="index.html" class="nav-item" style="font-weight: bold; color: white; font-size: 18px;">OCARMY</a>
+        
+        <div class="nav-item">
+            <i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i>
+            <div class="dropdown">
+                <a href="submit_character.html" class="drop-item"><i class="fa fa-user"></i> Character</a>
+                <a href="#" class="drop-item"><i class="fa fa-folder"></i> Folder</a>
+                <a href="#" class="drop-item"><i class="fa fa-star"></i> Adoptable</a>
+                <a href="#" class="drop-item"><i class="fa fa-file-invoice-dollar"></i> Commission Sheet</a>
+            </div>
+        </div>
     </div>
+    
     <div class="nav-right" id="auth-status">
         <a href="register.html" class="nav-item">Register</a>
     </div>
@@ -36,13 +58,16 @@
     </div>
     <div class="main-wall">
         <div class="section-header">RECENT ACTIVITY</div>
-        <p id="welcome-msg">Welcome to the army. Please register to start your archive!</p>
+        <div class="grid" id="oc-grid">
+            </div>
+        <p id="welcome-msg">Welcome to Ocarmy. Please register to start your archive!</p>
     </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
@@ -55,16 +80,10 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth();
+  const db = getFirestore(app);
 
   onAuthStateChanged(auth, (user) => {
     const statusDiv = document.getElementById('auth-status');
     const welcome = document.getElementById('welcome-msg');
     if (user) {
-      statusDiv.innerHTML = `<span class="nav-item">User: ${user.email}</span><a href="#" id="logout" class="nav-item">Logout</a>`;
-      welcome.innerHTML = `<b>Welcome back, Commander.</b> Your archive is ready.`;
-      document.getElementById('logout').onclick = () => signOut(auth);
-    }
-  });
-</script>
-</body>
-</html>
+      statusDiv.innerHTML = `<span class="nav-item">User: ${user.email}</span>
