@@ -3,159 +3,57 @@
 <head>
     <title>OCARMY | Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!DOCTYPE html>
-<html>
-<head>
-    <title>OCARMY | Notifications</title>
     <style>
-        body { font-family: Arial; background: #f7f7f7; margin: 0; }
-        .nav { background: #212529; padding: 10px; color: white; }
-        .container { max-width: 800px; margin: 40px auto; background: white; border: 1px solid #dcdcdc; border-radius: 4px; padding: 20px; }
-        .notif-item { border-bottom: 1px solid #eee; padding: 15px; display: flex; align-items: center; }
-        .notif-icon { width: 30px; margin-right: 15px; color: #5bc0de; }
-    </style>
-</head>
-<body>
-    <div class="nav"><b>OCARMY</b> | Inbox</div>
-    <div class="container">
-        <h2 style="border-bottom: 2px solid #008eb0; padding-bottom: 10px;">Recent Activity</h2>
-        <div class="notif-item"><i class="fa fa-star notif-icon"></i> Welcome to the army! No new alerts yet.</div>
-        <a href="dashboard.html" style="display:block; margin-top: 20px; color: #008eb0; text-decoration: none;">&larr; Back to Profile</a>
-    </div>
-</body>
-</html>
-
-        /* NAVBAR & NOTIFICATIONS */
-        .navbar { background: var(--th-dark); color: white; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; position: sticky; top: 0; z-index: 1000; }
+        :root { --th-dark: #212529; --th-blue: #008eb0; --th-border: #dcdcdc; --th-nav-blue: #5bc0de; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #fff; }
+        .navbar { background: var(--th-dark); color: white; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; }
         .nav-left, .nav-right { display: flex; align-items: center; gap: 12px; }
-        .nav-brand { font-weight: bold; font-size: 18px; color: white; text-decoration: none; margin-right: 10px; }
-        
-        .nav-link { color: #aaa; text-decoration: none; font-size: 13px; display: flex; align-items: center; gap: 5px; position: relative; }
-        .nav-link:hover { color: white; }
-
-        /* Notification Icons (Linked to notifications.html) */
-        .notif-box { background: var(--th-nav-blue); color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 4px; transition: 0.2s; }
-        .notif-box:hover { background: #46b8da; box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
-
-        /* Submit Dropdown */
-        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #333; border: 1px solid #444; border-radius: 0 0 4px 4px; min-width: 150px; z-index: 2000; }
+        .nav-brand { font-weight: bold; font-size: 18px; color: white; text-decoration: none; }
+        .nav-link { color: #aaa; text-decoration: none; font-size: 13px; cursor: pointer; position: relative; }
+        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #333; min-width: 150px; z-index: 10; border: 1px solid #444; }
         .nav-link:hover .dropdown { display: block; }
-        .drop-item { display: block; padding: 10px 15px; color: #ccc; text-decoration: none; font-size: 13px; border-bottom: 1px solid #444; }
-        .drop-item:hover { background: #444; color: white; }
-
-        /* LAYOUT & SIDEBAR */
+        .drop-item { display: block; padding: 10px; color: #ccc; text-decoration: none; border-bottom: 1px solid #444; }
+        .notif-box { background: var(--th-nav-blue); color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; text-decoration: none; }
         .container { display: flex; min-height: calc(100vh - 50px); }
         .sidebar { width: 180px; background: var(--th-blue); color: white; }
-        
-        .sidebar-user { background: rgba(0,0,0,0.1); padding: 15px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .avatar { width: 40px; height: 40px; background: #eee; border-radius: 2px; margin-right: 10px; border: 1px solid rgba(0,0,0,0.2); background-size: cover; background-position: center; }
-        
+        .sidebar-user { background: rgba(0,0,0,0.1); padding: 15px; display: flex; align-items: center; }
+        .avatar { width: 40px; height: 40px; background: #eee; border-radius: 2px; margin-right: 10px; background-size: cover; }
         .side-item { display: block; padding: 10px 15px; color: #e0f4f9; text-decoration: none; font-size: 13px; }
-        .side-item:hover { background: rgba(255,255,255,0.1); color: white; }
-        .crown-icon { color: #f1c40f; text-shadow: 0 0 5px rgba(241, 196, 15, 0.5); font-size: 10px; margin-left: 2px; }
-
         .main-content { flex-grow: 1; padding: 30px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .crown-icon { color: #f1c40f; margin-left: 5px; }
     </style>
 </head>
 <body>
-
-<nav class="navbar">
-    <div class="nav-left">
-        <a href="index.html" class="nav-brand">OCARMY</a>
-        <a href="dashboard.html" class="nav-link"><i class="fa fa-home"></i> Profile</a>
-        <a href="#" class="nav-link"><i class="fa fa-comments"></i> Forums</a>
-        <div class="nav-link">Browse <i class="fa fa-caret-down"></i></div>
-        <div class="nav-link">
-            <i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i>
-            <div class="dropdown">
-                <a href="submit_character.html" class="drop-item">Character</a>
-                <a href="#" class="drop-item">Folder</a>
-                <a href="#" class="drop-item">Adoptable</a>
-                <a href="#" class="drop-item">Commission</a>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html" class="nav-brand">OCARMY</a>
+            <a href="dashboard.html" class="nav-link"><i class="fa fa-home"></i> Profile</a>
+            <div class="nav-link"><i class="fa fa-plus"></i> Submit
+                <div class="dropdown">
+                    <a href="submit_character.html" class="drop-item">Character</a>
+                    <a href="#" class="drop-item">Folder</a>
+                    <a href="#" class="drop-item">Adoptable</a>
+                    <a href="#" class="drop-item">Commission</a>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="nav-right">
-        <a href="notifications.html" class="notif-box"><i class="fa fa-heart"></i> 0</a>
-        <a href="notifications.html" class="notif-box"><i class="fa fa-star"></i> 0</a>
-        <a href="notifications.html" class="notif-box"><i class="fa fa-envelope"></i> 0</a>
-        <a href="notifications.html" class="notif-box"><i class="fa fa-bell"></i> 0</a>
-        <div class="nav-link">
-            <span id="nav-username">User</span> <i class="fa fa-caret-down"></i>
+        <div class="nav-right" id="notif-container">
+            </div>
+    </nav>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-user">
+                <div class="avatar" id="sidebar-avatar"></div>
+                <div><b id="side-username">User</b><span id="owner-crown"></span></div>
+            </div>
+            <a href="#" class="side-item">Bulletins</a>
+            <a href="#" class="side-item">Characters</a>
+            <a href="settings.html" class="side-item">Settings</a>
+        </div>
+        <div class="main-content">
+            <h2 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Recent Characters & Designs</h2>
+            <div id="char-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:15px;"></div>
         </div>
     </div>
-</nav>
-
-<div class="container">
-    <div class="sidebar">
-        <div class="sidebar-user">
-            <div class="avatar" id="sidebar-avatar"></div>
-            <div style="font-size: 13px; font-weight: bold;">
-                <span id="side-username">User</span>
-                <span id="owner-crown"></span>
-            </div>
-        </div>
-        <a href="#" class="side-item"><i class="fa fa-newspaper"></i> Bulletins</a>
-        <a href="#" class="side-item"><i class="fa fa-user"></i> Characters</a>
-        <a href="#" class="side-item"><i class="fa fa-link"></i> Links</a>
-        <a href="#" class="side-item"><i class="fa fa-cog"></i> Settings</a>
-        <a href="#" id="logout-btn" class="side-item"><i class="fa fa-sign-out-alt"></i> Logout</a>
-    </div>
-
-    <div class="main-content">
-        <h2 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Recent Characters & Designs</h2>
-        <div class="grid" id="char-grid">
-            </div>
-    </div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
-    authDomain: "ocarmy-db.firebaseapp.com",
-    projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.appspot.com",
-    messagingSenderId: "848883355194",
-    appId: "1:848883355194:web:51254de3c4992d7750af03"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getFirestore(app);
-
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.location.href = "index.html";
-    } else {
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const username = userDoc.data().username;
-        document.getElementById('nav-username').innerText = username;
-        document.getElementById('side-username').innerText = username;
-
-        if (username.toLowerCase() === "military grade") {
-            document.getElementById('owner-crown').innerHTML = '<i class="fa fa-crown crown-icon"></i>';
-        }
-      }
-      document.getElementById('logout-btn').onclick = () => signOut(auth);
-      
-      // Pull characters
-      onSnapshot(query(collection(db, "characters"), orderBy("timestamp", "desc")), (snap) => {
-        const grid = document.getElementById('char-grid');
-        grid.innerHTML = '';
-        snap.forEach(doc => {
-          const char = doc.data();
-          grid.innerHTML += `<div style="border:1px solid #ddd; text-align:center; padding:5px;"><img src="${char.image}" style="width:100%; height:150px; object-fit:cover;"><div style="background:var(--th-blue); color:white; font-size:11px; padding:5px; font-weight:bold;">${char.name}</div></div>`;
-        });
-      });
-    }
-  });
-</script>
 </body>
 </html>
