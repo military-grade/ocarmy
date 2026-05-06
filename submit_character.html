@@ -1,47 +1,122 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Submit Character | OCARMY</title>
+    <title>Edit Profile Content | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --th-teal: #5bc0de; --th-dark: #212529; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: Arial, sans-serif; background: var(--th-bg); color: #333; }
-        
-        .navbar { background: var(--th-dark); color: white; padding: 10px 20px; font-weight: bold; }
-        .container { max-width: 600px; margin: 50px auto; background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 30px; }
-        
-        h2 { border-bottom: 2px solid var(--th-teal); padding-bottom: 10px; margin-bottom: 20px; color: #444; }
-        
-        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #666; }
-        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        
-        .btn-submit { background: var(--th-teal); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-submit:hover { background: #46b8da; }
-        
-        .back-link { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; font-size: 13px; }
+        :root { --th-teal: #5bc0de; --th-dark: #251e2e; --th-bg: #1a1523; --th-border: #332c3d; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #eee; display: flex; }
+
+        /* Sidebar Navigation */
+        .sidebar { width: 240px; background: #3b2a51; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; }
+        .side-header { padding: 15px; background: rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .nav-link { display: block; padding: 12px 20px; color: #bbb; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .nav-link.active { background: var(--th-teal); color: white; border-left: 4px solid white; }
+
+        /* Main Editor Layout */
+        .main { flex-grow: 1; padding: 30px; max-width: 1100px; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-wysiwyg { background: #333; color: white; border: 1px solid #444; padding: 6px 15px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+
+        /* TOYHOUSE STYLE TOOLBAR */
+        .editor-container { background: white; border: 1px solid var(--th-border); border-radius: 4px; overflow: hidden; margin-bottom: 25px; color: #333; }
+        .toolbar { background: #fdfdfd; padding: 10px; border-bottom: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .toolbar i, .toolbar select { cursor: pointer; color: #666; font-size: 14px; }
+        .toolbar i:hover { color: var(--th-teal); }
+        .toolbar select { border: 1px solid #ddd; border-radius: 3px; font-size: 12px; padding: 2px; }
+        .sep { width: 1px; height: 20px; background: #ddd; margin: 0 5px; }
+
+        /* THE ACTUAL TEXT AREA */
+        #editor-body { 
+            width: 100%; 
+            min-height: 400px; 
+            padding: 30px; 
+            font-size: 14px; 
+            outline: none; 
+            background: white;
+            white-space: pre-wrap; /* This keeps your "further down" text from shifting up */
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        /* Profile Block Cards */
+        .card { background: var(--th-dark); border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; margin-top: 30px; }
+        .card-label { font-size: 13px; color: #bbb; font-weight: bold; margin-bottom: 15px; display: block; text-transform: uppercase; }
+        .block-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .block-row select { background: #1a1523; color: white; border: 1px solid #443c50; padding: 8px; border-radius: 4px; width: 300px; }
+
+        .btn-save { background: var(--th-teal); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; font-size: 15px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-<div class="navbar">OCARMY | Submission</div>
+<div class="sidebar">
+    <div class="side-header">
+        <div id="side-pfp" style="width:30px; height:30px; background:#eee; background-size:cover;"></div>
+        <span id="side-user">User</span>
+    </div>
+    <a href="dashboard.html" class="nav-link"><i class="fa fa-arrow-left"></i> Back to Profile</a>
+    <a href="settings.html" class="nav-link">General Settings</a>
+    <a href="#" class="nav-link active">Profile Content</a>
+</div>
 
-<div class="container">
-    <h2><i class="fa fa-user-plus"></i> Submit Character</h2>
-    
-    <label>Character Name</label>
-    <input type="text" id="char-name" placeholder="Enter character name...">
-    
-    <label>Character Image URL</label>
-    <input type="text" id="char-img" placeholder="Paste link (Imgur, Discord, etc.)">
-    
-    <button class="btn-submit" onclick="submitOC()">Upload to Army</button>
-    
-    <a href="dashboard.html" class="back-link">← Cancel and return to profile</a>
+<div class="main">
+    <div class="header-flex">
+        <h2 style="margin:0;">Edit Profile</h2>
+        <button class="btn-wysiwyg" onclick="toggleCodeMode()">Disable WYSIWYG</button>
+    </div>
+
+    <div class="editor-container">
+        <div class="toolbar" id="main-toolbar">
+            <i class="fa fa-bold" onclick="exec('bold')"></i>
+            <i class="fa fa-italic" onclick="exec('italic')"></i>
+            <i class="fa fa-underline" onclick="exec('underline')"></i>
+            <i class="fa fa-strikethrough" onclick="exec('strikethrough')"></i>
+            <div class="sep"></div>
+            <select onchange="exec('fontName', this.value)">
+                <option value="Arial">Arial</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Courier New">Monospace</option>
+            </select>
+            <select onchange="exec('fontSize', this.value)">
+                <option value="2">Small</option>
+                <option value="3" selected>Normal</option>
+                <option value="5">Large</option>
+            </select>
+            <input type="color" onchange="exec('foreColor', this.value)" title="Text Color" style="width:20px; height:20px; border:none; padding:0; background:none; cursor:pointer;">
+            <div class="sep"></div>
+            <i class="fa fa-link" onclick="addLink()"></i>
+            <i class="fa fa-image" onclick="addImage()"></i>
+            <i class="fa fa-align-center" onclick="exec('justifyCenter')"></i>
+            <i class="fa fa-list-ul" onclick="exec('insertUnorderedList')"></i>
+            <i class="fa fa-quote-left" onclick="exec('formatBlock', 'blockquote')"></i>
+        </div>
+
+        <div id="editor-body" contenteditable="true">
+            <p>hello!</p>
+            <p><br></p>
+            <p><br></p>
+            <p>hello but further down</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="card-label">Profile Page Blocks</span>
+        <div class="block-row">
+            <span>Display recent characters</span>
+            <select id="block-recent">
+                <option value="all">Display recent characters and designs</option>
+                <option value="none">Hide</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="btn-save" onclick="saveChanges()">Save Changes</button>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const firebaseConfig = {
@@ -55,38 +130,64 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
   const db = getFirestore(app);
+  const auth = getAuth();
+  const editor = document.getElementById('editor-body');
 
-  // Ensure user is logged in
-  onAuthStateChanged(auth, (user) => {
-    if (!user) window.location.href = "index.html";
+  // Load existing profile content
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            document.getElementById('side-user').innerText = data.username;
+            if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+            if(data.profileHTML) editor.innerHTML = data.profileHTML;
+        }
+    }
   });
 
-  window.submitOC = async () => {
-    const name = document.getElementById('char-name').value;
-    const img = document.getElementById('char-img').value;
+  // TOOLBAR FUNCTIONS
+  window.exec = (cmd, val = null) => {
+    document.execCommand(cmd, false, val);
+  };
+
+  window.addLink = () => {
+    const url = prompt("Enter URL:");
+    if(url) exec('createLink', url);
+  };
+
+  window.addImage = () => {
+    const url = prompt("Enter Image URL:");
+    if(url) exec('insertImage', url);
+  };
+
+  // HTML Toggle Logic
+  window.toggleCodeMode = () => {
+    const btn = document.querySelector('.btn-wysiwyg');
+    if (btn.innerText === "Disable WYSIWYG") {
+        editor.innerText = editor.innerHTML; // Show raw code
+        document.getElementById('main-toolbar').style.opacity = "0.3";
+        document.getElementById('main-toolbar').style.pointerEvents = "none";
+        btn.innerText = "Enable WYSIWYG";
+    } else {
+        editor.innerHTML = editor.innerText; // Turn code back into visuals
+        document.getElementById('main-toolbar').style.opacity = "1";
+        document.getElementById('main-toolbar').style.pointerEvents = "auto";
+        btn.innerText = "Disable WYSIWYG";
+    }
+  };
+
+  // SAVE CHANGES
+  window.saveChanges = async () => {
     const user = auth.currentUser;
-
-    if (!name || !img) {
-        alert("Please provide both a name and an image link!");
-        return;
-    }
-
-    try {
-        // Save character with INDEPENDENT ownerID
-        await addDoc(collection(db, "characters"), {
-            name: name,
-            image: img,
-            ownerID: user.uid,
-            timestamp: serverTimestamp()
-        });
-        
-        alert(name + " has joined the army!");
-        window.location.href = "dashboard.html";
-    } catch (e) {
-        alert("Error: " + e.message);
-    }
+    const content = (document.querySelector('.btn-wysiwyg').innerText === "Enable WYSIWYG") ? editor.innerText : editor.innerHTML;
+    
+    await updateDoc(doc(db, "users", user.uid), {
+        profileHTML: content,
+        blockRecent: document.getElementById('block-recent').value
+    });
+    alert("Profile saved successfully!");
   };
 </script>
 </body>
