@@ -6,70 +6,22 @@
     <style>
         :root { --th-blue: #008eb0; --th-border: #dcdcdc; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f7f7f7; color: #333; }
-        
         .navbar { background: #212529; color: white; padding: 10px 20px; font-weight: bold; font-size: 14px; }
-        
         .container { max-width: 800px; margin: 40px auto; background: white; border: 1px solid var(--th-border); border-radius: 4px; overflow: hidden; }
-        
-        .card-header { 
-            padding: 15px; 
-            border-bottom: 2px solid var(--th-blue); 
-            font-weight: bold; 
-            font-size: 1.2rem; 
-            color: #555; 
-        }
-
+        .card-header { padding: 15px; border-bottom: 2px solid var(--th-blue); font-weight: bold; font-size: 1.2rem; color: #555; }
         .notif-body { padding: 40px; text-align: center; }
-        
         .alert-text { font-size: 18px; color: #888; margin-bottom: 20px; }
-        
         .back-link { color: var(--th-blue); text-decoration: none; font-size: 14px; }
-        .back-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-
-<div class="navbar">OCARMY | Inbox</div>
-
-<div class="container">
-    <div class="card-header">Recent Activity</div>
-    
-    <div class="notif-body">
-        <div class="alert-text" id="alert-display">You have (0) new alerts.</div>
-        
-        <a href="dashboard.html" class="back-link">← Back to Profile</a>
+    <div class="navbar">OCARMY | Inbox</div>
+    <div class="container">
+        <div class="card-header">Recent Activity</div>
+        <div class="notif-body">
+            <div class="alert-text" id="alert-display">You have (0) new alerts.</div>
+            <a href="dashboard.html" class="back-link">← Back to Profile</a>
+        </div>
     </div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
-    authDomain: "ocarmy-db.firebaseapp.com",
-    projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.appspot.com",
-    messagingSenderId: "848883355194",
-    appId: "1:848883355194:web:51254de3c4992d7750af03"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getFirestore(app);
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // Listen for notification changes in your user profile
-      onSnapshot(doc(db, "users", user.uid), (snap) => {
-        const data = snap.data();
-        const count = data.alerts || 0;
-        document.getElementById('alert-display').innerText = `You have (${count}) new alerts.`;
-      });
-    }
-  });
-</script>
-
 </body>
 </html>
