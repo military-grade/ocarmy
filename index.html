@@ -1,78 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OC ARMY | Archive</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>OCARMY | Welcome</title>
     <style>
-        :root { --th-blue: #2c3e50; --th-light-bg: #f7f7f7; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-light-bg); }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #222; color: white; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* THE DARK TOP BAR */
-        .navbar { background-color: var(--th-blue); color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .nav-item { margin-right: 20px; cursor: pointer; color: #ddd; text-decoration: none; font-size: 14px; position: relative; }
-        .nav-item:hover { color: white; }
-
-        /* THE DROPDOWN MENU */
-        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid var(--th-border); min-width: 180px; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 4px; }
-        .nav-item:hover .dropdown { display: block; }
-        .drop-item { display: block; padding: 12px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; }
-        .drop-item:hover { background: #f0f0f0; }
-
-        /* THE CENTERED LAYOUT */
-        .container { max-width: 1200px; margin: 30px auto; display: flex; gap: 20px; padding: 0 15px; }
+        /* The Big Dark Banner */
+        .hero { background: #333; padding: 100px 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
         
-        /* THE WHITE SIDEBAR */
-        .sidebar { width: 250px; background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 15px; height: fit-content; }
-        
-        /* THE MAIN ACTIVITY BOX */
-        .main-wall { flex-grow: 1; background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; min-height: 400px; position: relative; }
-        .section-header { border-bottom: 1px solid var(--th-border); padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; color: #555; text-transform: uppercase; }
+        .glow-text { 
+            font-size: 4rem; 
+            letter-spacing: 8px; 
+            margin: 0; 
+            text-transform: uppercase; 
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.5);
+        }
+        .sub-text { color: #888; margin-top: 15px; font-size: 14px; }
 
-        /* POLICY BOX (Top Right of the Main Card) */
-        .policy-box { float: right; width: 200px; background: #fcfcfc; border: 1px solid #eee; padding: 15px; margin-left: 20px; margin-bottom: 20px; font-size: 13px; }
-        .policy-box h4 { margin: 0 0 10px 0; font-size: 11px; color: #999; letter-spacing: 1px; }
-        .policy-link { display: block; color: #3498db; text-decoration: none; margin-bottom: 5px; }
+        /* The Button Bar */
+        .auth-bar { background: #1a1a1a; padding: 20px; text-align: center; border-bottom: 4px solid #2c3e50; }
+        .auth-bar a { color: #eee; text-decoration: none; margin: 0 20px; font-size: 14px; transition: 0.3s; }
+        .auth-bar a:hover { color: #3498db; text-shadow: 0 0 5px #3498db; }
+        .auth-bar strong { color: #fff; }
+
+        /* Policies Section */
+        .policy-container { max-width: 900px; margin: 40px auto; text-align: center; padding: 20px; }
+        .policy-title { color: #666; font-size: 12px; letter-spacing: 2px; margin-bottom: 20px; }
+        .policy-grid { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; }
+        .policy-link { color: #3498db; text-decoration: none; font-size: 14px; font-weight: 500; }
         .policy-link:hover { text-decoration: underline; }
 
-        /* THE CHARACTER GRID */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; clear: left; }
+        /* Recent Activity Glimpse */
+        .recent-section { background: #f7f7f7; color: #333; padding: 40px 20px; text-align: center; }
+        .grid { max-width: 1000px; margin: 20px auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+        .mini-card { background: white; border: 1px solid #ddd; padding: 5px; border-radius: 4px; }
+        .mini-card img { width: 100%; height: 120px; object-fit: cover; }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="nav-left" style="display:flex; align-items:center;">
-        <a href="index.html" class="nav-item" style="font-weight: bold; color: white; font-size: 18px;">OCARMY</a>
-        <div class="nav-item">
-            <i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i>
-            <div class="dropdown">
-                <a href="submit_character.html" class="drop-item">Character</a>
-                <a href="javascript:void(0)" class="drop-item">Folder</a>
-                <a href="javascript:void(0)" class="drop-item">Adoptable</a>
-                <a href="javascript:void(0)" class="drop-item">Commission Sheet</a>
-            </div>
-        </div>
-    </div>
-    <div class="nav-right" id="auth-status">
-        <a href="index.html" class="nav-item">Check out our site!</a>
-        <a href="login.html" class="nav-item">Login</a>
-        <a href="register.html" class="nav-item">Read our terms of service!</a>
-    </div>
-</nav>
-
-<div class="container">
-    <div class="sidebar">
-        <div class="section-header">MENU</div>
-        <p><i class="fa fa-user"></i> Characters</p>
-        <p><i class="fa fa-folder"></i> Folders</p>
-        <p><i class="fa fa-link"></i> Commissions</p>
+<div id="intro-content">
+    <div class="hero">
+        <h1 class="glow-text">OCARMY</h1>
+        <p class="sub-text">... is in private beta. Welcome to the archive.</p>
     </div>
 
-    <div class="main-wall">
-        <div class="section-header">RECENT ACTIVITY</div>
-        
-        <div class="policy-box">
-            <h4>OUR POLICIES</h4>
+    <div class="auth-bar">
+        <a href="#">Check out our site!</a>
+        <a href="login.html">Have an account? <strong>Login</strong></a>
+        <a href="register.html">Read our terms of service!</a>
+    </div>
+
+    <div class="policy-container">
+        <div class="policy-title">OUR POLICIES</div>
+        <div class="policy-grid">
             <a href="tos.html" class="policy-link">Terms of service</a>
             <a href="adopts.html" class="policy-link">Adoptables</a>
             <a href="commissions.html" class="policy-link">Commissions</a>
@@ -80,7 +62,49 @@
             <a href="extra.html" class="policy-link">Extra Information</a>
             <a href="contact.html" class="policy-link">Contact</a>
         </div>
+    </div>
 
-        <p>Welcome to Ocarmy. Here is our recently uploaded character feed!</p>
-        
-        <div
+    <div class="recent-section">
+        <div style="font-weight: bold; color: #666; margin-bottom: 20px;">RECENTLY UPLOADED CHARACTERS</div>
+        <div class="grid" id="recent-grid">
+            </div>
+    </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
+    authDomain: "ocarmy-db.firebaseapp.com",
+    projectId: "ocarmy-db",
+    storageBucket: "ocarmy-db.appspot.com",
+    messagingSenderId: "848883355194",
+    appId: "1:848883355194:web:51254de3c4992d7750af03"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const db = getFirestore(app);
+
+  // REDIRECT IF LOGGED IN
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      window.location.href = "dashboard.html";
+    }
+  });
+
+  // LOAD RECENT CHARS
+  onSnapshot(query(collection(db, "characters"), orderBy("timestamp", "desc"), limit(6)), (snap) => {
+    const grid = document.getElementById('recent-grid');
+    grid.innerHTML = '';
+    snap.forEach(doc => {
+      const data = doc.data();
+      grid.innerHTML += `<div class="mini-card"><img src="${data.image}"><div style="font-size:10px; margin-top:5px; font-weight:bold;">${data.name}</div></div>`;
+    });
+  });
+</script>
+</body>
+</html>
