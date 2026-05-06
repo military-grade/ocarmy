@@ -1,73 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OC ARMY | Archive</title>
+    <title>OCARMY | Archive</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --th-blue: #2c3e50; --th-light-bg: #f7f7f7; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-light-bg); }
+        :root { --th-blue: #2c3e50; --th-border: #dcdcdc; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f7f7f7; color: #333; }
         
-        /* Navbar Styles */
-        .navbar { background-color: var(--th-blue); color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .nav-item { margin-right: 20px; cursor: pointer; color: #ddd; text-decoration: none; font-size: 14px; position: relative; }
-        .nav-item:hover { color: white; }
-
-        /* NEW: Dropdown Menu Logic */
-        .dropdown { display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid var(--th-border); min-width: 180px; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 4px; }
-        .nav-item:hover .dropdown { display: block; }
-        .drop-item { display: block; padding: 12px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; }
-        .drop-item:hover { background: #f0f0f0; }
-
-        .container { max-width: 1200px; margin: 30px auto; display: flex; gap: 20px; }
-        .sidebar { width: 250px; background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 15px; }
-        .main-wall { flex-grow: 1; background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; min-height: 400px; }
-        .section-header { border-bottom: 1px solid var(--th-border); padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; color: #555; }
+        /* The Big Landing Banner */
+        .landing-header { background: #333; color: white; text-align: center; padding: 100px 20px; position: relative; }
+        .landing-header h1 { font-size: 3.5rem; margin: 0; letter-spacing: 5px; text-transform: uppercase; }
+        .landing-header p { color: #aaa; margin-top: 10px; }
         
-        /* OC Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .auth-bar { background: #222; padding: 15px; text-align: center; border-bottom: 5px solid var(--th-blue); }
+        .auth-bar a { color: white; text-decoration: none; margin: 0 15px; font-size: 14px; }
+        .auth-bar a:hover { text-decoration: underline; }
+
+        /* The Info Section */
+        .info-grid { max-width: 1100px; margin: 50px auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; padding: 0 20px; }
+        .info-col { text-align: center; }
+        .info-col h3 { border-bottom: 1px solid #ddd; padding-bottom: 10px; color: #666; font-weight: normal; }
+        .info-col p { font-size: 13px; color: #777; line-height: 1.6; }
+
+        /* Dashboard (Hidden by default) */
+        #dashboard { display: none; padding: 20px; }
+        .navbar { background: var(--th-blue); color: white; padding: 10px 20px; display: flex; justify-content: space-between; }
+        .container { max-width: 1200px; margin: 20px auto; display: flex; gap: 20px; }
+        .main-wall { flex: 3; background: white; border: 1px solid var(--th-border); padding: 20px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="nav-left" style="display:flex; align-items:center;">
-        <a href="index.html" class="nav-item" style="font-weight: bold; color: white; font-size: 18px;">OCARMY</a>
-        
-        <div class="nav-item">
-            <i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i>
-            <div class="dropdown">
-                <a href="submit_character.html" class="drop-item"><i class="fa fa-user"></i> Character</a>
-                <a href="#" class="drop-item"><i class="fa fa-folder"></i> Folder</a>
-                <a href="#" class="drop-item"><i class="fa fa-star"></i> Adoptable</a>
-                <a href="#" class="drop-item"><i class="fa fa-file-invoice-dollar"></i> Commission Sheet</a>
-            </div>
-        </div>
+<div id="landing-view">
+    <div class="landing-header">
+        <h1>OCARMY</h1>
+        <p>...is a private character repository. Welcome!</p>
     </div>
     
-    <div class="nav-right" id="auth-status">
-        <a href="register.html" class="nav-item">Register</a>
+    <div class="auth-bar">
+        <a href="index.html">Have a look around</a>
+        <a href="login.html">Have an account? <strong>Login</strong></a>
+        <a href="register.html">Need an account? <strong>Register here</strong></a>
     </div>
-</nav>
 
-<div class="container">
-    <div class="sidebar">
-        <div class="section-header">MENU</div>
-        <p><i class="fa fa-user"></i> Characters</p>
-        <p><i class="fa fa-folder"></i> Folders</p>
-        <p><i class="fa fa-link"></i> Commissions</p>
+    <div class="info-grid">
+        <div class="info-col">
+            <h3>Character Repository</h3>
+            <p>Store characters, set up profiles and upload image galleries. Organize characters into folders, tags or worlds.</p>
+        </div>
+        <div class="info-col">
+            <h3>Adoptable Trading</h3>
+            <p>Transfer characters on-site. View a gallery of all characters you've created and who their current owners are.</p>
+        </div>
+        <div class="info-col">
+            <h3>Roleplay Community</h3>
+            <p>Invite users and characters to your worlds for easy grouping. Make posts or comment on profiles.</p>
+        </div>
     </div>
-    <div class="main-wall">
-        <div class="section-header">RECENT ACTIVITY</div>
-        <div class="grid" id="oc-grid">
-            </div>
-        <p id="welcome-msg">Welcome to Ocarmy. Please register to start your archive!</p>
+</div>
+
+<div id="dashboard">
+    <nav class="navbar">
+        <div style="font-weight:bold;">OCARMY</div>
+        <div id="user-info"></div>
+    </nav>
+    <div class="container">
+        <div class="main-wall">
+            <h2 style="border-bottom: 1px solid #eee; padding-bottom:10px;">Recently Uploaded</h2>
+            <div id="oc-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                </div>
+        </div>
     </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
@@ -80,10 +88,18 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth();
-  const db = getFirestore(app);
 
   onAuthStateChanged(auth, (user) => {
-    const statusDiv = document.getElementById('auth-status');
-    const welcome = document.getElementById('welcome-msg');
     if (user) {
-      statusDiv.innerHTML = `<span class="nav-item">User: ${user.email}</span>
+      document.getElementById('landing-view').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('user-info').innerHTML = `${user.email} | <a href="#" id="logout" style="color:white;">Logout</a>`;
+      document.getElementById('logout').onclick = () => signOut(auth);
+    } else {
+      document.getElementById('landing-view').style.display = 'block';
+      document.getElementById('dashboard').style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>
