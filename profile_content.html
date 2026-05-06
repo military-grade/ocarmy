@@ -4,30 +4,30 @@
     <title>Edit Profile | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --th-teal: #5bc0de; --th-dark: #212529; --th-bg: #1a1523; --th-border: #332c3d; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #eee; display: flex; }
+        :root { --th-teal: #5bc0de; --th-dark: #212529; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #1a1523; color: #eee; display: flex; }
 
         /* Sidebar Navigation */
-        .sidebar { width: 240px; background: #3b2a51; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; }
+        .sidebar { width: 240px; background: #3b2a51; min-height: 100vh; border-right: 1px solid #332c3d; position: sticky; top: 0; }
         .side-header { padding: 15px; background: rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; font-weight: bold; }
         .nav-link { display: block; padding: 12px 20px; color: #bbb; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.1); }
         .nav-link.active { background: var(--th-teal); color: white; border-left: 4px solid white; }
 
-        /* Main Content Area */
-        .main { flex-grow: 1; padding: 30px; max-width: 1100px; }
+        /* Main Editor Area */
+        .main { flex-grow: 1; padding: 30px; max-width: 1100px; margin: 0 auto; }
         .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .btn-wysiwyg { background: #333; color: white; border: 1px solid #444; padding: 6px 15px; border-radius: 4px; font-size: 11px; cursor: pointer; }
 
-        /* Editor Container (White background for the box itself) */
-        .editor-container { background: white; border: 1px solid var(--th-border); border-radius: 4px; overflow: hidden; margin-bottom: 25px; color: #333; }
+        /* THE EDITOR BOX - Forces White Background for Visibility */
+        .editor-container { background: white; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; margin-bottom: 25px; color: #333; }
         
-        /* Toolbar matches your screenshot icons */
+        /* Toolbar Style matches your screenshot */
         .toolbar { background: #fdfdfd; padding: 10px; border-bottom: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
-        .toolbar i, .toolbar select { cursor: pointer; color: #666; font-size: 14px; }
+        .toolbar i, .toolbar select { cursor: pointer; color: #666; font-size: 14px; transition: 0.2s; }
         .toolbar i:hover { color: var(--th-teal); }
         .sep { width: 1px; height: 20px; background: #ddd; margin: 0 5px; }
 
-        /* Centered Editable Area */
+        /* The Interactive Area */
         #editor-body { 
             width: 100%; 
             min-height: 400px; 
@@ -35,18 +35,20 @@
             font-size: 14px; 
             outline: none; 
             background: white;
-            white-space: pre-wrap; /* Keeps lines from shifting up */
+            white-space: pre-wrap; /* Crucial for your spacing! */
             line-height: 1.6;
-            text-align: center; /* Centered like your screenshot example */
+            text-align: center; /* Centered like your example */
+            overflow-y: auto;
         }
 
-        /* Settings Cards */
-        .card { background: #251e2e; border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; margin-top: 30px; }
-        .card-header { font-size: 14px; font-weight: bold; color: #ccc; margin-bottom: 15px; border-bottom: 1px solid var(--th-border); padding-bottom: 10px; text-transform: uppercase; }
+        /* Profile Block Cards */
+        .card { background: #251e2e; border: 1px solid #332c3d; border-radius: 4px; padding: 20px; margin-top: 30px; }
+        .card-header { font-size: 12px; font-weight: bold; color: #ccc; margin-bottom: 15px; border-bottom: 1px solid #332c3d; padding-bottom: 10px; text-transform: uppercase; }
         .block-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .block-row select { background: #1a1523; color: white; border: 1px solid #443c50; padding: 8px; border-radius: 4px; width: 350px; }
 
         .btn-save { background: var(--th-teal); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; font-size: 15px; margin-top: 20px; }
+        .btn-save:hover { background: #46b8da; }
     </style>
 </head>
 <body>
@@ -72,32 +74,24 @@
             <i class="fa fa-bold" onclick="doCmd('bold')" title="Bold"></i>
             <i class="fa fa-italic" onclick="doCmd('italic')" title="Italic"></i>
             <i class="fa fa-underline" onclick="doCmd('underline')" title="Underline"></i>
-            <i class="fa fa-strikethrough" onclick="doCmd('strikethrough')" title="Strikethrough"></i>
-            <div class="sep"></div>
-            <i class="fa fa-subscript" onclick="doCmd('subscript')"></i>
-            <i class="fa fa-superscript" onclick="doCmd('superscript')"></i>
+            <i class="fa fa-strikethrough" onclick="doCmd('strikethrough')"></i>
             <div class="sep"></div>
             <select onchange="doCmd('fontName', this.value)">
                 <option value="Arial">Arial</option>
                 <option value="Helvetica" selected>Helvetica</option>
                 <option value="Courier New">Monospace</option>
             </select>
-            <i class="fa fa-text-height"></i>
             <i class="fa fa-palette" onclick="doCmd('foreColor', prompt('Enter color hex (e.g. #ff0000):'))"></i>
             <div class="sep"></div>
             <i class="fa fa-link" onclick="addLink()"></i>
             <i class="fa fa-image" onclick="addImage()"></i>
-            <i class="fa fa-undo" onclick="doCmd('undo')"></i>
-            <i class="fa fa-redo" onclick="doCmd('redo')"></i>
-            <div class="sep"></div>
             <i class="fa fa-align-center" onclick="doCmd('justifyCenter')"></i>
             <i class="fa fa-list-ul" onclick="doCmd('insertUnorderedList')"></i>
-            <i class="fa fa-quote-left" onclick="doCmd('formatBlock', 'blockquote')"></i>
             <i class="fa fa-code" onclick="toggleCodeMode()"></i>
         </div>
 
         <div id="editor-body" contenteditable="true">
-            <p>hello! I am the owner of ocarmy this website is a work in progress, so please PM me if you have any inquiries!</p>
+            hello! I am the owner of ocarmy this website is a work in progress, so please PM me if you have any inquiries!
         </div>
     </div>
 
@@ -107,13 +101,6 @@
             <span>Display recent characters</span>
             <select id="block-recent">
                 <option value="all">Display recent characters and designs</option>
-                <option value="none">Hide</option>
-            </select>
-        </div>
-        <div class="block-row">
-            <span>Display featured characters</span>
-            <select id="block-featured">
-                <option value="random">Display random featured character</option>
                 <option value="none">Hide</option>
             </select>
         </div>
@@ -154,19 +141,9 @@
     }
   });
 
-  window.doCmd = (cmd, val = null) => {
-    document.execCommand(cmd, false, val);
-  };
-
-  window.addLink = () => {
-    const url = prompt("Enter URL (http://...):");
-    if(url) doCmd('createLink', url);
-  };
-
-  window.addImage = () => {
-    const url = prompt("Enter Image URL:");
-    if(url) doCmd('insertImage', url);
-  };
+  window.doCmd = (cmd, val = null) => { document.execCommand(cmd, false, val); };
+  window.addLink = () => { const url = prompt("Link URL:"); if(url) doCmd('createLink', url); };
+  window.addImage = () => { const url = prompt("Image URL:"); if(url) doCmd('insertImage', url); };
 
   window.toggleCodeMode = () => {
     const btn = document.querySelector('.btn-wysiwyg');
@@ -186,12 +163,11 @@
   window.saveChanges = async () => {
     const user = auth.currentUser;
     const content = (document.querySelector('.btn-wysiwyg').innerText === "Enable WYSIWYG") ? editor.innerText : editor.innerHTML;
-    
     await updateDoc(doc(db, "users", user.uid), {
         profileHTML: content,
         blockRecent: document.getElementById('block-recent').value
     });
-    alert("Profile saved successfully!");
+    alert("Profile saved!");
   };
 </script>
 </body>
