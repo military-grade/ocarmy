@@ -3,6 +3,7 @@
 <head>
     <title>Edit Profile | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
         :root { --th-teal: #5bc0de; --th-dark: #212529; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
         body { margin: 0; font-family: Arial, sans-serif; background: #1a1523; color: #eee; display: flex; }
@@ -13,33 +14,12 @@
         .nav-link { display: block; padding: 12px 20px; color: #bbb; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.1); }
         .nav-link.active { background: var(--th-teal); color: white; border-left: 4px solid white; }
 
-        /* Main Editor Area */
+        /* Main Area */
         .main { flex-grow: 1; padding: 30px; max-width: 1100px; margin: 0 auto; }
         .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-wysiwyg { background: #333; color: white; border: 1px solid #444; padding: 6px 15px; border-radius: 4px; font-size: 11px; cursor: pointer; }
-
-        /* THE EDITOR BOX - Forces White Background for Visibility */
-        .editor-container { background: white; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; margin-bottom: 25px; color: #333; }
         
-        /* Toolbar Style matches your screenshot */
-        .toolbar { background: #fdfdfd; padding: 10px; border-bottom: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
-        .toolbar i, .toolbar select { cursor: pointer; color: #666; font-size: 14px; transition: 0.2s; }
-        .toolbar i:hover { color: var(--th-teal); }
-        .sep { width: 1px; height: 20px; background: #ddd; margin: 0 5px; }
-
-        /* The Interactive Area */
-        #editor-body { 
-            width: 100%; 
-            min-height: 400px; 
-            padding: 40px; 
-            font-size: 14px; 
-            outline: none; 
-            background: white;
-            white-space: pre-wrap; /* Crucial for your spacing! */
-            line-height: 1.6;
-            text-align: center; /* Centered like your example */
-            overflow-y: auto;
-        }
+        /* The Editor Container Background */
+        .editor-container { background: #251e2e; padding: 2px; border-radius: 4px; margin-bottom: 25px; }
 
         /* Profile Block Cards */
         .card { background: #251e2e; border: 1px solid #332c3d; border-radius: 4px; padding: 20px; margin-top: 30px; }
@@ -66,33 +46,12 @@
 <div class="main">
     <div class="header-flex">
         <h2 style="margin:0;">Edit Profile</h2>
-        <button class="btn-wysiwyg" onclick="toggleCodeMode()">Disable WYSIWYG</button>
     </div>
 
     <div class="editor-container">
-        <div class="toolbar" id="main-toolbar">
-            <i class="fa fa-bold" onclick="doCmd('bold')" title="Bold"></i>
-            <i class="fa fa-italic" onclick="doCmd('italic')" title="Italic"></i>
-            <i class="fa fa-underline" onclick="doCmd('underline')" title="Underline"></i>
-            <i class="fa fa-strikethrough" onclick="doCmd('strikethrough')"></i>
-            <div class="sep"></div>
-            <select onchange="doCmd('fontName', this.value)">
-                <option value="Arial">Arial</option>
-                <option value="Helvetica" selected>Helvetica</option>
-                <option value="Courier New">Monospace</option>
-            </select>
-            <i class="fa fa-palette" onclick="doCmd('foreColor', prompt('Enter color hex (e.g. #ff0000):'))"></i>
-            <div class="sep"></div>
-            <i class="fa fa-link" onclick="addLink()"></i>
-            <i class="fa fa-image" onclick="addImage()"></i>
-            <i class="fa fa-align-center" onclick="doCmd('justifyCenter')"></i>
-            <i class="fa fa-list-ul" onclick="doCmd('insertUnorderedList')"></i>
-            <i class="fa fa-code" onclick="toggleCodeMode()"></i>
-        </div>
-
-        <div id="editor-body" contenteditable="true">
+        <textarea id="editor-body">
             hello! I am the owner of ocarmy this website is a work in progress, so please PM me if you have any inquiries!
-        </div>
+        </textarea>
     </div>
 
     <div class="card">
@@ -109,66 +68,87 @@
     <button class="btn-save" onclick="saveChanges()">Save Changes</button>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
-    authDomain: "ocarmy-db.firebaseapp.com",
-    projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.firebasestorage.app",
-    messagingSenderId: "848883355194",
-    appId: "1:848883355194:web:361e9fe8eb9e01f350af03",
-    measurementId: "G-9G2WV3NXV1"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth();
-  const editor = document.getElementById('editor-body');
-
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-            const data = userDoc.data();
-            document.getElementById('side-user').innerText = data.username;
-            if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
-            if(data.profileHTML) editor.innerHTML = data.profileHTML;
+<script>
+    // Initialize the TinyMCE Editor
+    tinymce.init({
+        selector: '#editor-body',
+        height: 500,
+        plugins: 'lists link image charmap emoticons table code fullscreen',
+        // This toolbar string dictates exactly which buttons appear and in what order
+        toolbar: 'undo redo | blocks fontfamily | bold italic underline strikethrough | subscript superscript | forecolor backcolor emoticons charmap | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote customSpoiler hr | link image table | removeformat | code fullscreen',
+        menubar: false,
+        skin: 'oxide-dark', // Automatically gives it a dark mode aesthetic
+        content_css: 'dark', // Makes the text area background dark to match your site
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px; text-align:center; }', // Defaults to centered text
+        setup: function (editor) {
+            // Creating a custom button for the "Spoiler" feature
+            editor.ui.registry.addButton('customSpoiler', {
+                text: 'Spoiler',
+                tooltip: 'Insert Spoiler Box',
+                onAction: function (_) {
+                    editor.insertContent('<details style="background:#1a1523; padding:10px; border: 1px solid #443c50; border-radius:4px; margin: 10px 0;"><summary style="cursor:pointer; font-weight:bold; color: #5bc0de;">Spoiler (Click to open)</summary><p>Replace this with your spoiler text...</p></details><p></p>');
+                }
+            });
         }
-    }
-  });
-
-  window.doCmd = (cmd, val = null) => { document.execCommand(cmd, false, val); };
-  window.addLink = () => { const url = prompt("Link URL:"); if(url) doCmd('createLink', url); };
-  window.addImage = () => { const url = prompt("Image URL:"); if(url) doCmd('insertImage', url); };
-
-  window.toggleCodeMode = () => {
-    const btn = document.querySelector('.btn-wysiwyg');
-    if (btn.innerText === "Disable WYSIWYG") {
-        editor.innerText = editor.innerHTML;
-        document.getElementById('main-toolbar').style.opacity = "0.3";
-        document.getElementById('main-toolbar').style.pointerEvents = "none";
-        btn.innerText = "Enable WYSIWYG";
-    } else {
-        editor.innerHTML = editor.innerText;
-        document.getElementById('main-toolbar').style.opacity = "1";
-        document.getElementById('main-toolbar').style.pointerEvents = "auto";
-        btn.innerText = "Disable WYSIWYG";
-    }
-  };
-
-  window.saveChanges = async () => {
-    const user = auth.currentUser;
-    const content = (document.querySelector('.btn-wysiwyg').innerText === "Enable WYSIWYG") ? editor.innerText : editor.innerHTML;
-    await updateDoc(doc(db, "users", user.uid), {
-        profileHTML: content,
-        blockRecent: document.getElementById('block-recent').value
     });
-    alert("Profile saved!");
-  };
+</script>
+
+<script type="module">
+    // Firebase Logic
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
+        authDomain: "ocarmy-db.firebaseapp.com",
+        projectId: "ocarmy-db",
+        storageBucket: "ocarmy-db.firebasestorage.app",
+        messagingSenderId: "848883355194",
+        appId: "1:848883355194:web:361e9fe8eb9e01f350af03",
+        measurementId: "G-9G2WV3NXV1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    // Load data when user logs in
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                document.getElementById('side-user').innerText = data.username;
+                if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+                
+                // Wait for TinyMCE to finish loading, then set the content from the database
+                tinymce.get('editor-body').on('init', function() {
+                    if(data.profileHTML) {
+                        tinymce.get('editor-body').setContent(data.profileHTML);
+                    }
+                });
+            }
+        }
+    });
+
+    // Custom Save Function
+    window.saveChanges = async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("You must be logged in to save.");
+            return;
+        }
+
+        // We pull the raw HTML directly from the TinyMCE editor
+        const content = tinymce.get('editor-body').getContent();
+        
+        await updateDoc(doc(db, "users", user.uid), {
+            profileHTML: content,
+            blockRecent: document.getElementById('block-recent').value
+        });
+        alert("Profile saved successfully!");
+    };
 </script>
 </body>
 </html>
