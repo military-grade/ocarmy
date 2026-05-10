@@ -6,48 +6,44 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; overflow-x: hidden; }
 
-        /* Navbar & Dropdowns */
+        /* Navbar */
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .nav-left { display: flex; gap: 15px; align-items: center; height: 100%; }
         .nav-left a, .nav-item { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 5px; }
         .nav-left a:hover, .nav-item:hover { color: white; }
         
+        /* Dropdowns */
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
         .dropdown-content { display: none; position: absolute; top: 50px; left: 0; background: white; border: 1px solid var(--border); min-width: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1001; }
         .dropdown-right { left: auto; right: 0; }
         .dropdown-content a { display: block; padding: 10px 15px; color: #333 !important; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; height: auto; }
-        .dropdown-content a:hover { background: #f5f5f5; }
         .show { display: block; }
 
         .nav-pfp { width: 30px; height: 30px; background: #eee; border-radius: 2px; background-size: cover; margin-left: 8px; }
 
-        .container { display: flex; max-width: 1200px; margin: 0 auto; min-height: calc(100vh - 50px); }
+        /* The Container - FIXED TO REMOVE GAP */
+        .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
 
-        /* SIDEBAR (Screenshot Fix) */
+        /* Sidebar Header (Screenshot 11.20.32 Match) */
         .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; }
-        
-        /* New Sidebar Header matching your Screenshot */
-        .side-header-box { background: rgba(0,0,0,0.1); padding: 10px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .side-header-avatar { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; flex-shrink: 0; }
-        .side-header-user { font-weight: bold; font-size: 14px; overflow: hidden; text-overflow: ellipsis; }
+        .side-user-header { background: #427e95; padding: 10px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .side-avatar-box { width: 50px; height: 50px; background: #eee; border-radius: 2px; background-size: cover; flex-shrink: 0; }
+        .side-user-name { font-weight: bold; font-size: 16px; color: white; }
 
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
 
-        /* Main Content - No Gap */
-        .main { flex: 1; padding: 25px; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+        /* Main Content - REMOVED MARGINS TO FIX GAP */
+        .main { flex: 1; padding: 30px; background: white; }
         
         /* Comments Layout */
         .section-header { background: #f9f9f9; padding: 8px 15px; border: 1px solid var(--border); border-radius: 4px 4px 0 0; font-weight: bold; font-size: 14px; margin-top: 40px; }
         .comment-box { border: 1px solid var(--border); border-top: none; padding: 15px; display: flex; gap: 15px; background: white; }
         .comment-avatar { width: 55px; height: 55px; background: #eee; border-radius: 4px; background-size: cover; flex-shrink: 0; border: 1px solid #eee; }
-        .comment-content { flex: 1; }
-        .comment-meta { font-size: 12px; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; }
-        .comment-user { font-weight: bold; color: var(--th-blue); text-decoration: none; }
-        .comment-text { font-size: 13px; line-height: 1.5; }
+        .comment-text { flex: 1; font-size: 13px; line-height: 1.5; }
     </style>
     <style id="user-custom-css"></style>
 </head>
@@ -65,7 +61,6 @@
                 <a href="#">Bulletin</a>
                 <a href="#">Image</a>
                 <a href="#">Literature</a>
-                <a href="#">World</a>
             </div>
         </div>
 
@@ -82,26 +77,19 @@
         </div>
         <div id="drop-user" class="dropdown-content dropdown-right">
             <a href="dashboard.html">Profile</a>
-            <a href="#">Characters</a>
             <a href="messages.html">Inbox</a>
+            <a href="profile_content.html">Edit Profile</a>
             <a href="settings.html">Settings</a>
-            <div style="border-top:1px solid #eee; margin: 5px 0;"></div>
-            <a href="#">Folders</a>
-            <a href="#">Tags</a>
-            <a href="#">Sort Characters</a>
-            <a href="#">Designs</a>
-            <a href="#">Images</a>
-            <div style="border-top:1px solid #eee; margin: 5px 0;"></div>
             <a href="#" id="logout-btn">Logout</a>
         </div>
     </div>
 </nav>
 
-<div class="container">
+<div class="wrapper">
     <aside class="sidebar">
-        <div class="side-header-box">
-            <div class="side-header-avatar" id="side-pfp"></div>
-            <div class="side-header-user" id="side-username-text">User</div>
+        <div class="side-user-header">
+            <div class="side-avatar-box" id="side-pfp"></div>
+            <div class="side-user-name" id="side-user-text">User</div>
         </div>
 
         <div class="side-nav">
@@ -127,7 +115,8 @@
 
         <div id="comments-section">
             <div class="section-header">Comments</div>
-            <div id="comment-list"></div>
+            <div id="comment-list">
+                </div>
 
             <div style="margin-top: 20px; padding: 15px; border: 1px solid var(--border); border-radius: 4px;">
                 <textarea id="comment-input" style="width:100%; height:80px; border:1px solid #ddd; padding:10px; box-sizing: border-box;" placeholder="Leave a comment..."></textarea>
@@ -166,7 +155,7 @@
             if (userDoc.exists()) {
                 const data = userDoc.data();
                 document.getElementById('nav-username').innerText = data.username || "User";
-                document.getElementById('side-username-text').innerText = data.username || "User";
+                document.getElementById('side-user-text').innerText = data.username || "User";
                 
                 if (data.pfp) {
                     document.getElementById('nav-pfp-img').style.backgroundImage = `url('${data.pfp}')`;
