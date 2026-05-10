@@ -8,7 +8,7 @@
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; --side-teal: #7cc1d8; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
 
         /* Left Sidebar */
@@ -18,8 +18,8 @@
         .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
-        .side-nav a.fav-active { color: #ffb3b3; font-weight: bold; }
         
+        /* Control Panel Dropdown */
         .cp-header { background: var(--side-teal); color: white; padding: 10px 15px; font-weight: bold; font-size: 13px; cursor: pointer; }
         .cp-subnav { background: #f1f8fb; display: none; }
         .cp-subnav a { display: block; padding: 8px 20px; color: #4e92ac !important; font-size: 12px; border-bottom: 1px solid #e1eef2; }
@@ -32,7 +32,7 @@
         /* Warning Overlay */
         #warning-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; padding: 50px 20px; overflow-y: auto; }
         
-        /* Right Stats Column */
+        /* Stats Right Column */
         .stats-col { width: 260px; padding: 25px; background: #fafafa; flex-shrink: 0; font-size: 13px; }
         .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #eee; }
         .stat-label { font-weight: bold; color: #666; }
@@ -61,10 +61,9 @@
         <div class="side-nav">
             <a href="#" class="active"><i class="fa fa-file-alt"></i> Profile</a>
             <a href="#" id="link-gallery"><i class="fa fa-image"></i> Gallery <span id="count-gallery" class="badge bg-light text-dark float-end">0</span></a>
-            
-            <div class="side-label" style="font-size:10px; padding:10px 15px; opacity:0.7;">INTERACTION</div>
-            <a href="javascript:void(0)" id="fav-btn" onclick="toggleFavorite()"><i class="fa-regular fa-heart"></i> Favorite</a>
-            <a href="#"><i class="fa fa-comments"></i> Comments</a>
+            <div class="p-2">
+                 <button class="btn btn-sm btn-outline-light w-100" id="fav-btn" onclick="toggleFavorite()"><i class="fa-regular fa-heart"></i> Favorite</button>
+            </div>
             
             <div id="owner-panel" style="display:none; margin-top:10px;">
                 <div class="cp-header" onclick="this.parentElement.classList.toggle('cp-active')">
@@ -75,7 +74,7 @@
                     <a href="#" id="edit-imgs-link"><i class="fa fa-images"></i> Manage Images</a>
                     <a href="#" id="edit-warnings-link"><i class="fa fa-exclamation-triangle"></i> Character Warnings</a>
                 </div>
-                <div class="p-3"><a href="javascript:void(0)" class="text-danger small fw-bold text-decoration-none" onclick="confirmDelete()"><i class="fa fa-trash"></i> Delete Character</a></div>
+                <div class="p-2"><button class="btn btn-sm btn-link text-danger fw-bold" onclick="confirmDelete()">Delete Character</button></div>
             </div>
         </div>
     </aside>
@@ -87,7 +86,7 @@
         <div class="d-flex gap-3 mb-4">
             <div class="char-main-pfp" id="main-pfp"></div>
             <div>
-                <h2 class="m-0"><a href="#" id="refresh-link" class="text-dark text-decoration-none"><i class="fa fa-lock"></i> <span id="display-name">...</span></a></h2>
+                <h2 class="m-0" id="display-name">Loading...</h2>
                 <div class="small"><i class="fa fa-user"></i> <a href="#" id="creator-link" style="color:#4e92ac; font-weight:bold; text-decoration:none;">User</a></div>
             </div>
         </div>
@@ -112,89 +111,94 @@
     const auth = getAuth();
     const charId = new URLSearchParams(window.location.search).get('id');
 
-    onAuthStateChanged(auth, (user) => {
-        onSnapshot(doc(db, "characters", charId), async (snap) => {
-            if(!snap.exists()) return;
-            const data = snap.data();
-            
-            // 1. PUBLIC DATA LOADS FIRST (Fixes "Something went wrong" for guests)
-            document.getElementById('display-name').innerText = data.name;
-            document.getElementById('refresh-link').href = `character.html?id=${charId}`;
-            document.getElementById('main-pfp').style.backgroundImage = `url('${data.avatar}')`;
-            document.getElementById('bio-content').innerHTML = data.description || "";
-            document.getElementById('stat-creator').innerText = data.designer || "Unknown";
-            document.getElementById('stat-date').innerText = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : "-";
-            document.getElementById('stat-favs').innerText = (data.subscribers || []).length;
+    // Load Data - PUBLIC ACCESS FIRST
+    onSnapshot(doc(db, "characters", charId), async (snap) => {
+        if (!snap.exists()) {
+            document.querySelector('.main').innerHTML = "<h3>Character not found.</h3>";
+            return;
+        }
+        const data = snap.data();
 
-            // Warning Logic
-            if (data.warningActive && !sessionStorage.getItem(`warn_${charId}`)) {
-                document.getElementById('warning-overlay').style.display = 'block';
-                document.getElementById('warning-text').innerHTML = data.warningContent || "Warning: Sensitive content.";
-                document.getElementById('proceed-btn').onclick = () => {
-                    sessionStorage.setItem(`warn_${charId}`, 'true');
-                    document.getElementById('warning-overlay').style.display = 'none';
-                };
-            }
+        // 1. Load basic info (Visible to everyone)
+        document.getElementById('display-name').innerText = data.name;
+        document.getElementById('main-pfp').style.backgroundImage = `url('${data.avatar || ''}')`;
+        document.getElementById('bio-content').innerHTML = data.description || "No description.";
+        document.getElementById('stat-creator').innerText = data.designer || "Unknown";
+        document.getElementById('stat-favs').innerText = (data.subscribers || []).length;
+        document.getElementById('stat-date').innerText = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : "-";
+        
+        // 2. Fetch Owner Info for Sidebar
+        const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
+        if (ownerSnap.exists()) {
+            const oData = ownerSnap.data();
+            document.getElementById('side-user-link').innerText = oData.username;
+            document.getElementById('side-user-link').href = `user.html?id=${data.ownerId}`;
+            document.getElementById('creator-link').innerText = oData.username;
+            document.getElementById('creator-link').href = `user.html?id=${data.ownerId}`;
+            document.getElementById('dynamic-back-btn').href = `user.html?id=${data.ownerId}`;
+            if (oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
+        }
 
-            // Sync Owner Data & DYNAMIC BACK BUTTON
-            const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
-            if(ownerSnap.exists()){
-                const oData = ownerSnap.data();
-                document.getElementById('dynamic-back-btn').href = `user.html?id=${data.ownerId}`;
-                document.getElementById('side-user-link').innerText = oData.username;
-                document.getElementById('side-user-link').href = `user.html?id=${data.ownerId}`;
-                document.getElementById('creator-link').innerText = oData.username;
-                if(oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
-            }
+        // 3. Load Gallery
+        const gallery = data.gallery || [];
+        document.getElementById('count-gallery').innerText = gallery.length;
+        document.getElementById('link-gallery').href = `character_gallery.html?id=${charId}`;
+        document.getElementById('gallery-preview').innerHTML = gallery.slice(0, 6).map(img => `
+            <div class="col-4"><div style="aspect-ratio:1/1; background:url('${img}') center/cover; border:1px solid #ddd;"></div></div>
+        `).join('');
 
-            // Favorite Button Sync
-            const subs = data.subscribers || [];
-            const favBtn = document.getElementById('fav-btn');
-            if (user && subs.includes(user.uid)) {
-                favBtn.innerHTML = '<i class="fa fa-heart"></i> Unfavorite';
-                favBtn.classList.add('fav-active');
-            } else {
-                favBtn.innerHTML = '<i class="fa-regular fa-heart"></i> Favorite';
-                favBtn.classList.remove('fav-active');
-            }
+        // 4. Handle Warnings
+        if (data.warningActive && !sessionStorage.getItem(`warn_${charId}`)) {
+            document.getElementById('warning-overlay').style.display = 'block';
+            document.getElementById('warning-text').innerHTML = data.warningContent || "Sensitive Content Warning.";
+            document.getElementById('proceed-btn').onclick = () => {
+                sessionStorage.setItem(`warn_${charId}`, 'true');
+                document.getElementById('warning-overlay').style.display = 'none';
+            };
+        }
 
-            const gallery = data.gallery || [];
-            document.getElementById('count-gallery').innerText = gallery.length;
-            document.getElementById('link-gallery').href = `character_gallery.html?id=${charId}`;
-            document.getElementById('gallery-preview').innerHTML = gallery.slice(0,6).map(img => `<div class="col-4"><div style="aspect-ratio:1/1; background:url('${img}') center/cover; border:1px solid #ddd;"></div></div>`).join('');
-
-            // Private Owner Logic
-            if (user && (user.uid === data.ownerId || !data.ownerId)) {
-                document.getElementById('owner-panel').style.display = "block";
+        // 5. Auth-specific items (Control Panel & Favorite Button state)
+        onAuthStateChanged(auth, (user) => {
+            const ownerPanel = document.getElementById('owner-panel');
+            if (user && user.uid === data.ownerId) {
+                ownerPanel.style.display = "block";
                 document.getElementById('edit-char-link').href = `edit_character.html?id=${charId}`;
                 document.getElementById('edit-imgs-link').href = `manage_images.html?id=${charId}`;
                 document.getElementById('edit-warnings-link').href = `edit_warnings.html?id=${charId}`;
             } else {
-                document.getElementById('owner-panel').style.display = "none";
+                ownerPanel.style.display = "none";
+            }
+
+            const favBtn = document.getElementById('fav-btn');
+            if (user && (data.subscribers || []).includes(user.uid)) {
+                favBtn.innerHTML = '<i class="fa fa-heart text-danger"></i> Unfavorite';
+            } else {
+                favBtn.innerHTML = '<i class="fa-regular fa-heart"></i> Favorite';
             }
         });
-
-        // Toggle Favorite Logic
-        window.toggleFavorite = async () => {
-            if (!user) return alert("Log in to favorite characters!");
-            const charRef = doc(db, "characters", charId);
-            const docSnap = await getDoc(charRef);
-            const currentSubs = docSnap.data().subscribers || [];
-
-            if (currentSubs.includes(user.uid)) {
-                await updateDoc(charRef, { subscribers: arrayRemove(user.uid) });
-            } else {
-                await updateDoc(charRef, { subscribers: arrayUnion(user.uid) });
-            }
-        };
-
-        window.confirmDelete = async () => {
-            if (confirm("Delete this character forever?")) {
-                await deleteDoc(doc(db, "characters", charId));
-                window.location.href = "characters.html";
-            }
-        };
     });
+
+    // Interaction Functions
+    window.toggleFavorite = async () => {
+        const user = auth.currentUser;
+        if (!user) return alert("Log in to favorite characters!");
+        const charRef = doc(db, "characters", charId);
+        const charSnap = await getDoc(charRef);
+        const subs = charSnap.data().subscribers || [];
+
+        if (subs.includes(user.uid)) {
+            await updateDoc(charRef, { subscribers: arrayRemove(user.uid) });
+        } else {
+            await updateDoc(charRef, { subscribers: arrayUnion(user.uid) });
+        }
+    };
+
+    window.confirmDelete = async () => {
+        if (confirm("Delete this character forever?")) {
+            await deleteDoc(doc(db, "characters", charId));
+            window.location.href = "characters.html";
+        }
+    };
 </script>
 </body>
 </html>
