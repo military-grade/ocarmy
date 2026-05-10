@@ -10,36 +10,47 @@
         .card { background: white; border: 1px solid var(--border); border-radius: 4px; max-width: 900px; margin: 0 auto 20px; }
         .card-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); }
         .card-body { padding: 20px; }
-        .toggle-btn { background: #eee; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; border-radius: 4px; margin-bottom: 15px; display: inline-block; }
+        .toggle-btn { background: #eee; border: 1px solid #ccc; padding: 8px 15px; cursor: pointer; border-radius: 4px; margin-bottom: 15px; display: inline-block; font-size: 13px; font-weight: bold; }
         .active-toggle { background: var(--th-blue); color: white; border-color: var(--th-blue); }
-        #poll-options { display: none; margin-top: 15px; border: 1px solid #eee; padding: 15px; }
+        #poll-options { display: none; margin-top: 15px; border: 1px solid #eee; padding: 15px; background: #fff; }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="card-header">Create Bulletin</div>
+        <div class="card-header">New Bulletin</div>
         <div class="card-body">
-            <div class="toggle-btn" id="ooc-toggle" onclick="this.classList.toggle('active-toggle')">OOC</div>
+            <div class="toggle-btn" id="ooc-toggle" onclick="this.classList.toggle('active-toggle')">OOC Update</div>
             
-            <input type="text" placeholder="Bulletin Subject" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px;">
+            <input type="text" placeholder="Subject" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px;">
             
             <textarea id="bulletin-editor"></textarea>
 
-            <div class="toggle-btn" onclick="togglePoll()">Add Poll</div>
+            <div class="toggle-btn" onclick="togglePoll()" id="poll-btn">Add Poll</div>
             <div id="poll-options">
-                <label>Poll Question</label>
+                <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Question</label>
                 <input type="text" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ccc; border-radius:4px;">
-                <button style="width:100%; padding:10px; border:1px dashed #ccc; background:none; cursor:pointer;">+ Add Option</button>
+                <button style="width:100%; padding:8px; border:1px dashed #ccc; background:none; cursor:pointer; color:#666;">+ Add Option</button>
             </div>
 
-            <button style="background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-weight: bold; margin-top:15px;">Create Bulletin</button>
+            <button style="background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-weight: bold; margin-top:20px; border-radius:4px; font-size:16px;">Post Bulletin</button>
         </div>
     </div>
     <script>
-        tinymce.init({ selector: '#bulletin-editor', height: 300, toolbar_mode: 'wrap', menubar: false });
+        tinymce.init({
+            selector: '#bulletin-editor',
+            height: 350,
+            menubar: false,
+            toolbar_mode: 'wrap',
+            plugins: 'link image code lists emoticons charmap table fullscreen',
+            toolbar: 'undo redo | bold italic underline | emoticons charmap | alignleft aligncenter alignright | numlist bullist | link image table | code fullscreen',
+            branding: false
+        });
         function togglePoll() {
             const p = document.getElementById('poll-options');
-            p.style.display = (p.style.display === 'block') ? 'none' : 'block';
+            const btn = document.getElementById('poll-btn');
+            const isOpen = p.style.display === 'block';
+            p.style.display = isOpen ? 'none' : 'block';
+            btn.classList.toggle('active-toggle', !isOpen);
         }
     </script>
 </body>
