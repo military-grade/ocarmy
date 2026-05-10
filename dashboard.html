@@ -8,58 +8,41 @@
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; overflow-x: hidden; }
 
+        /* Navbar & Wrapper Fixes */
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
-        .nav-left { display: flex; gap: 15px; align-items: center; height: 100%; }
-        .nav-left a, .nav-item { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 5px; }
-        
-        .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
-        .dropdown-content { display: none; position: absolute; top: 50px; left: 0; background: white; border: 1px solid var(--border); min-width: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1001; }
-        .dropdown-right { left: auto; right: 0; }
-        .dropdown-content a { display: block; padding: 10px 15px; color: #333 !important; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; }
-        .show { display: block; }
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-top: none; min-height: calc(100vh - 50px); align-items: stretch; }
 
-        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); align-items: stretch; }
+        /* Sidebar Styling (Matches Screenshot 12.40.09) */
         .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-user-header { background: #427e95; padding: 10px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .side-avatar-box { width: 50px; height: 50px; background: #eee; border-radius: 2px; background-size: cover; flex-shrink: 0; }
         .side-user-name { font-weight: bold; font-size: 16px; color: white; }
-
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
+
+        /* Folder Header (Matches Screenshot 12.41.19) */
         .main { flex: 1; padding: 30px; background: white; }
+        .folder-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 20px; }
+        .folder-title { font-weight: bold; font-size: 18px; display: flex; align-items: center; gap: 8px; }
         
-        .folder-header { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 10px 15px; border: 1px solid var(--border); border-radius: 4px; margin-top: 30px; }
+        /* Grid Layout (Matches Screenshot 12.41.19) */
         .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; padding: 20px 0; }
         .char-card { text-align: center; text-decoration: none; color: inherit; }
         .char-thumb { width: 130px; height: 130px; background: #eee; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; margin-bottom: 5px; }
+        .char-name-tag { background: var(--th-blue); color: white; padding: 4px; font-size: 11px; font-weight: bold; border-radius: 4px; display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .char-stats { font-size: 10px; color: #999; margin-top: 3px; display: flex; justify-content: center; gap: 8px; }
     </style>
-    <style id="user-custom-css"></style>
 </head>
 <body>
 
 <nav class="navbar">
     <div class="nav-left">
-        <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
-        <a href="#"><i class="fa fa-eye"></i> Browse</a>
-        <div class="dropdown">
-            <div class="nav-item" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></div>
-            <div id="drop-submit" class="dropdown-content">
-                <a href="create_character.html">Character</a>
-                <a href="create_folder.html">Folder</a>
-            </div>
-        </div>
-        <a href="#"><i class="fa fa-search"></i> Search</a>
+        <a href="dashboard.html" style="font-weight:bold; color:white; text-decoration:none;">OCARMY</a>
     </div>
-    <div class="dropdown">
-        <div class="nav-item" onclick="toggleDrop('drop-user')">
-            <span id="nav-username">User</span>
-            <div class="nav-pfp" id="nav-pfp-img"></div>
-        </div>
-        <div id="drop-user" class="dropdown-content dropdown-right">
-            <a href="dashboard.html">Profile</a>
-            <a href="#" id="logout-btn">Logout</a>
-        </div>
+    <div class="nav-right" id="nav-user-dropdown">
+        <span id="nav-username">militarygrade</span>
+        <div class="nav-pfp" id="nav-pfp-img"></div>
     </div>
 </nav>
 
@@ -67,59 +50,78 @@
     <aside class="sidebar">
         <div class="side-user-header">
             <div class="side-avatar-box" id="side-pfp"></div>
-            <div class="side-user-name" id="side-user-text">User</div>
+            <div class="side-user-name" id="side-username">militarygrade</div>
         </div>
         <div class="side-nav">
             <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
-            <a href="#"><i class="fa fa-users"></i> Characters</a>
+            <a href="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
+            <a href="characters.html"><i class="fa fa-users"></i> Characters</a>
+            
             <div class="side-label">Portfolio</div>
-            <a href="#"><i class="fa fa-paint-brush"></i> Designs</a>
-            <a href="#"><i class="fa fa-image"></i> Art</a>
+            <a href="designs.html"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a href="art.html"><i class="fa fa-image"></i> Art</a>
+            
+            <div class="side-label">Interaction</div>
+            <a href="#comments-section"><i class="fa fa-comments"></i> Comments</a>
+            <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
         </div>
     </aside>
+
     <main class="main">
-        <div id="profile-blurb"></div>
-        <div class="folder-header"><span style="font-weight:bold;"><i class="fa fa-folder-open"></i> Unsorted</span></div>
-        <div class="char-grid" id="char-list"></div>
+        <div id="user-custom-content">
+            </div>
+
+        <div class="folder-header">
+            <span class="folder-title"><i class="fa fa-folder-open"></i> Unsorted</span>
+            <button style="font-size:11px; padding:2px 8px; cursor:pointer;"><i class="fa fa-eye"></i> View All</button>
+        </div>
+
+        <div class="char-grid" id="char-list">
+            </div>
     </main>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
     const db = getFirestore(app);
-
-    window.toggleDrop = (id) => {
-        document.querySelectorAll('.dropdown-content').forEach(d => { if(d.id !== id) d.classList.remove('show'); });
-        document.getElementById(id).classList.toggle('show');
-    };
+    const auth = getAuth();
 
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists()) {
-                const data = userDoc.data();
-                document.getElementById('nav-username').innerText = data.username;
-                document.getElementById('side-user-text').innerText = data.username;
-                if (data.pfp) {
-                    document.getElementById('nav-pfp-img').style.backgroundImage = `url('${data.pfp}')`;
-                    document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
-                }
-                document.getElementById('profile-blurb').innerHTML = data.profileHTML || "";
-            }
-            const q = query(collection(db, "characters"), where("ownerId", "==", user.uid));
-            const snap = await getDocs(q);
-            const list = document.getElementById('char-list');
-            snap.forEach(d => {
-                const c = d.data();
-                list.innerHTML += `<a href="character.html?id=${d.id}" class="char-card"><div class="char-thumb" style="background-image:url('${c.avatar}')"></div><div style="font-size:12px; font-weight:bold; color:#4e92ac;">${c.name}</div></a>`;
-            });
+        if (!user) return;
+        
+        // Fetch User Info
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            document.getElementById('nav-username').innerText = data.username;
+            document.getElementById('side-username').innerText = data.username;
+            if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
         }
+
+        // Fetch Characters for "Unsorted"
+        const q = query(collection(db, "characters"), where("ownerId", "==", user.uid), where("folder", "==", "Unsorted"));
+        const snap = await getDocs(q);
+        const list = document.getElementById('char-list');
+        
+        snap.forEach(d => {
+            const c = d.data();
+            list.innerHTML += `
+                <a href="character.html?id=${d.id}" class="char-card">
+                    <div class="char-thumb" style="background-image:url('${c.avatar}')"></div>
+                    <span class="char-name-tag">
+                        ${c.visibility === 'Private' ? '<i class="fa fa-lock"></i>' : ''} ${c.name}
+                    </span>
+                    <div class="char-stats">
+                        <span><i class="fa fa-star"></i> ${c.favCount || 0}</span>
+                        <span><i class="fa fa-image"></i> ${c.imageCount || 1}</span>
+                    </div>
+                </a>`;
+        });
     });
 </script>
 </body>
