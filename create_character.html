@@ -2,167 +2,104 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Submit Character | OCARMY</title>
+    <title>Create Character | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-top: none; min-height: 100vh; }
-
-        /* Sidebar */
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; }
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: 100vh; }
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
-        .side-header { background: rgba(0,0,0,0.1); padding: 15px; font-weight: bold; font-size: 14px; }
-        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        /* Main Content */
-        .main { flex: 1; padding: 30px; border-left: 1px solid var(--border); }
-        .card { background: white; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 25px; }
-        .card-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .main { flex: 1; padding: 30px; }
+        .card { border: 1px solid var(--border); border-radius: 4px; margin-bottom: 25px; }
+        .card-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); }
         .card-body { padding: 20px; }
-
-        label { display: block; font-weight: bold; font-size: 12px; margin-bottom: 5px; color: #666; text-transform: uppercase; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; font-size: 13px; }
-
-        /* Draggable Cropper (Screenshot 13) */
-        .cropper-container { text-align: center; background: #fafafa; padding: 20px; border: 1px dashed #ccc; }
-        .preview-window { width: 150px; height: 150px; margin: 10px auto; overflow: hidden; position: relative; border: 2px solid var(--th-blue); background: #eee; cursor: grab; }
-        .preview-window:active { cursor: grabbing; }
-        #preview-img { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; }
-
-        /* Tabs (Screenshot 14) */
-        .tab-row { display: flex; border-bottom: 1px solid #ddd; margin-bottom: 15px; }
-        .tab { padding: 10px 20px; cursor: pointer; font-size: 13px; font-weight: bold; color: var(--th-blue); border: 1px solid transparent; }
-        .tab.active { background: white; border: 1px solid #ddd; border-bottom-color: white; color: #333; border-radius: 4px 4px 0 0; }
-
+        label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; }
         .btn-submit { background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <div style="font-weight: bold;">OCARMY</div>
-    <a href="dashboard.html" style="color:#ccc; text-decoration:none; font-size:13px;">Cancel</a>
-</nav>
+<nav class="navbar"><strong>OCARMY</strong></nav>
 
 <div class="wrapper">
-    <aside class="sidebar">
-        <div class="side-header"><i class="fa fa-plus"></i> Submit</div>
-        <div class="side-nav">
-            <a href="create_character.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-user"></i> Character</a>
-            <a href="create_bulletin.html"><i class="fa fa-newspaper"></i> Bulletin</a>
-            <a href="create_folder.html"><i class="fa fa-folder"></i> Folder</a>
-        </div>
+    <aside class="sidebar" style="padding:20px;">
+        <div style="font-weight:bold; margin-bottom:10px;"><i class="fa fa-plus"></i> Submit</div>
+        <a href="create_character.html" style="color:white; text-decoration:none; display:block; padding:5px 0;">Character</a>
+        <a href="create_folder.html" style="color:rgba(255,255,255,0.7); text-decoration:none; display:block; padding:5px 0;">Folder</a>
     </aside>
 
     <main class="main">
-        <h2 style="margin-top:0;">Submit Character</h2>
-
+        <h2>Create Character</h2>
         <div class="card">
-            <div class="card-header">Avatar Upload</div>
-            <div class="card-body cropper-container">
-                <input type="file" id="file-input" accept="image/*" onchange="loadImg(event)">
-                <div class="preview-window" id="crop-box">
-                    <img id="preview-img" src="" alt="">
-                </div>
-                <input type="range" id="zoom-slider" min="100" max="300" value="100" style="width:200px;" oninput="syncZoom()">
-                <p style="font-size:11px; color:#888;">Click and drag inside the box to position.</p>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">Basics</div>
+            <div class="card-header">Character Details</div>
             <div class="card-body">
-                <label>Character Name</label>
-                <input type="text" id="char-name" placeholder="Name">
-                
-                <label>Worth (Optional)</label>
-                <input type="text" id="char-worth" placeholder="e.g. $20.00">
+                <label>Name</label>
+                <input type="text" id="char-name" placeholder="Character Name" required>
 
-                <label>Folder</label>
-                <select id="char-folder">
-                    <option value="Unsorted">Unsorted</option>
-                </select>
-            </div>
-        </div>
+                <label>Reference Sheet (Main Image URL)</label>
+                <input type="text" id="char-image" placeholder="Paste direct link to image...">
 
-        <div class="card">
-            <div class="card-header">Profile Description</div>
-            <div class="card-body" style="padding:0;">
-                <textarea id="editor"></textarea>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">Design Credit & Tradeability</div>
-            <div class="card-body">
-                <div class="tab-row">
-                    <div class="tab active" onclick="setTab('self')">I am the creator</div>
-                    <div class="tab" onclick="setTab('offsite')">Off-site Creator</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                    <div>
+                        <label>Designer Credit</label>
+                        <input type="text" id="char-designer" placeholder="Link or Username">
+                    </div>
+                    <div>
+                        <label>Tradeability</label>
+                        <select id="char-trade">
+                            <option value="Not for Trade">Not for Trade</option>
+                            <option value="Trading">Open for Trades</option>
+                            <option value="Selling">For Sale</option>
+                            <option value="Gifting">Gift Only</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="credit-input" style="margin-top:15px;">
-                    <p style="font-size:13px;">You will be credited as the designer.</p>
-                </div>
-                
-                <label style="margin-top:20px;">Tradeability</label>
-                <select id="char-trade">
-                    <option value="transferable">Can be transferred</option>
-                    <option value="nontransferable">Cannot be transferred</option>
-                </select>
+
+                <label>Description</label>
+                <textarea id="char-desc"></textarea>
             </div>
         </div>
-
-        <button class="btn-submit" onclick="submitOC()">Create Character</button>
+        <button class="btn-submit" id="btn-create">Create Character</button>
     </main>
 </div>
 
-<script>
-    // TinyMCE Setup
-    tinymce.init({
-        selector: '#editor',
-        height: 400,
-        menubar: false,
-        toolbar_mode: 'wrap',
-        plugins: 'link image code lists table emoticons charmap fullscreen',
-        toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize forecolor backcolor | emoticons charmap | alignleft aligncenter alignright | numlist bullist | link image table | code fullscreen',
-        branding: false
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    tinymce.init({ selector: '#char-desc', height: 300, menubar: false });
+
+    document.getElementById('btn-create').addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) return alert("You must be logged in!");
+
+        tinymce.triggerSave();
+        const mainImg = document.getElementById('char-image').value;
+
+        try {
+            await addDoc(collection(db, "characters"), {
+                ownerId: user.uid,
+                name: document.getElementById('char-name').value,
+                avatar: mainImg,
+                designer: document.getElementById('char-designer').value,
+                tradeability: document.getElementById('char-trade').value,
+                description: document.getElementById('char-desc').value,
+                gallery: mainImg ? [mainImg] : [], // Adds the ref sheet as the first gallery item
+                createdAt: serverTimestamp()
+            });
+            alert("Character Created!");
+            window.location.href = "characters.html";
+        } catch (e) { alert(e.message); }
     });
-
-    // Draggable Logic
-    let isDragging = false, startX, startY, currentX = 0, currentY = 0;
-    const box = document.getElementById('crop-box');
-    const img = document.getElementById('preview-img');
-
-    function loadImg(e) {
-        const reader = new FileReader();
-        reader.onload = (event) => { img.src = event.target.result; };
-        reader.readAsDataURL(e.target.files[0]);
-    }
-
-    function syncZoom() { img.style.width = document.getElementById('zoom-slider').value + '%'; }
-
-    box.onmousedown = (e) => {
-        isDragging = true;
-        startX = e.clientX - currentX;
-        startY = e.clientY - currentY;
-    };
-    window.onmousemove = (e) => {
-        if (!isDragging) return;
-        currentX = e.clientX - startX;
-        currentY = e.clientY - startY;
-        img.style.transform = `translate(${currentX}px, ${currentY}px)`;
-    };
-    window.onmouseup = () => isDragging = false;
-
-    function setTab(type) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
-        document.getElementById('credit-input').innerHTML = type === 'self' ? 
-            '<p>You will be credited as designer.</p>' : 
-            '<label>Creator URL</label><input type="text" id="creator-url" placeholder="https://...">';
-    }
 </script>
 </body>
 </html>
