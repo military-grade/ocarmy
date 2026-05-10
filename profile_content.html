@@ -1,40 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Profile | OCARMY</title>
+    <title>Edit Profile Content | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
         :root { --th-blue: #008eb0; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; display: flex; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); display: flex; }
 
-        .sidebar { width: 250px; background: #fff; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; }
-        .side-header { padding: 15px; background: var(--th-blue); color: white; display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        .back-link { display: block; padding: 15px 20px; color: blue; text-decoration: underline; font-size: 16px; font-weight: bold; }
-        .nav-link { display: block; padding: 12px 20px; color: #555; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; }
-        .nav-link.active { background: #f0f0f0; border-left: 4px solid var(--th-blue); font-weight: bold; }
+        .sidebar { width: 250px; background: white; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; padding: 20px; box-sizing: border-box; }
+        .side-header { font-weight: bold; color: var(--th-blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .back-link { display: block; margin-bottom: 20px; color: blue; text-decoration: underline; font-weight: bold; font-size: 15px; }
 
-        .main { flex-grow: 1; padding: 30px; max-width: 1100px; margin: 0 auto; }
-        .btn-wysiwyg { background: #333; color: white; border: none; padding: 6px 15px; border-radius: 4px; font-size: 11px; cursor: pointer; float: right; }
-        .card { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; margin-top: 20px; }
-        .btn-save { background: var(--th-blue); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 20px; }
+        .main { flex-grow: 1; padding: 40px; max-width: 1100px; margin: 0 auto; }
+        .btn-wysiwyg { background: #333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; float: right; font-size: 12px; }
+        .btn-save { background: var(--th-blue); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 20px; font-size: 16px; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
     <div class="side-header">
-        <div id="side-pfp" style="width:30px; height:30px; background:#eee; background-size:cover; border-radius:2px;"></div>
-        <span id="side-user">User</span>
+        <div id="side-pfp" style="width:30px; height:30px; background:#eee; background-size:cover;"></div>
+        <span id="display-user">User</span>
     </div>
     <a href="dashboard.html" class="back-link">← Back to Profile</a>
-    <a href="settings.html" class="nav-link">Account Settings</a>
-    <a href="profile_content.html" class="nav-link active">Profile Content</a>
+    <div style="border-top: 1px solid #eee; padding-top: 10px;">
+        <a href="settings.html" style="display:block; padding:10px 0; color:#555; text-decoration:none;">Account Settings</a>
+        <a href="profile_content.html" style="display:block; padding:10px 0; color:var(--th-blue); font-weight:bold; text-decoration:none;">Profile Content</a>
+    </div>
 </div>
 
 <div class="main">
     <button class="btn-wysiwyg" onclick="toggleEditor()">Disable WYSIWYG</button>
-    <h2 style="color: #444;">Edit Profile Content</h2>
+    <h2 style="color: #444; margin-top: 0;">Edit Profile Content</h2>
 
     <div style="border: 1px solid #ccc; border-radius: 4px; overflow: hidden; background: white;">
         <textarea id="editor-body"></textarea>
@@ -49,7 +48,7 @@
         height: 500,
         plugins: 'lists link image charmap emoticons table code fullscreen hr',
         toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | subscript superscript | forecolor backcolor | emoticons charmap | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote hr | link image table | removeformat | code fullscreen',
-        toolbar_mode: 'wrap', // Layered toolbar
+        toolbar_mode: 'wrap', // Layers buttons downwards
         menubar: false,
         branding: false,
         content_style: 'body { font-family:Arial; font-size:14px; text-align:center; } p { margin: 16px 0; }'
@@ -76,8 +75,6 @@
         apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
         authDomain: "ocarmy-db.firebaseapp.com",
         projectId: "ocarmy-db",
-        storageBucket: "ocarmy-db.firebasestorage.app",
-        messagingSenderId: "848883355194",
         appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
     };
 
@@ -90,7 +87,7 @@
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (userDoc.exists()) {
                 const data = userDoc.data();
-                document.getElementById('side-user').innerText = data.username || "User";
+                document.getElementById('display-user').innerText = data.username || "User";
                 if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
                 
                 tinymce.get('editor-body').on('init', () => {
@@ -104,7 +101,7 @@
         const user = auth.currentUser;
         if (!user) return;
         
-        // This is the line that fixes the save bug
+        // CRITICAL FIX: Forces TinyMCE to update the textarea
         tinymce.triggerSave();
         const content = tinymce.get('editor-body').getContent();
         
@@ -112,7 +109,7 @@
             profileHTML: content
         }, { merge: true });
         
-        alert("Profile saved successfully!");
+        alert("Saved! Refresh your dashboard to see your new bio.");
     };
 </script>
 </body>
