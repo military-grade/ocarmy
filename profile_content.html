@@ -1,66 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Profile Content | OCARMY</title>
+    <title>Edit Profile | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
-        :root { --th-blue: #008eb0; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); display: flex; }
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); display: flex; flex-direction: column; }
+        
+        .navbar { background: var(--th-dark); color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .container { display: flex; flex: 1; }
 
-        .sidebar { width: 250px; background: white; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; padding: 20px; box-sizing: border-box; }
-        .side-header { font-weight: bold; color: var(--th-blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .back-link { display: block; margin-bottom: 20px; color: blue; text-decoration: underline; font-weight: bold; font-size: 15px; }
+        .sidebar { width: 180px; background: var(--th-blue); color: white; padding: 15px 0; min-height: 100vh; }
+        .back-link { display: block; padding: 10px 15px; color: white; text-decoration: none; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 10px; }
 
-        .main { flex-grow: 1; padding: 40px; max-width: 1100px; margin: 0 auto; }
-        .btn-wysiwyg { background: #333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; float: right; font-size: 12px; }
-        .btn-save { background: var(--th-blue); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 20px; font-size: 16px; }
+        .main { flex: 1; padding: 30px; }
+        .editor-card { background: white; border: 1px solid #ddd; border-radius: 4px; padding: 20px; }
+        .label-group { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #666; margin: 20px 0 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        
+        .btn-update { background: #7cc1d8; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 20px; }
+        .btn-wysiwyg { background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; float: right; }
+        
+        textarea.css-box { width: 100%; height: 100px; font-family: monospace; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div class="side-header">
-        <div id="side-pfp" style="width:30px; height:30px; background:#eee; background-size:cover;"></div>
-        <span id="display-user">User</span>
-    </div>
-    <a href="dashboard.html" class="back-link">← Back to Profile</a>
-    <div style="border-top: 1px solid #eee; padding-top: 10px;">
-        <a href="settings.html" style="display:block; padding:10px 0; color:#555; text-decoration:none;">Account Settings</a>
-        <a href="profile_content.html" style="display:block; padding:10px 0; color:var(--th-blue); font-weight:bold; text-decoration:none;">Profile Content</a>
-    </div>
+<div class="navbar">
+    <div style="font-weight: bold;">OCARMY</div>
+    <div id="user-tag" style="font-size: 13px;">User Settings</div>
 </div>
 
-<div class="main">
-    <button class="btn-wysiwyg" onclick="toggleEditor()">Disable WYSIWYG</button>
-    <h2 style="color: #444; margin-top: 0;">Edit Profile Content</h2>
-
-    <div style="border: 1px solid #ccc; border-radius: 4px; overflow: hidden; background: white;">
-        <textarea id="editor-body"></textarea>
+<div class="container">
+    <div class="sidebar">
+        <a href="dashboard.html" class="back-link"><i class="fa fa-arrow-left"></i> Back to Profile</a>
+        <div style="padding: 10px 15px; font-size: 13px; opacity: 0.8;">General Settings</div>
+        <div style="padding: 10px 15px; font-size: 13px; font-weight: bold; background: rgba(0,0,0,0.1);">Profile Content</div>
     </div>
 
-    <button class="btn-save" onclick="saveProfile()">Save Changes</button>
+    <div class="main">
+        <button class="btn-wysiwyg" onclick="toggleWYSIWYG()">Disable WYSIWYG</button>
+        <h2 style="margin-top:0;">Edit Profile</h2>
+
+        <div class="editor-card">
+            <div class="label-group">Edit Profile Blurb</div>
+            <textarea id="profile-editor"></textarea>
+
+            <div class="label-group">Custom CSS</div>
+            <textarea class="css-box" placeholder="<style> ... </style>"></textarea>
+
+            <button class="btn-update" onclick="updateProfile()">Update Profile</button>
+        </div>
+    </div>
 </div>
 
 <script>
     tinymce.init({
-        selector: '#editor-body',
-        height: 500,
-        plugins: 'lists link image charmap emoticons table code fullscreen hr',
-        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | subscript superscript | forecolor backcolor | emoticons charmap | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote hr | link image table | removeformat | code fullscreen',
-        toolbar_mode: 'wrap', // Layers buttons downwards
+        selector: '#profile-editor',
+        height: 300,
         menubar: false,
+        plugins: 'link image code lists table emoticons',
+        toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image emoticons | code',
         branding: false,
-        content_style: 'body { font-family:Arial; font-size:14px; text-align:center; } p { margin: 16px 0; }'
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px; text-align:center; }'
     });
 
-    function toggleEditor() {
+    function toggleWYSIWYG() {
+        const editor = tinymce.get('profile-editor');
         const btn = document.querySelector('.btn-wysiwyg');
-        if (tinymce.get('editor-body').isHidden()) {
-            tinymce.get('editor-body').show();
+        if (editor.isHidden()) {
+            editor.show();
             btn.innerText = "Disable WYSIWYG";
         } else {
-            tinymce.get('editor-body').hide();
+            editor.hide();
             btn.innerText = "Enable WYSIWYG";
         }
     }
@@ -87,29 +99,34 @@
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (userDoc.exists()) {
                 const data = userDoc.data();
-                document.getElementById('display-user').innerText = data.username || "User";
-                if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+                document.getElementById('user-tag').innerText = data.username || user.email;
                 
-                tinymce.get('editor-body').on('init', () => {
-                    if(data.profileHTML) tinymce.get('editor-body').setContent(data.profileHTML);
+                // Load existing content into TinyMCE
+                tinymce.get('profile-editor').on('init', () => {
+                    if(data.profileHTML) tinymce.get('profile-editor').setContent(data.profileHTML);
                 });
             }
         }
     });
 
-    window.saveProfile = async () => {
+    window.updateProfile = async () => {
         const user = auth.currentUser;
         if (!user) return;
-        
-        // CRITICAL FIX: Forces TinyMCE to update the textarea
+
+        // CRITICAL: Forces TinyMCE to update the textarea value
         tinymce.triggerSave();
-        const content = tinymce.get('editor-body').getContent();
-        
-        await setDoc(doc(db, "users", user.uid), {
-            profileHTML: content
-        }, { merge: true });
-        
-        alert("Saved! Refresh your dashboard to see your new bio.");
+        const newHTML = tinymce.get('profile-editor').getContent();
+
+        try {
+            await setDoc(doc(db, "users", user.uid), {
+                profileHTML: newHTML
+            }, { merge: true });
+            
+            alert("Profile Updated!");
+            window.location.href = "dashboard.html";
+        } catch (e) {
+            console.error("Save Error: ", e);
+        }
     };
 </script>
 </body>
