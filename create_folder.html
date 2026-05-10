@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Folder | OCARMY</title>
+    <title>Create Character | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; display: flex; flex-direction: column; }
-
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
         .wrapper { display: flex; max-width: 1200px; margin: 0 auto; width: 100%; min-height: 100vh; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
 
         /* Sidebar */
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
         .side-header { background: rgba(0,0,0,0.1); padding: 15px; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.8; }
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .side-nav a:hover { background: rgba(0,0,0,0.1); }
+        .side-nav a:hover, .side-nav a.active { background: rgba(0,0,0,0.1); }
 
         /* Main Content */
         .main { flex: 1; padding: 30px; }
@@ -25,10 +25,12 @@
         .card-body { padding: 20px; }
 
         label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: #555; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; background: #fff; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; }
         
-        .grid-row { display: grid; grid-template-columns: 1fr 1; gap: 20px; }
-        .btn-wysiwyg { background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; float: right; }
+        .btn-wysiwyg { border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; float: right; color: white; transition: 0.3s; }
+        .btn-blue { background: #007bff; } /* Enabled */
+        .btn-black { background: #333; } /* Disabled */
+        
         .btn-submit { background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
@@ -43,82 +45,61 @@
     <aside class="sidebar">
         <div class="side-header"><i class="fa fa-plus"></i> Submit</div>
         <div class="side-nav">
-            <a href="create_character.html"><i class="fa fa-user"></i> Character</a>
-            <a href="create_folder.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-folder"></i> Folder</a>
+            <a href="create_character.html" class="active"><i class="fa fa-user"></i> Character</a>
+            <a href="create_folder.html"><i class="fa fa-folder"></i> Folder</a>
+            <div class="side-label">Profile Settings</div>
+            <a href="profile_content.html"><i class="fa fa-id-card"></i> Profile Content</a>
+            <div class="side-label">Management</div>
+            <a href="#"><i class="fa fa-link"></i> Links</a>
+            <a href="#"><i class="fa fa-globe"></i> Worlds</a>
+            <a href="#"><i class="fa fa-star"></i> Favorites</a>
         </div>
     </aside>
 
     <main class="main">
-        <h2 style="margin-top:0;">Create Folder</h2>
+        <h2 style="margin-top:0;">Create Character</h2>
 
         <div class="card">
             <div class="card-header">General Settings</div>
             <div class="card-body">
-                <label>Thumbnail (Optional Image URL)</label>
-                <input type="text" id="folder-thumb" placeholder="Paste image link...">
+                <label>Character Name</label>
+                <input type="text" id="char-name" required>
 
-                <div class="grid-row" style="grid-template-columns: 2fr 1fr 1fr;">
-                    <div>
-                        <label>Folder Name</label>
-                        <input type="text" id="folder-name" required>
-                    </div>
-                    <div>
-                        <label>Parent Folder</label>
-                        <select id="parent-folder">
-                            <option value="none">None (Top Level)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Folder Privacy</label>
-                        <select id="folder-privacy">
-                            <option value="public">Public</option>
-                            <option value="protected">Protected</option>
-                            <option value="private">Private</option>
-                        </select>
-                    </div>
-                </div>
-
-                <label>Folder Sort</label>
-                <select id="folder-sort">
-                    <option value="default">Default</option>
-                    <option value="name">Name</option>
-                    <option value="newest">Newest</option>
-                    <option value="oldest">Oldest</option>
+                <label>Folder</label>
+                <select id="char-folder">
+                    <option value="none">Unsorted</option>
                 </select>
 
-                <label>Folder Description</label>
+                <label>Reference Image (URL)</label>
+                <input type="text" id="char-image" placeholder="Paste ref sheet link...">
+
+                <label>Designer Credit</label>
+                <input type="text" id="char-designer" placeholder="Designer username or link">
+
+                <label>Tradeability</label>
+                <select id="char-trade">
+                    <option value="Not for Trade">Not for Trade</option>
+                    <option value="Trading">Open for Trades</option>
+                    <option value="Selling">For Sale</option>
+                    <option value="Gifting">Gift Only</option>
+                </select>
+
+                <label>Profile Description</label>
                 <div style="margin-bottom: 10px;">
-                    <button class="btn-wysiwyg" onclick="toggleWYSIWYG()">Disable WYSIWYG</button>
+                    <button id="wysiwyg-toggle" class="btn-wysiwyg btn-blue" onclick="toggleWYSIWYG()">Disable WYSIWYG</button>
                     <div style="clear:both;"></div>
                 </div>
-                <textarea id="folder-desc"></textarea>
+                <textarea id="char-desc"></textarea>
             </div>
         </div>
 
-        <button class="btn-submit" onclick="saveFolder()">Create Folder</button>
+        <button class="btn-submit" id="submit-btn">Create Character</button>
     </main>
 </div>
 
-<script>
-    tinymce.init({
-        selector: '#folder-desc',
-        height: 300,
-        menubar: false,
-        toolbar_mode: 'wrap',
-        plugins: 'link image code lists table emoticons charmap fullscreen',
-        toolbar: 'undo redo | bold italic underline | forecolor backcolor | emoticons charmap | bullist numlist | link image table | code fullscreen',
-        branding: false
-    });
-
-    function toggleWYSIWYG() {
-        const ed = tinymce.get('folder-desc');
-        ed.isHidden() ? ed.show() : ed.hide();
-    }
-</script>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = { 
@@ -132,13 +113,36 @@
     const db = getFirestore(app);
     const auth = getAuth();
 
-    // Load existing folders for the parent folder dropdown
+    tinymce.init({
+        selector: '#char-desc',
+        height: 350,
+        menubar: false,
+        plugins: 'link image code lists table emoticons charmap',
+        toolbar: 'undo redo | bold italic underline | forecolor backcolor | emoticons | bullist numlist | link image | code',
+        branding: false
+    });
+
+    window.toggleWYSIWYG = function() {
+        const ed = tinymce.get('char-desc');
+        const btn = document.getElementById('wysiwyg-toggle');
+        if (ed.isHidden()) {
+            ed.show();
+            btn.innerText = "Disable WYSIWYG";
+            btn.className = "btn-wysiwyg btn-blue";
+        } else {
+            ed.hide();
+            btn.innerText = "Enable WYSIWYG";
+            btn.className = "btn-wysiwyg btn-black";
+        }
+    };
+
     onAuthStateChanged(auth, async (user) => {
         if (!user) return;
+        // Load folders for selection
         const q = query(collection(db, "folders"), where("ownerId", "==", user.uid));
-        const querySnapshot = await getDocs(q);
-        const select = document.getElementById('parent-folder');
-        querySnapshot.forEach((doc) => {
+        const snap = await getDocs(q);
+        const select = document.getElementById('char-folder');
+        snap.forEach(doc => {
             const opt = document.createElement('option');
             opt.value = doc.id;
             opt.text = doc.data().name;
@@ -146,33 +150,29 @@
         });
     });
 
-    window.saveFolder = async () => {
+    document.getElementById('submit-btn').addEventListener('click', async () => {
         const user = auth.currentUser;
-        if (!user) return alert("Please log in.");
+        if (!user) return alert("Log in first.");
 
         tinymce.triggerSave();
-        
-        const folderData = {
-            ownerId: user.uid,
-            name: document.getElementById('folder-name').value,
-            thumbnail: document.getElementById('folder-thumb').value,
-            parent: document.getElementById('parent-folder').value,
-            privacy: document.getElementById('folder-privacy').value,
-            sort: document.getElementById('folder-sort').value,
-            description: tinymce.get('folder-desc').getContent(),
-            createdAt: serverTimestamp()
-        };
-
-        if (!folderData.name) return alert("Folder name is required.");
+        const mainImg = document.getElementById('char-image').value;
 
         try {
-            await addDoc(collection(db, "folders"), folderData);
-            alert("Folder Created!");
-            window.location.href = "dashboard.html";
-        } catch (e) {
-            alert("Error: " + e.message);
-        }
-    };
+            await addDoc(collection(db, "characters"), {
+                ownerId: user.uid,
+                name: document.getElementById('char-name').value,
+                folder: document.getElementById('char-folder').value,
+                avatar: mainImg,
+                designer: document.getElementById('char-designer').value,
+                tradeability: document.getElementById('char-trade').value,
+                description: tinymce.get('char-desc').getContent(),
+                gallery: mainImg ? [mainImg] : [], // Start gallery with the ref sheet
+                createdAt: new Date()
+            });
+            alert("Character Created!");
+            window.location.href = "characters.html";
+        } catch (e) { alert("Error: " + e.message); }
+    });
 </script>
 </body>
 </html>
