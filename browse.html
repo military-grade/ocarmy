@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browse | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
+
+        /* Navbar Matches Dashboard Restoration */
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
+        .nav-left { display: flex; gap: 10px; align-items: center; height: 100%; }
+        .nav-left a, .nav-item { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
+        .nav-left a:hover, .nav-item:hover { color: white; background: rgba(255,255,255,0.1); }
+
+        .wrapper { max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-top: none; min-height: calc(100vh - 50px); padding: 30px; }
+
+        /* Search Bar Area */
+        .search-area { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .search-trigger { width: 100%; padding: 12px 20px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; color: #999; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .search-trigger:hover { border-color: var(--th-blue); }
+
+        /* Section Styling */
+        .browse-section { margin-bottom: 40px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+        .section-header { background: #f9f9f9; padding: 10px 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .section-title { font-size: 18px; color: #333; display: flex; align-items: center; gap: 10px; }
+        .section-body { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+
+        /* Character Cards (Matches Screenshot 1.30.46) */
+        .char-card { text-align: center; text-decoration: none; color: inherit; display: block; }
+        .char-thumb { width: 140px; height: 140px; background: #eee; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; margin-bottom: 5px; position: relative; }
+        .char-badge { background: var(--th-blue); color: white; padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 3px; max-width: 100%; }
+        .char-owner { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; color: #555; }
+        .char-owner i { font-size: 10px; }
+        .char-stats { font-size: 10px; color: #999; margin-top: 4px; }
+        
+        .btn-browse-tool { padding: 4px 8px; font-size: 12px; background: white; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
+        <a href="browse.html" style="background: rgba(255,255,255,0.1); color: white;"><i class="fa fa-eye"></i> Browse</a>
+        <a href="#"><i class="fa fa-plus"></i> Submit</a>
+        <a href="search.html"><i class="fa fa-search"></i> Search</a>
+        <a href="#"><i class="fa fa-info-circle"></i> Info</a>
+        <a href="#"><i class="fa fa-newspaper"></i> Blogs</a>
+    </div>
+</nav>
+
+<div class="wrapper">
+    <div class="search-area">
+        <a href="search.html" class="search-trigger">
+            <i class="fa fa-search"></i> Search OCARMY...
+        </a>
+    </div>
+
+    <div class="browse-section">
+        <div class="section-header">
+            <span class="section-title"><i class="fa fa-users"></i> Feed</span>
+            <div style="display: flex; gap: 5px;">
+                <button class="btn-browse-tool">Browse</button>
+                <button class="btn-browse-tool"><i class="fa fa-cog"></i></button>
+            </div>
+        </div>
+        <div class="section-body" id="feed-grid">
+            </div>
+    </div>
+
+    <div class="browse-section">
+        <div class="section-header">
+            <span class="section-title"><i class="fa fa-dice"></i> Random</span>
+        </div>
+        <div class="section-body" id="random-grid">
+            <a href="#" class="char-card">
+                <div class="char-thumb" style="background-image: url('https://via.placeholder.com/140')"></div>
+                <div class="char-badge"><i class="fa fa-lock"></i> DOBIE</div><br>
+                <div class="char-owner"><i class="fa fa-user"></i> fourteendays</div>
+                <div class="char-stats">★ 1 | ✉ 1</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="browse-section">
+        <div class="section-header">
+            <span class="section-title"><i class="fa fa-clock"></i> Recent</span>
+        </div>
+        <div class="section-body" id="recent-grid">
+            </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    // Template function to generate the Toyhouse character card
+    function createCharCard(id, data) {
+        return `
+            <a href="character.html?id=${id}" class="char-card">
+                <div class="char-thumb" style="background-image: url('${data.avatar || ''}')"></div>
+                <div class="char-badge">
+                    ${data.visibility === 'Private' ? '<i class="fa fa-lock"></i>' : ''} ${data.name}
+                </div><br>
+                <div class="char-owner"><i class="fa fa-user"></i> ${data.ownerName}</div>
+                <div class="char-stats">★ ${data.favCount || 0} | ✉ ${data.imgCount || 1}</div>
+            </a>`;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        // Load Random (Limit 6 for now)
+        const qRand = query(collection(db, "characters"), limit(6));
+        const snapRand = await getDocs(qRand);
+        const randomGrid = document.getElementById('random-grid');
+        randomGrid.innerHTML = "";
+        snapRand.forEach(doc => {
+            randomGrid.innerHTML += createCharCard(doc.id, doc.data());
+        });
+
+        // Load Recent (OrderBy timestamp)
+        const qRecent = query(collection(db, "characters"), orderBy("createdAt", "desc"), limit(6));
+        const snapRecent = await getDocs(qRecent);
+        const recentGrid = document.getElementById('recent-grid');
+        recentGrid.innerHTML = "";
+        snapRecent.forEach(doc => {
+            recentGrid.innerHTML += createCharCard(doc.id, doc.data());
+        });
+    });
+</script>
+</body>
+</html>
