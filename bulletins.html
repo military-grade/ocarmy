@@ -3,32 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>Bulletins | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; align-items: stretch; }
+        .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .main { flex: 1; padding: 30px; }
+        
+        .page-header { font-size: 18px; font-weight: bold; color: var(--th-blue); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
         .bulletin-card { border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
-        .bulletin-header { background: #f9f9f9; padding: 10px; border-bottom: 1px solid #ddd; display: flex; gap: 15px; }
-        .bulletin-pfp { width: 60px; height: 60px; border-radius: 4px; background-size: cover; }
-        .bulletin-content { padding: 15px; min-height: 50px; }
+        .bulletin-header { background: #f9f9f9; padding: 15px; border-bottom: 1px solid #ddd; display: flex; gap: 15px; }
+        .bulletin-pfp { width: 80px; height: 80px; border-radius: 4px; background-size: cover; border: 1px solid #eee; }
+        .bulletin-content { padding: 20px; min-height: 50px; font-size: 14px; }
+        .btn-sm { padding: 2px 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; background: white; }
     </style>
 </head>
 <body>
+<nav class="navbar"><b style="font-size:16px;">OCARMY</b></nav>
+<div class="wrapper">
+    <aside class="sidebar">
+        <div style="padding:15px; background:rgba(0,0,0,0.1); font-weight:bold;">militarygrade</div>
+        <div class="side-nav">
+            <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
+            <a href="bulletins.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-comment"></i> Bulletins</a>
+            <a href="dashboard.html"><i class="fa fa-users"></i> Characters</a>
+        </div>
+    </aside>
     <main class="main">
-        <div class="page-header"><i class="fa fa-user"></i> <span id="user-header-b">User</span>'s Bulletins</div>
+        <div class="page-header"><i class="fa fa-user"></i> militarygrade's Bulletins</div>
         <div id="bulletin-list">
             <div class="bulletin-card">
                 <div class="bulletin-header">
-                    <div class="bulletin-pfp" style="background-image: url('pfp.jpg')"></div>
+                    <div class="bulletin-pfp" id="user-pfp"></div>
                     <div>
-                        <div style="font-weight:bold; color:var(--th-blue); font-size:18px;"><i class="fa fa-times-circle"></i> TEST HI</div>
-                        <div style="font-size:11px; color:#666;">Posted 5 seconds ago by <strong>User</strong></div>
-                        <div style="margin-top:5px;">
+                        <div style="font-weight:bold; color:var(--th-blue); font-size:20px;"><i class="fa fa-times-circle"></i> TEST HI</div>
+                        <div style="font-size:12px; color:#666; margin: 5px 0;">Posted by <strong>militarygrade</strong></div>
+                        <div style="display:flex; gap:5px;">
                             <button class="btn-sm"><i class="fa fa-pencil"></i> Edit</button>
-                            <button class="btn-sm btn-danger"><i class="fa fa-trash"></i> Delete</button>
+                            <button class="btn-sm" style="background:#d9534f; color:white; border:none;"><i class="fa fa-trash"></i> Delete</button>
                         </div>
                     </div>
                 </div>
                 <div class="bulletin-content">hi hih hihkgjfv vf</div>
+                <div style="background:#f9f9f9; padding:8px 15px; border-top:1px solid #eee; text-align:center; font-size:12px; color:#777;">0 Comments</div>
             </div>
         </div>
     </main>
+</div>
 </body>
 </html>
