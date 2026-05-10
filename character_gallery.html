@@ -5,22 +5,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; }
+        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; --side-teal: #7cc1d8; }
         body { margin: 0; font-family: sans-serif; background: var(--th-bg); }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; min-height: 100vh; }
-        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
+        .side-header { background: #427e95; padding: 10px 15px; font-weight: bold; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .side-user-info { padding: 12px 15px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); }
+        .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .main { flex: 1; padding: 25px; }
-        
-        /* Gallery Grid - Screenshot 3.09.13 */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
         .gallery-card { border: 1px solid var(--border); padding: 5px; border-radius: 4px; position: relative; }
-        .gallery-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 2px; }
-        .edit-pencil { position: absolute; bottom: 10px; right: 10px; background: white; border: 1px solid #ddd; padding: 2px 6px; border-radius: 3px; font-size: 10px; color: #666; cursor: pointer; }
+        .gallery-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
     </style>
 </head>
 <body>
 <div class="wrapper">
-    <aside class="sidebar">/* ... Sidebar Code ... */</aside>
+    <aside class="sidebar">
+        <div class="side-header"><i class="fa fa-heart"></i> Character</div>
+        <div class="side-user-info">
+            <div class="side-avatar" id="side-pfp"></div>
+            <a href="#" id="side-user-link" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
+        </div>
+        <div class="side-nav">
+            <a href="#" id="link-profile"><i class="fa fa-file-alt"></i> Profile</a>
+            <a href="#" class="active"><i class="fa fa-image"></i> Gallery <span id="count-gallery" class="badge bg-light text-dark float-end">0</span></a>
+        </div>
+    </aside>
 
     <main class="main">
         <h2 class="border-bottom pb-2 mb-4"><i class="fa fa-image"></i> <span id="char-name">Character</span>'s Gallery</h2>
@@ -30,25 +41,27 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
-    const auth = getAuth();
     const charId = new URLSearchParams(window.location.search).get('id');
 
-    onAuthStateChanged(auth, (user) => {
-        onSnapshot(doc(db, "characters", charId), (snap) => {
-            const data = snap.data();
-            document.getElementById('char-name').innerText = data.name;
-            const grid = document.getElementById('gallery-display');
-            grid.innerHTML = (data.gallery || []).map(img => `
-                <div class="gallery-card">
-                    <img src="${img}">
-                    ${user && user.uid === data.ownerId ? `<div class="edit-pencil"><i class="fa fa-pencil"></i></div>` : ''}
-                </div>
-            `).join('');
-        });
+    onSnapshot(doc(db, "characters", charId), async (snap) => {
+        const data = snap.data();
+        document.getElementById('char-name').innerText = data.name;
+        document.getElementById('link-profile').href = `character.html?id=${charId}`;
+        
+        const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
+        if(ownerSnap.exists()){
+            const oData = ownerSnap.data();
+            document.getElementById('side-user-link').innerText = oData.username;
+            document.getElementById('side-user-link').href = `user.html?id=${data.ownerId}`;
+            if(oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
+        }
+
+        const gallery = data.gallery || [];
+        document.getElementById('count-gallery').innerText = gallery.length;
+        document.getElementById('gallery-display').innerHTML = gallery.map(img => `<div class="gallery-card"><img src="${img}"></div>`).join('');
     });
 </script>
 </body>
