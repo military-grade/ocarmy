@@ -1,89 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard | OCARMY</title>
+    <meta charset="UTF-8">
+    <title>Profile | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --th-blue: #008eb0; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; display: flex; }
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* Top Navbar */
+        .navbar { background: var(--th-dark); color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-links { display: flex; gap: 20px; font-size: 14px; }
+        .nav-links a { color: #ccc; text-decoration: none; }
+        .nav-links a:hover { color: white; }
+
+        .container { display: flex; flex: 1; }
 
         /* Sidebar */
-        .sidebar { width: 250px; background: white; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; padding: 20px; box-sizing: border-box; }
-        .side-header { font-weight: bold; color: var(--th-blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .side-nav a { display: block; padding: 10px 0; color: #555; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee; }
-        .side-nav a:hover { color: var(--th-blue); }
+        .sidebar { width: 180px; background: var(--th-blue); color: white; padding: 15px 0; display: flex; flex-direction: column; }
+        .sidebar-user { text-align: center; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .side-avatar { width: 60px; height: 60px; background: white; margin: 0 auto 10px; background-size: cover; border-radius: 2px; }
+        .side-nav-group { margin-bottom: 20px; }
+        .side-nav-label { font-size: 10px; font-weight: bold; padding: 5px 15px; text-transform: uppercase; opacity: 0.8; }
+        .side-nav a { display: block; padding: 8px 15px; color: white; text-decoration: none; font-size: 13px; }
+        .side-nav a:hover { background: rgba(0,0,0,0.1); }
 
-        /* Main Profile Area */
-        .main { flex-grow: 1; padding: 40px; max-width: 1000px; margin: 0 auto; }
-        .profile-header { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 30px; text-align: center; margin-bottom: 20px; }
-        .avatar-main { width: 150px; height: 150px; background: #eee; border-radius: 4px; margin: 0 auto 15px; background-size: cover; border: 1px solid #ddd; }
-        
-        /* THE CONTENT AREA */
-        .profile-content { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 30px; line-height: 1.6; }
+        /* Main Content */
+        .main { flex: 1; padding: 25px; background: white; margin: 20px; border: 1px solid #ddd; border-radius: 4px; }
+        #profile-content-area { border: 1px dashed #ccc; padding: 20px; margin-bottom: 30px; text-align: center; min-height: 100px; }
+        .section-header { border-bottom: 1px solid #eee; margin-bottom: 15px; font-size: 20px; font-weight: bold; color: #444; }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div class="side-header">
-        <div id="side-pfp" style="width:30px; height:30px; background:#eee; background-size:cover;"></div>
-        <span id="display-username">Loading...</span>
+<div class="navbar">
+    <div style="font-weight: bold; letter-spacing: 1px;">OCARMY</div>
+    <div class="nav-links">
+        <a href="dashboard.html"><i class="fa fa-home"></i> Profile</a>
+        <a href="#"><i class="fa fa-info-circle"></i> Info</a>
+        <a href="#"><i class="fa fa-plus"></i> Submit</a>
     </div>
-    <div class="side-nav">
-        <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
-        <a href="settings.html"><i class="fa fa-cog"></i> Settings</a>
-        <a href="profile_content.html"><i class="fa fa-edit"></i> Edit Profile</a>
-    </div>
+    <div id="nav-username" style="font-size: 13px;">Guest</div>
 </div>
 
-<div class="main">
-    <div class="profile-header">
-        <div class="avatar-main" id="main-pfp"></div>
-        <h1 id="profile-name">User</h1>
+<div class="container">
+    <div class="sidebar">
+        <div class="sidebar-user">
+            <div class="side-avatar" id="side-pfp"></div>
+            <div id="side-username" style="font-weight: bold;">User</div>
+        </div>
+        
+        <div class="side-nav">
+            <a href="#"><i class="fa fa-file-alt"></i> Bulletins</a>
+            <a href="#"><i class="fa fa-users"></i> Characters</a>
+            <a href="#"><i class="fa fa-link"></i> Links</a>
+            <a href="#"><i class="fa fa-globe"></i> Worlds</a>
+            <a href="#"><i class="fa fa-star"></i> Favorites</a>
+            
+            <div class="side-nav-label">Portfolio</div>
+            <a href="#"><i class="fa fa-palette"></i> Designs</a>
+            <a href="#"><i class="fa fa-pencil-alt"></i> Art</a>
+            
+            <div class="side-nav-label">Account</div>
+            <a href="settings.html"><i class="fa fa-cog"></i> Settings</a>
+            <a href="profile_content.html"><i class="fa fa-edit"></i> Edit Profile</a>
+            <a href="#" id="logout-btn"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        </div>
     </div>
 
-    <div class="profile-content" id="profile-display">
-        <p style="color: #999;">Loading your profile content...</p>
+    <div class="main">
+        <div id="profile-content-area">
+            <p style="color: #999;">Loading profile blurb...</p>
+        </div>
+
+        <div style="display: flex; gap: 40px;">
+            <div style="flex: 2;">
+                <div class="section-header">Recent Characters</div>
+                <p style="color: #888; font-size: 13px;">No characters found.</p>
+            </div>
+            <div style="flex: 1;">
+                <div class="section-header">Latest Comments</div>
+                <p style="color: #888; font-size: 13px;">No comments found.</p>
+            </div>
+        </div>
     </div>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
-    authDomain: "ocarmy-db.firebaseapp.com",
-    projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.firebasestorage.app",
-    appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
-  };
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
+        authDomain: "ocarmy-db.firebaseapp.com",
+        projectId: "ocarmy-db",
+        storageBucket: "ocarmy-db.firebasestorage.app",
+        appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const data = userDoc.data();
-        document.getElementById('display-username').innerText = data.username || "User";
-        document.getElementById('profile-name').innerText = data.username || "User";
-        
-        if (data.pfp) {
-          document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
-          document.getElementById('main-pfp').style.backgroundImage = `url('${data.pfp}')`;
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                
+                // Update UI elements
+                document.getElementById('side-username').innerText = data.username || "User";
+                document.getElementById('nav-username').innerText = data.username || user.email;
+                if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+                
+                // THE CARRY-OVER FIX: Match this key to profile_content.html
+                const profileArea = document.getElementById('profile-content-area');
+                profileArea.innerHTML = data.profileHTML || "hello! I am the owner of ocarmy.";
+            }
+        } else {
+            window.location.href = "index.html";
         }
-        
-        // This pulls the text saved in profile_content.html
-        document.getElementById('profile-display').innerHTML = data.profileHTML || "<p>No profile content yet.</p>";
-      }
-    } else {
-      window.location.href = "index.html";
-    }
-  });
+    });
+
+    document.getElementById('logout-btn').onclick = () => signOut(auth);
 </script>
 </body>
 </html>
