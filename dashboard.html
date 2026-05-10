@@ -9,18 +9,23 @@
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
 
-        /* Navbar - Every button restored per Screenshot 1.24.10 */
+        /* Navbar: Full Restore (Screenshot 1.24.10 & 1.35.15) */
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .nav-left { display: flex; gap: 10px; align-items: center; height: 100%; }
         .nav-left a, .nav-item { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
         .nav-left a:hover, .nav-item:hover { color: white; background: rgba(255,255,255,0.1); }
         
+        /* Notif Badges (Screenshot 1.35.15) */
+        .notif-bar { display: flex; align-items: center; gap: 2px; margin-right: 15px; }
+        .notif-item { padding: 4px 10px; font-size: 11px; border-radius: 3px; color: white; display: flex; align-items: center; gap: 5px; background: #337ab7; text-decoration: none; }
+        .notif-world { background: #f0ad4e; }
+
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
         .dropdown-content { display: none; position: absolute; top: 50px; right: 0; background: white; border: 1px solid var(--border); min-width: 160px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1001; }
         .dropdown-content a { display: block; padding: 10px 15px; color: #333 !important; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; height: auto; text-align: left; }
         .show { display: block; }
 
-        /* Sidebar - Restored Sections per Screenshot 1.08.55 */
+        /* Sidebar: Full Restore (Screenshot 1.08.55) */
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); align-items: stretch; }
         .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -28,6 +33,8 @@
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
+        
+        .btn-subscribe { color: white !important; font-weight: bold; background: rgba(255,255,255,0.1); }
 
         .main { flex: 1; padding: 30px; background: white; }
         #profile-render-zone { width: 100%; min-height: 50px; }
@@ -39,7 +46,7 @@
 <nav class="navbar">
     <div class="nav-left">
         <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
-        <a href="#"><i class="fa fa-eye"></i> Browse</a>
+        <a href="browse.html"><i class="fa fa-eye"></i> Browse</a>
         <div class="dropdown">
             <button class="nav-item" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></button>
             <div id="drop-submit" class="dropdown-content" style="left:0; right:auto;">
@@ -47,25 +54,34 @@
                 <a href="create_bulletin.html">Bulletin</a>
             </div>
         </div>
-        <a href="#"><i class="fa fa-search"></i> Search</a>
+        <a href="search.html"><i class="fa fa-search"></i> Search</a>
         <a href="#"><i class="fa fa-info-circle"></i> Info</a>
         <a href="#"><i class="fa fa-newspaper"></i> Blogs</a>
         <a href="#"><i class="fa fa-bullhorn"></i> News</a>
     </div>
 
-    <div class="dropdown">
-        <button class="nav-item" onclick="toggleDrop('drop-user')">
-            <span id="nav-username">militarygrade</span>
-            <div id="nav-avatar" style="width:30px; height:30px; background:#eee; border-radius:2px; background-size:cover; margin-left:8px;"></div>
-            <i class="fa fa-caret-down" style="margin-left:5px; font-size:10px;"></i>
-        </button>
-        <div id="drop-user" class="dropdown-content">
-            <a href="dashboard.html">Profile</a>
-            <a href="characters.html">Characters</a>
-            <a href="messages.html">Inbox</a>
-            <a href="settings.html">Settings</a>
-            <div style="border-top:1px solid #eee;"></div>
-            <a href="#" id="logout-btn">Logout</a>
+    <div style="display: flex; align-items: center;">
+        <div class="notif-bar" id="global-notifs">
+            <a href="#" class="notif-item notif-world"><i class="fa fa-globe"></i> <span id="count-world">0</span></a>
+            <a href="notifications.html" class="notif-item"><i class="fa fa-user"></i> <span id="count-alerts">0</span></a>
+            <a href="#" class="notif-item"><i class="fa fa-star"></i> <span id="count-favs">0</span></a>
+            <a href="messages.html" class="notif-item"><i class="fa fa-envelope"></i> <span id="count-inbox">0</span></a>
+        </div>
+
+        <div class="dropdown">
+            <button class="nav-item" onclick="toggleDrop('drop-user')">
+                <span id="nav-username">User</span>
+                <div id="nav-avatar" style="width:30px; height:30px; background:#eee; border-radius:2px; background-size:cover; margin-left:8px;"></div>
+                <i class="fa fa-caret-down" style="margin-left:5px; font-size:10px;"></i>
+            </button>
+            <div id="drop-user" class="dropdown-content">
+                <a href="dashboard.html">Profile</a>
+                <a href="characters.html">Characters</a>
+                <a href="messages.html">Inbox</a>
+                <a href="settings.html">Settings</a>
+                <div style="border-top:1px solid #eee;"></div>
+                <a href="#" id="logout-btn">Logout</a>
+            </div>
         </div>
     </div>
 </nav>
@@ -74,7 +90,7 @@
     <aside class="sidebar">
         <div class="side-user-header">
             <div class="side-avatar" id="side-pfp"></div>
-            <div style="font-weight: bold;" id="side-user-text">militarygrade</div>
+            <div style="font-weight: bold;" id="side-user-text">User</div>
         </div>
         <div class="side-nav">
             <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
@@ -90,15 +106,16 @@
             <div class="side-label">Interaction</div>
             <a href="profile_comments.html"><i class="fa fa-comments"></i> Comments</a>
             <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
+            <a href="subscribe.html" class="btn-subscribe"><i class="fa fa-plus"></i> Subscribe</a>
         </div>
     </aside>
 
     <main class="main">
         <div id="profile-render-zone"></div>
-
+        
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 40px;">
             <span style="font-weight:bold; font-size: 18px;"><i class="fa fa-folder-open"></i> Unsorted</span>
-            <a href="#" style="font-size:11px; font-weight:bold; color:var(--th-blue); text-decoration:none;"><i class="fa fa-eye"></i> View All</a>
+            <a href="characters.html" style="font-size:11px; font-weight:bold; color:var(--th-blue); text-decoration:none;"><i class="fa fa-eye"></i> View All</a>
         </div>
         <div id="char-grid-placeholder" style="padding: 20px 0; color: #999; font-size: 13px;">No characters found.</div>
     </main>
@@ -106,7 +123,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
@@ -121,7 +138,7 @@
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Real-time listener: changes in Settings reflect on Profile instantly
+            // Profile & Code Injection Listener
             onSnapshot(doc(db, "users", user.uid), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
@@ -131,10 +148,15 @@
                         document.getElementById('nav-avatar').style.backgroundImage = `url('${data.pfp}')`;
                         document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
                     }
-                    // Inject Raw HTML and CSS
                     document.getElementById('profile-render-zone').innerHTML = data.profileHTML || "Welcome!";
                     document.getElementById('custom-profile-css').innerHTML = data.profileCSS || "";
                 }
+            });
+
+            // Notification Counter Listener
+            const qNotif = query(collection(db, "notifications"), where("to", "==", user.uid));
+            onSnapshot(qNotif, (snap) => {
+                document.getElementById('count-alerts').innerText = snap.size;
             });
         }
     });
