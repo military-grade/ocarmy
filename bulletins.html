@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bulletins | OCARMY</title>
+    <style>
+        .bulletin-card { border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        .bulletin-header { background: #f9f9f9; padding: 10px; border-bottom: 1px solid #ddd; display: flex; gap: 15px; }
+        .bulletin-pfp { width: 60px; height: 60px; border-radius: 4px; background-size: cover; }
+        .bulletin-content { padding: 15px; min-height: 50px; }
+    </style>
+</head>
+<body>
+    <main class="main">
+        <div class="page-header"><i class="fa fa-user"></i> <span id="user-header-b">User</span>'s Bulletins</div>
+        <div id="bulletin-list">
+            <div class="bulletin-card">
+                <div class="bulletin-header">
+                    <div class="bulletin-pfp" style="background-image: url('pfp.jpg')"></div>
+                    <div>
+                        <div style="font-weight:bold; color:var(--th-blue); font-size:18px;"><i class="fa fa-times-circle"></i> TEST HI</div>
+                        <div style="font-size:11px; color:#666;">Posted 5 seconds ago by <strong>User</strong></div>
+                        <div style="margin-top:5px;">
+                            <button class="btn-sm"><i class="fa fa-pencil"></i> Edit</button>
+                            <button class="btn-sm btn-danger"><i class="fa fa-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bulletin-content">hi hih hihkgjfv vf</div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
