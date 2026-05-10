@@ -7,22 +7,14 @@
     <style>
         :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); display: flex; min-height: 100vh; }
-
-        /* Sidebar */
         .sidebar { width: 220px; background: var(--th-blue); color: white; display: flex; flex-direction: column; }
         .back-link { display: block; padding: 12px 15px; color: white; text-decoration: none; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.2); }
-        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.8; }
         .side-nav a { display: block; padding: 8px 15px; color: white; text-decoration: none; font-size: 13px; }
-        .side-nav a:hover, .side-nav a.active { background: rgba(0,0,0,0.1); }
-
-        /* Editor Area */
         .main { flex: 1; padding: 30px; }
         .editor-card { background: white; border: 1px solid #ddd; border-radius: 4px; padding: 25px; }
-        .btn-wysiwyg { background: #333; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; float: right; font-size: 11px; }
-        
         .label-group { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #666; margin: 25px 0 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .css-box { width: 100%; height: 120px; font-family: monospace; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; background: #fff; }
-        .btn-save { background: #7cc1d8; color: white; border: none; padding: 15px 30px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 20px; width: 100%; font-size: 16px; }
+        .css-box { width: 100%; height: 120px; font-family: monospace; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; }
+        .btn-save { background: #7cc1d8; color: white; border: none; padding: 15px 30px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -30,118 +22,67 @@
 <div class="sidebar">
     <a href="dashboard.html" class="back-link"><i class="fa fa-arrow-left"></i> Back to Profile</a>
     <div class="side-nav">
-        <div class="side-label">General Settings</div>
-        <a href="settings.html">Account Settings</a>
-        
-        <div class="side-label">Profile Settings</div>
-        <a href="profile_content.html" class="active">Profile Content</a>
-        <a href="#">Profile CSS</a>
-        
-        <div class="side-label">Management</div>
-        <a href="#">Folders</a>
-        <a href="#">Characters</a>
+        <a href="profile_content.html" style="background:rgba(0,0,0,0.1);">Profile Content</a>
     </div>
 </div>
 
 <div class="main">
-    <button class="btn-wysiwyg" onclick="toggleWYSIWYG()">Disable WYSIWYG</button>
-    <h2 style="margin-top: 0; color: #444;">Edit Profile Content</h2>
-
+    <h2 style="color: #444;">Edit Profile Content</h2>
     <div class="editor-card">
-        <div class="label-group">Profile Blurb</div>
+        <div class="label-group">Profile Blurb (HTML Supported)</div>
         <textarea id="profile-editor"></textarea>
-
         <div class="label-group">Custom Profile CSS</div>
-        <textarea class="css-box" id="profile-css" placeholder="/* Your CSS here... */"></textarea>
-
+        <textarea class="css-box" id="profile-css"></textarea>
         <button class="btn-save" onclick="updateProfile()">Update Profile</button>
     </div>
 </div>
-
-<script>
-    tinymce.init({
-        selector: '#profile-editor',
-        height: 450,
-        menubar: false,
-        toolbar_mode: 'wrap', // This forces all 27 icons to stack instead of hiding in a menu
-        plugins: 'link image code lists table emoticons charmap fullscreen',
-        // The massive toolbar array with everything you requested:
-        toolbar: 'undo redo removeformat | bold italic underline strikethrough subscript superscript | fontfamily fontsize forecolor backcolor | charmap emoticons spoiler | blocks | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote hr | link image table | code fullscreen',
-        
-        setup: function(editor) {
-            // Custom Spoiler Button Logic
-            editor.ui.registry.addButton('spoiler', {
-                text: 'Spoiler',
-                tooltip: 'Wrap highlighted text in a spoiler',
-                onAction: function () {
-                    const selectedText = editor.selection.getContent() || 'Hidden content';
-                    editor.insertContent(
-                        `<details style="border: 1px solid #ccc; padding: 10px; border-radius: 4px; margin: 10px 0; background: #f9f9f9;">
-                            <summary style="font-weight: bold; cursor: pointer; color: #4e92ac;">Spoiler (Click to view)</summary>
-                            <div style="margin-top: 10px;">${selectedText}</div>
-                        </details>`
-                    );
-                }
-            });
-        },
-        branding: false,
-        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px; text-align:left; }'
-    });
-
-    function toggleWYSIWYG() {
-        const ed = tinymce.get('profile-editor');
-        const btn = document.querySelector('.btn-wysiwyg');
-        if (ed.isHidden()) {
-            ed.show();
-            btn.innerText = "Disable WYSIWYG";
-        } else {
-            ed.hide();
-            btn.innerText = "Enable WYSIWYG";
-        }
-    }
-</script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
-        authDomain: "ocarmy-db.firebaseapp.com",
-        projectId: "ocarmy-db",
-        appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth();
+
+    tinymce.init({
+        selector: '#profile-editor',
+        height: 400,
+        menubar: false,
+        plugins: 'code link image lists',
+        toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code link image',
+        branding: false
+    });
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (userDoc.exists()) {
                 const data = userDoc.data();
+                // THIS KEEPS THE CONTENT SAVED IN THE BOX
                 if(data.profileCSS) document.getElementById('profile-css').value = data.profileCSS;
                 
-                tinymce.get('profile-editor').on('init', () => {
-                    if(data.profileHTML) tinymce.get('profile-editor').setContent(data.profileHTML);
-                });
+                // Wait for TinyMCE to be ready before putting the text back in
+                const editor = tinymce.get('profile-editor');
+                if (editor) {
+                    editor.setContent(data.profileHTML || "");
+                } else {
+                    tinymce.on('init', () => tinymce.get('profile-editor').setContent(data.profileHTML || ""));
+                }
             }
         }
     });
 
     window.updateProfile = async () => {
-        tinymce.triggerSave();
         const newHTML = tinymce.get('profile-editor').getContent();
         const newCSS = document.getElementById('profile-css').value;
-
         await setDoc(doc(db, "users", auth.currentUser.uid), {
             profileHTML: newHTML,
             profileCSS: newCSS
         }, { merge: true });
-        
-        alert("Profile Updated Successfully!");
+        alert("Saved!");
         window.location.href = "dashboard.html";
     };
 </script>
