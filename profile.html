@@ -2,69 +2,157 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Search | OCARMY</title>
+    <title>Profile | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
-        body { margin: 0; font-family: sans-serif; background: var(--th-bg); padding: 20px; }
-        .container { max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-radius: 4px; padding: 25px; }
-        .search-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 25px; }
-        .mode-btn { background: var(--th-blue); color: white; border: none; padding: 10px; border-radius: 4px; opacity: 0.6; font-weight: bold; cursor: pointer; }
-        .mode-btn.active { opacity: 1; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
+
+        /* Full Navbar (Screenshot 1.24.10 & 1.35.15) */
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 2000; }
+        .nav-left { display: flex; gap: 5px; align-items: center; height: 100%; }
+        .nav-left a, .nav-item-btn { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
+        .nav-left a:hover, .nav-item-btn:hover { color: white; background: rgba(255,255,255,0.1); }
+        
+        .notif-bar { display: flex; align-items: center; gap: 2px; margin-right: 10px; }
+        .notif-item { padding: 4px 8px; font-size: 11px; border-radius: 3px; color: white; display: flex; align-items: center; gap: 5px; background: #337ab7; text-decoration: none; }
+        .notif-world { background: #f0ad4e; }
+
+        .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
+        .dropdown-content { display: none; position: absolute; top: 50px; background: white; border: 1px solid var(--border); min-width: 160px; box-shadow: 0 6px 12px rgba(0,0,0,.175); z-index: 3000; padding: 5px 0; border-radius: 0 0 4px 4px; }
+        .dropdown-content a { display: block; padding: 8px 20px; color: #333 !important; text-decoration: none; font-size: 13px; width: 100%; text-align: left; }
+        .show { display: block !important; }
+
+        /* Sidebar (Screenshot 1.57.28) */
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); align-items: stretch; }
+        .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
+        .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .side-avatar { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
+
+        .main { flex: 1; padding: 30px; background: white; }
+        #profile-raw-render { width: 100%; min-height: 100px; }
     </style>
+    <style id="custom-profile-css"></style>
 </head>
 <body>
-<div class="container">
-    <h2 style="margin-bottom: 20px;">Search</h2>
-    <div class="search-modes">
-        <button class="mode-btn active" id="m-user" onclick="setMode('user')"><i class="fa fa-check"></i> Profile Search</button>
-        <button class="mode-btn" id="m-oc" onclick="setMode('oc')"><i class="fa fa-check"></i> Original Characters</button>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <label style="font-weight:bold; font-size:12px;">NAME</label>
-            <input type="text" id="query" placeholder="Enter name..." onkeyup="doSearch()">
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
+        <a href="browse.html"><i class="fa fa-eye"></i> Browse</a>
+        <div class="dropdown">
+            <button class="nav-item-btn" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></button>
+            <div id="drop-submit" class="dropdown-content" style="left:0;">
+                <a href="create_character.html"><i class="fa fa-user"></i> Character</a>
+                <a href="create_bulletin.html"><i class="fa fa-newspaper"></i> Bulletin</a>
+            </div>
         </div>
-        <div class="col-md-6">
-            <label style="font-weight:bold; font-size:12px;">TAGS</label>
-            <input type="text" placeholder="Enter tags...">
+        <a href="search.html"><i class="fa fa-search"></i> Search</a>
+        <a href="#"><i class="fa fa-info-circle"></i> Info</a>
+        <a href="#"><i class="fa fa-newspaper"></i> Blogs</a>
+        <a href="#"><i class="fa fa-bullhorn"></i> News</a>
+    </div>
+
+    <div style="display: flex; align-items: center;">
+        <div class="notif-bar" id="nav-notifs">
+            <a href="#" class="notif-item notif-world"><i class="fa fa-globe"></i> 0</a>
+            <a href="#" class="notif-item"><i class="fa fa-user"></i> 0</a>
+            <a href="#" class="notif-item"><i class="fa fa-star"></i> 0</a>
+            <a href="messages.html" class="notif-item"><i class="fa fa-envelope"></i> 0</a>
+        </div>
+        <div class="dropdown">
+            <button class="nav-item-btn" onclick="toggleDrop('drop-user')">
+                <span id="nav-username">User</span>
+                <div id="nav-avatar" style="width:30px; height:30px; background:#eee; border-radius:2px; background-size:cover; margin-left:8px;"></div>
+                <i class="fa fa-caret-down" style="margin-left:5px; font-size:10px;"></i>
+            </button>
+            <div id="drop-user" class="dropdown-content" style="right:0;">
+                <a href="dashboard.html">Profile</a>
+                <a href="settings.html">Settings</a>
+                <div style="border-top:1px solid #eee; margin: 5px 0;"></div>
+                <a href="#" id="logout-btn">Logout</a>
+            </div>
         </div>
     </div>
-    <div id="results" style="margin-top: 30px;"></div>
+</nav>
+
+<div class="wrapper">
+    <aside class="sidebar">
+        <div class="side-user-header">
+            <div class="side-avatar" id="side-pfp"></div>
+            <div style="font-weight: bold;" id="side-user-text">User</div>
+        </div>
+        <div class="side-nav">
+            <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
+            <a href="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
+            <a href="characters.html"><i class="fa fa-users"></i> Characters</a>
+            <a href="#"><i class="fa fa-link"></i> Links</a>
+            <a href="#"><i class="fa fa-globe"></i> Worlds</a>
+            <a href="#"><i class="fa fa-star"></i> Favorites</a>
+            <div class="side-label">Portfolio</div>
+            <a href="designs.html"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a href="art.html"><i class="fa fa-image"></i> Art</a>
+            <a href="#"><i class="fa fa-book"></i> Library</a>
+            <div class="side-label">Interaction</div>
+            <a href="profile_comments.html"><i class="fa fa-comments"></i> Comments</a>
+            <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
+            <a href="subscribe.html" style="color:white; font-weight:bold; background:rgba(255,255,255,0.1);"><i class="fa fa-plus"></i> Subscribe</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div id="profile-raw-render"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 40px;">
+            <span style="font-weight:bold; font-size: 18px;"><i class="fa fa-folder-open"></i> Unsorted</span>
+            <a href="#" style="font-size:11px; font-weight:bold; color:var(--th-blue); text-decoration:none;"><i class="fa fa-eye"></i> View All</a>
+        </div>
+        <div id="char-grid" style="padding: 20px 0; color: #999; font-size: 13px;">No characters found.</div>
+    </main>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
-    let mode = 'user';
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
 
-    window.setMode = (m) => {
-        mode = m;
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`m-${m}`).classList.add('active');
+    window.toggleDrop = (id) => {
+        document.querySelectorAll('.dropdown-content').forEach(d => { if(d.id !== id) d.classList.remove('show'); });
+        document.getElementById(id).classList.toggle('show');
     };
 
-    window.doSearch = async () => {
-        const val = document.getElementById('query').value.toLowerCase();
-        if (val.length < 2) return;
-        const snap = await getDocs(collection(db, mode === 'user' ? "users" : "characters"));
-        const results = document.getElementById('results');
-        results.innerHTML = "";
-        snap.forEach(doc => {
-            const d = doc.data();
-            const name = (mode === 'user' ? d.username : d.name) || "";
-            if (name.toLowerCase().includes(val)) {
-                results.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">
-                    <a href="${mode === 'user' ? 'dashboard.html?user=' + doc.id : 'character.html?id=' + doc.id}" 
-                       style="color:#4e92ac; font-weight:bold; text-decoration:none;">${name}</a>
-                </div>`;
-            }
-        });
-    };
+    onAuthStateChanged(auth, (authUser) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const profileId = urlParams.get('user');
+
+        if (profileId) {
+            onSnapshot(doc(db, "users", profileId), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    document.getElementById('side-user-text').innerText = data.username || "User";
+                    if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+                    const rawContent = data.profileHTML || "Welcome!";
+                    document.getElementById('profile-raw-render').innerHTML = rawContent.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+                    document.getElementById('custom-profile-css').innerHTML = data.profileCSS || "";
+                }
+            });
+        }
+        
+        if (authUser) {
+             onSnapshot(doc(db, "users", authUser.uid), (snap) => {
+                const data = snap.data();
+                document.getElementById('nav-username').innerText = data.username || "User";
+                if (data.pfp) document.getElementById('nav-avatar').style.backgroundImage = `url('${data.pfp}')`;
+             });
+        }
+    });
 </script>
 </body>
 </html>
