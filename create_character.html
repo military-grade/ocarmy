@@ -11,21 +11,20 @@
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
         .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
-        .side-nav a { display: block; padding: 12px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .side-nav { display: block; padding: 12px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .main { flex: 1; padding: 30px; }
         .card { border: 1px solid var(--border); border-radius: 4px; margin-bottom: 25px; box-shadow: none; }
         .card-header { background: #f9f9f9; font-weight: bold; border-bottom: 1px solid var(--border); padding: 10px 15px; font-size: 14px; }
         
-        /* Fixed Buggy Text / Layout */
         .form-label { font-weight: bold; font-size: 13px; margin-bottom: 5px; display: block; color: #555; }
         .credit-toggle { display: flex; border: 1px solid var(--th-blue); border-radius: 4px; overflow: hidden; width: fit-content; margin-bottom: 15px; }
         .credit-btn { padding: 8px 15px; font-size: 12px; cursor: pointer; border: none; background: #fff; color: var(--th-blue); }
         .credit-btn.active { background: var(--th-blue); color: #fff; }
         .invalid-user { color: #d9534f; font-size: 11px; font-weight: bold; margin-top: 5px; display: none; }
 
-        /* Avatar Editor */
-        #avatar-preview-wrap { width: 200px; height: 200px; border: 1px solid #ccc; overflow: hidden; position: relative; background: #eee; }
-        #avatar-img { position: absolute; cursor: move; width: 100%; height: auto; }
+        /* Avatar Editor Styles */
+        #avatar-preview-wrap { width: 200px; height: 200px; border: 1px solid #ccc; overflow: hidden; position: relative; background: #eee; user-select: none; }
+        #avatar-img { position: absolute; cursor: move; width: 100%; top: 0; left: 0; }
     </style>
 </head>
 <body>
@@ -49,8 +48,8 @@
                 <div>
                     <input type="file" id="char-file" class="form-control mb-2" accept="image/*" onchange="previewAvatar()">
                     <label class="form-label">Zoom</label>
-                    <input type="range" id="zoom-slider" min="100" max="300" value="100" oninput="applyZoom()">
-                    <p class="small text-muted mt-2">Drag image to center it.</p>
+                    <input type="range" id="zoom-slider" min="100" max="500" value="100" oninput="applyZoom()">
+                    <p class="small text-muted mt-2">Drag image within the box to center it.</p>
                 </div>
             </div>
         </div>
@@ -65,12 +64,12 @@
                 </div>
                 <div id="onsite-box" style="display:none;">
                     <label class="form-label">Username</label>
-                    <input type="text" id="onsite-input" class="form-control" placeholder="Enter username..." onkeyup="validateUser()">
+                    <input type="text" id="onsite-input" class="form-control" placeholder="Enter exact username..." onkeyup="validateUser()">
                     <div id="user-error" class="invalid-user">Invalid username! No user found on site.</div>
                 </div>
                 <div id="offsite-box" style="display:none;">
                     <label class="form-label">Artist Link/Name</label>
-                    <input type="text" id="offsite-input" class="form-control" placeholder="Artist link...">
+                    <input type="text" id="offsite-input" class="form-control" placeholder="Artist link or handle...">
                 </div>
             </div>
         </div>
@@ -117,25 +116,52 @@
     let creditMode = 'self';
     let base64Avatar = "";
 
-    // Avatar Logic
+    /* --- DRAG LOGIC FOR AVATAR --- */
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+    const avatarImg = document.getElementById('avatar-img');
+
+    avatarImg.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        initialLeft = avatarImg.offsetLeft;
+        initialTop = avatarImg.offsetTop;
+        avatarImg.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        avatarImg.style.left = (initialLeft + dx) + 'px';
+        avatarImg.style.top = (initialTop + dy) + 'px';
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+        avatarImg.style.cursor = 'move';
+    });
+
     window.previewAvatar = () => {
         const file = document.getElementById('char-file').files[0];
         const reader = new FileReader();
         reader.onload = (e) => {
             base64Avatar = e.target.result;
-            const img = document.getElementById('avatar-img');
-            img.src = e.target.result;
-            img.style.display = "block";
+            avatarImg.src = e.target.result;
+            avatarImg.style.display = "block";
+            avatarImg.style.top = "0px"; // Reset positions
+            avatarImg.style.left = "0px";
         };
         if (file) reader.readAsDataURL(file);
     };
 
     window.applyZoom = () => {
         const val = document.getElementById('zoom-slider').value;
-        document.getElementById('avatar-img').style.width = val + "%";
+        avatarImg.style.width = val + "%";
     };
 
-    // Credit Logic (Case-Insensitive)
+    /* --- CREDIT LOGIC --- */
     window.setCredit = (mode) => {
         creditMode = mode;
         document.querySelectorAll('.credit-btn').forEach(b => b.classList.remove('active'));
@@ -149,32 +175,48 @@
         const err = document.getElementById('user-error');
         if (!val) { err.style.display = "none"; return; }
         
-        const q = query(collection(db, "users"));
+        // Efficient Query: Look for the specific user instead of fetching all
+        const q = query(collection(db, "users"), where("username_lowercase", "==", val.toLowerCase()));
         const snap = await getDocs(q);
-        // Case-insensitive check
-        const exists = snap.docs.some(d => d.data().username.toLowerCase() === val.toLowerCase());
-        err.style.display = exists ? "none" : "block";
+        err.style.display = snap.empty ? "block" : "none";
     };
 
+    /* --- SUBMISSION --- */
     document.getElementById('submit-btn').onclick = async () => {
         const user = auth.currentUser;
-        if (!user) return alert("Log in first.");
+        if (!user) return alert("You must be logged in to create a character.");
+        
+        const nameField = document.getElementById('char-name').value;
+        if (!nameField) return alert("Character name is required.");
+
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.innerText = "CREATING...";
+
         tinymce.triggerSave();
 
         try {
-            await addDoc(collection(db, "characters"), {
+            const docRef = await addDoc(collection(db, "characters"), {
                 ownerId: user.uid,
-                name: document.getElementById('char-name').value,
-                worth: document.getElementById('char-worth').value,
-                tags: document.getElementById('char-tags').value.split(',').map(t => t.trim()),
+                name: nameField,
+                worth: document.getElementById('char-worth').value || 0,
+                tags: document.getElementById('char-tags').value.split(',').map(t => t.trim()).filter(t => t !== ""),
                 avatar: base64Avatar,
                 designer: creditMode === 'self' ? user.displayName : (creditMode === 'onsite' ? document.getElementById('onsite-input').value : document.getElementById('offsite-input').value),
                 description: tinymce.get('char-desc').getContent(),
+                warningActive: false,
+                warningContent: "",
                 gallery: [],
                 createdAt: serverTimestamp()
             });
-            window.location.href = "characters.html";
-        } catch (e) { alert(e.message); }
+
+            // Redirect to the new character profile immediately
+            window.location.href = `character.html?id=${docRef.id}`;
+        } catch (e) { 
+            alert("Error: " + e.message); 
+            btn.disabled = false;
+            btn.innerText = "CREATE CHARACTER";
+        }
     };
 </script>
 </body>
