@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Bulletin | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
+    <style>
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: sans-serif; background: var(--th-bg); }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; }
+        .wrapper { max-width: 900px; margin: 30px auto; background: white; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+        .header { background: #f9f9f9; padding: 15px; font-weight: bold; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .body { padding: 25px; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-post { background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-weight: bold; font-size: 16px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar"><div style="font-weight:bold;">OCARMY</div></nav>
+
+<div class="wrapper">
+    <div class="header">Edit Bulletin</div>
+    <div class="body">
+        <label style="font-size:12px; font-weight:bold; color:#666; text-transform:uppercase;">Subject</label>
+        <input type="text" id="b-subject">
+
+        <textarea id="editor"></textarea>
+
+        <button class="btn-post" style="margin-top:20px;" onclick="updateBulletin()">Update Bulletin</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    // Get the ID from the URL (?id=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const bulletinId = urlParams.get('id');
+
+    tinymce.init({
+        selector: '#editor',
+        height: 350,
+        menubar: false,
+        toolbar_mode: 'wrap',
+        plugins: 'link emoticons code lists',
+        toolbar: 'undo redo | bold italic underline | emoticons link | bullist numlist | code',
+        branding: false,
+        setup: function (editor) {
+            editor.on('init', function () {
+                loadBulletinData(); // Load data only after editor is ready
+            });
+        }
+    });
+
+    async function loadBulletinData() {
+        if (!bulletinId) return;
+        const docRef = doc(db, "bulletins", bulletinId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('b-subject').value = data.subject;
+            tinymce.get('editor').setContent(data.content);
+        } else {
+            alert("Bulletin not found!");
+        }
+    }
+
+    window.updateBulletin = async () => {
+        const docRef = doc(db, "bulletins", bulletinId);
+        try {
+            await updateDoc(docRef, {
+                subject: document.getElementById('b-subject').value,
+                content: tinymce.get('editor').getContent()
+            });
+            alert("Bulletin Updated!");
+            window.location.href = "bulletins.html";
+        } catch (error) {
+            alert("Error updating: " + error.message);
+        }
+    };
+</script>
+</body>
+</html>
