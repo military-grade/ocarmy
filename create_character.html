@@ -4,65 +4,92 @@
     <meta charset="UTF-8">
     <title>Create Character | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; }
-        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: 100vh; }
+        .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .side-nav a { display: block; padding: 12px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .main { flex: 1; padding: 30px; }
-        .card { border: 1px solid var(--border); border-radius: 4px; margin-bottom: 25px; }
-        .card-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); }
-        .card-body { padding: 20px; }
-        label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: #555; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; }
-        .btn-submit { background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .card-header { background: #f9f9f9; font-weight: bold; border-bottom: 1px solid var(--border); }
+        
+        /* Avatar Drag Area */
+        #pfp-zone { width: 200px; height: 200px; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #eee; cursor: pointer; background-size: cover; background-position: center; }
+        
+        .btn-wysiwyg { background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; font-size: 11px; }
+        .btn-wysiwyg.active { background: #007bff; }
     </style>
 </head>
 <body>
 
-<nav class="navbar"><strong>OCARMY</strong></nav>
-
 <div class="wrapper">
-    <aside class="sidebar" style="padding:20px;">
-        <div style="font-weight:bold; margin-bottom:10px;"><i class="fa fa-plus"></i> Submit</div>
-        <a href="create_character.html" style="color:white; text-decoration:none; display:block; padding:5px 0;">Character</a>
-        <a href="create_folder.html" style="color:rgba(255,255,255,0.7); text-decoration:none; display:block; padding:5px 0;">Folder</a>
+    <aside class="sidebar">
+        <a href="dashboard.html" class="side-nav" style="background: rgba(0,0,0,0.2);"><i class="fa fa-arrow-left"></i> Back to Profile</a>
+        <div style="padding: 15px; font-weight: bold; opacity: 0.8;">SUBMIT</div>
+        <a href="create_character.html" class="side-nav" style="background: rgba(255,255,255,0.1);">Character</a>
+        <a href="create_folder.html" class="side-nav">Folder</a>
     </aside>
 
     <main class="main">
-        <h2>Create Character</h2>
-        <div class="card">
-            <div class="card-header">Character Details</div>
-            <div class="card-body">
-                <label>Name</label>
-                <input type="text" id="char-name" placeholder="Character Name" required>
+        <h2 class="mb-4">Create Character</h2>
 
-                <label>Reference Sheet (Main Image URL)</label>
-                <input type="text" id="char-image" placeholder="Paste direct link to image...">
-
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                    <div>
-                        <label>Designer Credit</label>
-                        <input type="text" id="char-designer" placeholder="Link or Username">
-                    </div>
-                    <div>
-                        <label>Tradeability</label>
-                        <select id="char-trade">
-                            <option value="Not for Trade">Not for Trade</option>
-                            <option value="Trading">Open for Trades</option>
-                            <option value="Selling">For Sale</option>
-                            <option value="Gifting">Gift Only</option>
-                        </select>
-                    </div>
+        <div class="card mb-4">
+            <div class="card-header">Avatar</div>
+            <div class="card-body d-flex gap-4">
+                <div id="pfp-zone" onclick="document.getElementById('file-input').click()">
+                    <span id="pfp-text">Click to Upload</span>
+                    <input type="file" id="file-input" hidden accept="image/*">
                 </div>
-
-                <label>Description</label>
-                <textarea id="char-desc"></textarea>
+                <div class="flex-grow-1">
+                    <label class="fw-bold">Import from File</label>
+                    <input type="file" class="form-control mb-2" id="import-json">
+                    <p class="text-muted small">Upload a .json character file to auto-fill fields.</p>
+                </div>
             </div>
         </div>
-        <button class="btn-submit" id="btn-create">Create Character</button>
+
+        <div class="card mb-4">
+            <div class="card-header">Basics</div>
+            <div class="card-body row">
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">Name</label>
+                    <input type="text" id="char-name" class="form-control" placeholder="Character Name">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">Total Worth ($)</label>
+                    <input type="number" id="char-worth" class="form-control" placeholder="0.00">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">Tags</label>
+                    <input type="text" id="char-tags" class="form-control" placeholder="tag1, tag2, tag3">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">Designer</label>
+                    <input type="text" id="char-designer" class="form-control" placeholder="Username or Link">
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                Advanced
+                <button class="btn-wysiwyg active" id="wysiwyg-btn" onclick="toggleWYSIWYG()">Disable WYSIWYG</button>
+            </div>
+            <div class="card-body">
+                <label class="fw-bold">Profile Content</label>
+                <textarea id="char-desc"></textarea>
+                
+                <div class="mt-4">
+                    <label class="fw-bold">Reference Images</label>
+                    <div id="extra-images-container"></div>
+                    <button class="btn btn-outline-secondary btn-sm mt-2" onclick="addImageField()">+ Add Image URL</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary w-100 p-3 fw-bold" id="submit-btn" style="background: var(--th-blue);">CREATE CHARACTER</button>
     </main>
 </div>
 
@@ -76,30 +103,59 @@
     const db = getFirestore(app);
     const auth = getAuth();
 
-    tinymce.init({ selector: '#char-desc', height: 300, menubar: false });
+    let uploadedPfpBase64 = "";
 
-    document.getElementById('btn-create').addEventListener('click', async () => {
+    // PFP Upload Logic
+    document.getElementById('file-input').onchange = (e) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            uploadedPfpBase64 = reader.result;
+            document.getElementById('pfp-zone').style.backgroundImage = `url(${reader.result})`;
+            document.getElementById('pfp-text').style.display = "none";
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    };
+
+    tinymce.init({ selector: '#char-desc', height: 300, menubar: true, plugins: 'code link image lists table', toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code link image' });
+
+    window.toggleWYSIWYG = () => {
+        const ed = tinymce.get('char-desc');
+        const btn = document.getElementById('wysiwyg-btn');
+        if(ed.isHidden()) { ed.show(); btn.innerText = "Disable WYSIWYG"; btn.classList.add('active'); }
+        else { ed.hide(); btn.innerText = "Enable WYSIWYG"; btn.classList.remove('active'); }
+    };
+
+    window.addImageField = () => {
+        const container = document.getElementById('extra-images-container');
+        const input = document.createElement('input');
+        input.type = "text";
+        input.className = "form-control mb-2 extra-img";
+        input.placeholder = "Image URL";
+        container.appendChild(input);
+    };
+
+    document.getElementById('submit-btn').onclick = async () => {
         const user = auth.currentUser;
-        if (!user) return alert("You must be logged in!");
+        if(!user) return alert("Please log in!");
 
         tinymce.triggerSave();
-        const mainImg = document.getElementById('char-image').value;
+        const extraImgs = Array.from(document.querySelectorAll('.extra-img')).map(i => i.value).filter(v => v);
 
         try {
             await addDoc(collection(db, "characters"), {
                 ownerId: user.uid,
                 name: document.getElementById('char-name').value,
-                avatar: mainImg,
+                worth: document.getElementById('char-worth').value,
+                tags: document.getElementById('char-tags').value.split(',').map(t => t.trim()),
+                avatar: uploadedPfpBase64,
                 designer: document.getElementById('char-designer').value,
-                tradeability: document.getElementById('char-trade').value,
                 description: document.getElementById('char-desc').value,
-                gallery: mainImg ? [mainImg] : [], // Adds the ref sheet as the first gallery item
+                gallery: extraImgs,
                 createdAt: serverTimestamp()
             });
-            alert("Character Created!");
             window.location.href = "characters.html";
         } catch (e) { alert(e.message); }
-    });
+    };
 </script>
 </body>
 </html>
