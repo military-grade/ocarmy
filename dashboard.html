@@ -8,6 +8,7 @@
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; overflow-x: hidden; }
 
+        /* Navbar & Dropdowns */
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .nav-left { display: flex; gap: 15px; align-items: center; height: 100%; }
         .nav-left a, .nav-item { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 5px; }
@@ -15,15 +16,15 @@
         
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
         .dropdown-content { display: none; position: absolute; top: 50px; left: 0; background: white; border: 1px solid var(--border); min-width: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1001; }
-        .dropdown-right { left: auto; right: 0; }
         .dropdown-content a { display: block; padding: 10px 15px; color: #333 !important; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; }
         .show { display: block; }
 
         .nav-pfp { width: 30px; height: 30px; background: #eee; border-radius: 2px; background-size: cover; margin-left: 8px; }
 
-        /* FIXED WRAPPER - REMOVES THE GAP */
+        /* Wrapper */
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-top: none; min-height: calc(100vh - 50px); align-items: stretch; }
 
+        /* Sidebar Header */
         .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-user-header { background: #427e95; padding: 10px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .side-avatar-box { width: 50px; height: 50px; background: #eee; border-radius: 2px; background-size: cover; flex-shrink: 0; }
@@ -33,10 +34,19 @@
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
 
+        /* Main Content */
         .main { flex: 1; padding: 30px; background: white; }
         
-        .section-header { background: #f9f9f9; padding: 8px 15px; border: 1px solid var(--border); border-radius: 4px 4px 0 0; font-weight: bold; font-size: 14px; margin-top: 30px; }
-        .bulletin-list { border: 1px solid var(--border); border-top: none; padding: 15px; margin-bottom: 20px; }
+        /* Folder Header Style (Image 50-52) */
+        .folder-header { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 10px 15px; border: 1px solid var(--border); border-radius: 4px; margin-top: 30px; }
+        .folder-title { font-weight: bold; color: #444; font-size: 15px; }
+        .view-all { font-size: 11px; color: var(--th-blue); text-decoration: none; font-weight: bold; }
+
+        /* Character Grid (Image 51) */
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; padding: 20px 0; }
+        .char-card { text-align: center; text-decoration: none; color: inherit; }
+        .char-thumb { width: 130px; height: 130px; background: #eee; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; margin-bottom: 5px; }
+        .char-name-tag { font-size: 12px; font-weight: bold; color: var(--th-blue); display: flex; align-items: center; justify-content: center; gap: 5px; }
     </style>
 </head>
 <body>
@@ -45,16 +55,16 @@
     <div class="nav-left">
         <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
         <a href="#"><i class="fa fa-eye"></i> Browse</a>
+        
         <div class="dropdown">
             <div class="nav-item" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></div>
             <div id="drop-submit" class="dropdown-content">
                 <a href="create_character.html"><i class="fa fa-user"></i> Character</a>
-                <a href="#"><i class="fa fa-newspaper"></i> Bulletin</a>
-                <a href="#"><i class="fa fa-image"></i> Image</a>
-                <a href="#"><i class="fa fa-book"></i> Literature</a>
-                <a href="#"><i class="fa fa-globe"></i> World</a>
+                <a href="create_folder.html"><i class="fa fa-folder"></i> Folder</a>
+                <a href="create_bulletin.html"><i class="fa fa-newspaper"></i> Bulletin</a>
             </div>
         </div>
+
         <a href="#"><i class="fa fa-search"></i> Search</a>
         <a href="#"><i class="fa fa-info-circle"></i> Info</a>
         <a href="#"><i class="fa fa-newspaper"></i> Blogs</a>
@@ -64,12 +74,9 @@
         <div class="nav-item" onclick="toggleDrop('drop-user')">
             <span id="nav-username">User</span>
             <div class="nav-pfp" id="nav-pfp-img"></div>
-            <i class="fa fa-caret-down" style="margin-left: 5px;"></i>
         </div>
         <div id="drop-user" class="dropdown-content dropdown-right">
             <a href="dashboard.html">Profile</a>
-            <a href="messages.html">Inbox</a>
-            <a href="profile_content.html">Edit Profile</a>
             <a href="settings.html">Settings</a>
             <a href="#" id="logout-btn">Logout</a>
         </div>
@@ -83,12 +90,16 @@
             <div class="side-user-name" id="side-user-text">User</div>
         </div>
         <div class="side-nav">
-            <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
+            <a href="dashboard.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-user"></i> Profile</a>
             <a href="#"><i class="fa fa-comment"></i> Bulletins</a>
             <a href="#"><i class="fa fa-users"></i> Characters</a>
-            <a href="#"><i class="fa fa-link"></i> Links</a>
-            <a href="#"><i class="fa fa-star"></i> Favorites</a>
+            
+            <div class="side-label">Portfolio</div>
+            <a href="#"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a href="#"><i class="fa fa-image"></i> Art</a>
+            
             <div class="side-label">Interaction</div>
+            <a href="#"><i class="fa fa-comments"></i> Comments</a>
             <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
         </div>
     </aside>
@@ -96,20 +107,21 @@
     <main class="main">
         <div id="profile-blurb"></div>
 
-        <div class="section-header">Recent Bulletins</div>
-        <div class="bulletin-list" id="recent-bulletins">
-            <p style="color: #999; font-size: 13px;">No recent bulletins found.</p>
+        <div class="folder-header">
+            <span class="folder-title"><i class="fa fa-folder-open"></i> Unsorted</span>
+            <a href="#" class="view-all">View All</a>
         </div>
 
-        <div class="section-header">Comments</div>
-        <div id="comment-list"></div>
+        <div class="char-grid" id="character-gallery">
+            <p style="color: #999; font-size: 13px;">No characters found in this folder.</p>
+        </div>
     </main>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, query, where, limit, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db", appId: "1:848883355194:web:361e9fe8eb9e01f350af03" };
     const app = initializeApp(firebaseConfig);
@@ -132,21 +144,27 @@
                     document.getElementById('nav-pfp-img').style.backgroundImage = `url('${data.pfp}')`;
                     document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
                 }
-                document.getElementById('profile-blurb').innerHTML = data.profileHTML || "Welcome!";
+                document.getElementById('profile-blurb').innerHTML = data.profileHTML || "";
             }
+
+            // LOAD CHARACTERS
+            const q = query(collection(db, "characters"), where("ownerId", "==", user.uid));
+            const querySnapshot = await getDocs(q);
+            const gallery = document.getElementById('character-gallery');
             
-            // FETCH RECENT BULLETINS
-            const bQuery = query(collection(db, "bulletins"), where("ownerId", "==", user.uid), orderBy("createdAt", "desc"), limit(3));
-            const bSnap = await getDocs(bQuery);
-            if(!bSnap.empty) {
-                const list = document.getElementById('recent-bulletins');
-                list.innerHTML = "";
-                bSnap.forEach(doc => {
-                    const b = doc.data();
-                    list.innerHTML += `<div style="padding: 10px 0; border-bottom: 1px solid #eee;">
-                        <a href="bulletin.html?id=${doc.id}" style="color:var(--th-blue); font-weight:bold; text-decoration:none;">${b.subject}</a>
-                        <span style="font-size: 11px; color:#999; margin-left: 10px;">${new Date(b.createdAt?.toDate()).toLocaleDateString()}</span>
-                    </div>`;
+            if (!querySnapshot.empty) {
+                gallery.innerHTML = "";
+                querySnapshot.forEach((doc) => {
+                    const char = doc.data();
+                    gallery.innerHTML += `
+                        <a href="character.html?id=${doc.id}" class="char-card">
+                            <div class="char-thumb" style="background-image: url('${char.avatar || ''}')"></div>
+                            <div class="char-name-tag">
+                                ${char.visibility === 'Private' ? '<i class="fa fa-lock" style="font-size:10px;"></i>' : ''}
+                                ${char.name}
+                            </div>
+                        </a>
+                    `;
                 });
             }
         }
