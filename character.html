@@ -2,90 +2,181 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Character Profile | OCARMY</title>
+    <title>Character | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; }
-        body { background: var(--th-bg); font-family: sans-serif; }
-        .main-card { background: white; border: 1px solid var(--border); border-radius: 4px; max-width: 1000px; margin: 40px auto; padding: 30px; }
-        
-        /* Fixed Center Avatar */
-        .avatar-container { width: 250px; height: 250px; margin: 0 auto 20px; border: 1px solid var(--border); overflow: hidden; border-radius: 4px; background: #eee; display: flex; align-items: center; justify-content: center; }
-        .avatar-container img { max-width: 100%; height: auto; }
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
 
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
-        .gallery-item { position: relative; width: 120px; height: 120px; border: 1px solid var(--border); }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-        .del-btn { position: absolute; top: 2px; right: 2px; background: red; color: white; border: none; font-size: 10px; border-radius: 2px; cursor: pointer; }
+        /* Navbar */
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
+        .nav-left a { color: #ccc; text-decoration: none; font-size: 13px; margin-right: 15px; }
+
+        /* Wrapper - 1140px centered */
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
+
+        /* Left Sidebar (Screenshot 12.07.48 style) */
+        .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
+        .side-header { background: #427e95; padding: 10px 15px; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .side-avatar { width: 40px; height: 40px; background: #eee; border-radius: 2px; background-size: cover; flex-shrink: 0; }
+        .side-nav a { display: block; padding: 8px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .side-nav a:hover { background: rgba(0,0,0,0.1); }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
+        
+        .btn-delete-oc { color: #ffb3b3 !important; font-weight: bold; margin-top: auto; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* Main Content Column */
+        .main { flex: 1; padding: 25px; border-right: 1px solid #eee; }
+        .char-info-header { display: flex; gap: 20px; align-items: flex-start; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .char-main-thumb { width: 120px; height: 120px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
+        .char-title-area h2 { margin: 0; font-size: 24px; color: #333; display: flex; align-items: center; gap: 10px; }
+        
+        /* Stats Right Column */
+        .stats-col { width: 250px; padding: 25px; background: #fafafa; flex-shrink: 0; font-size: 13px; }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .stat-label { font-weight: bold; color: #666; }
+
+        /* Recent Images Section */
+        .recent-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 30px; }
+        .gallery-thumb { aspect-ratio: 1/1; background: #eee; border: 1px solid var(--border); border-radius: 2px; background-size: cover; }
     </style>
 </head>
 <body>
-<div class="main-card">
-    <div class="avatar-container">
-        <img id="char-pfp" src="">
-    </div>
-    
-    <div class="text-center">
-        <h1 id="char-name">Loading...</h1>
-        <p class="text-muted">Worth: $<span id="char-worth">0.00</span></p>
-    </div>
 
-    <hr>
-    <div id="char-bio"></div>
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="dashboard.html" style="font-weight: bold; color: white;">OCARMY</a>
+        <a href="browse.html"><i class="fa fa-eye"></i> Browse</a>
+    </div>
+</nav>
 
-    <div id="gallery-editor" style="display:none; margin-top:50px; border-top: 2px dashed #eee; padding-top:20px;">
-        <h5>Gallery Editor</h5>
-        <div class="gallery-grid" id="manage-grid"></div>
-        <div class="mt-3 d-flex gap-2">
-            <input type="text" id="new-img-url" class="form-control" placeholder="Paste extra image URL...">
-            <button class="btn btn-primary btn-sm" onclick="addToGallery()">Add Image</button>
+<div class="wrapper">
+    <aside class="sidebar">
+        <div class="side-header">
+            <i class="fa fa-heart"></i> Character
         </div>
-    </div>
+        <div style="padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div class="side-avatar" id="side-owner-pfp"></div>
+            <div id="side-owner-name" style="font-weight: bold; font-size: 13px;">User</div>
+        </div>
+        
+        <div class="side-nav">
+            <a href="#" class="active" id="link-profile"><i class="fa fa-folder-open"></i> <span id="side-folder-name">Unsorted</span></a>
+            <a href="#" id="link-oc"><i class="fa fa-id-card"></i> <span id="side-oc-name">OC Name</span></a>
+            
+            <a href="#"><i class="fa fa-image"></i> Gallery <span class="badge bg-light text-dark float-end" id="count-gallery">0</span></a>
+            <a href="#"><i class="fa fa-book"></i> Library</a>
+            <a href="#"><i class="fa fa-globe"></i> Worlds</a>
+            <a href="#"><i class="fa fa-link"></i> Links</a>
+            
+            <div class="side-label">Interaction</div>
+            <a href="#"><i class="fa fa-comments"></i> Comments</a>
+            <a href="#"><i class="fa fa-star"></i> Favorite</a>
+            <a href="#"><i class="fa fa-check-square"></i> Ownership</a>
+            
+            <div class="side-label" id="panel-label" style="display:none;">Control Panel</div>
+            <a href="#" id="edit-char-btn" style="display:none;"><i class="fa fa-pencil"></i> Manage Character</a>
+            <a href="#" id="edit-img-btn" style="display:none;"><i class="fa fa-images"></i> Manage Images</a>
+            
+            <a href="#" class="btn-delete-oc" id="delete-oc-btn" style="display:none;" onclick="confirmDelete()"><i class="fa fa-trash"></i> Delete Character</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="char-info-header">
+            <div class="char-main-thumb" id="main-thumb"></div>
+            <div class="char-title-area">
+                <h2 id="display-name"><i class="fa fa-lock"></i> Loading...</h2>
+                <a href="#" id="owner-link" style="color:var(--th-blue); text-decoration:none; font-weight:bold;"><i class="fa fa-user"></i> <span id="display-owner">User</span></a>
+            </div>
+        </div>
+
+        <h4 style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">Basic Info</h4>
+        <div class="mb-4">
+            <span style="font-weight: bold; margin-right: 40px;">Worth</span>
+            <span id="display-worth">est $0</span>
+        </div>
+
+        <h4 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 5px;">Profile</h4>
+        <div id="display-bio" style="padding: 20px 0;">
+            </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-5" style="border-bottom: 1px solid #eee; padding-bottom: 5px;">
+            <h4 style="font-size: 18px; font-weight: bold; margin:0;">Recent Images</h4>
+            <button class="btn btn-sm btn-outline-secondary" style="font-size:11px;">View More</button>
+        </div>
+        <div class="recent-images" id="gallery-grid">
+            </div>
+    </main>
+
+    <aside class="stats-col">
+        <div class="stat-row">
+            <span class="stat-label">Created</span>
+            <span id="stat-created">-</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Creator</span>
+            <span id="stat-creator" style="color:var(--th-blue);">User</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Favorites</span>
+            <span id="stat-favs">0</span>
+        </div>
+    </aside>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const db = getFirestore(initializeApp(firebaseConfig));
     const auth = getAuth();
     const charId = new URLSearchParams(window.location.search).get('id');
 
     onAuthStateChanged(auth, (user) => {
         onSnapshot(doc(db, "characters", charId), (snap) => {
+            if (!snap.exists()) return;
             const data = snap.data();
-            document.getElementById('char-name').innerText = data.name;
-            document.getElementById('char-worth').innerText = data.worth || "0.00";
-            document.getElementById('char-pfp').src = data.avatar;
-            document.getElementById('char-bio').innerHTML = data.description;
+
+            // Populate Text
+            document.getElementById('display-name').innerHTML = `<i class="fa fa-lock"></i> ${data.name}`;
+            document.getElementById('side-oc-name').innerText = data.name;
+            document.getElementById('display-worth').innerText = `est $${data.worth || 0}`;
+            document.getElementById('display-bio').innerHTML = data.description || "<i>No profile description.</i>";
+            document.getElementById('display-owner').innerText = data.ownerName || "Unknown";
+            document.getElementById('stat-creator').innerText = data.designer || "None";
             
+            // Thumbnails
+            document.getElementById('main-thumb').style.backgroundImage = `url('${data.avatar}')`;
+            
+            // Gallery Grid
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = "";
+            const gallery = data.gallery || [];
+            document.getElementById('count-gallery').innerText = gallery.length;
+            gallery.slice(0, 6).forEach(img => {
+                grid.innerHTML += `<div class="gallery-thumb" style="background-image:url('${img}')"></div>`;
+            });
+
+            // Owner Only Tools (Screenshot 12.07.48 Control Panel)
             if (user && user.uid === data.ownerId) {
-                document.getElementById('gallery-editor').style.display = 'block';
-                renderGallery(data.gallery || []);
+                document.getElementById('panel-label').style.display = "block";
+                document.getElementById('edit-char-btn').style.display = "block";
+                document.getElementById('edit-img-btn').style.display = "block";
+                document.getElementById('delete-oc-btn').style.display = "block";
             }
         });
     });
 
-    function renderGallery(gallery) {
-        const grid = document.getElementById('manage-grid');
-        grid.innerHTML = gallery.map(img => `
-            <div class="gallery-item">
-                <img src="${img}">
-                <button class="del-btn" onclick="deleteImg('${img}')">×</button>
-            </div>
-        `).join('');
-    }
-
-    window.addToGallery = async () => {
-        const url = document.getElementById('new-img-url').value;
-        await updateDoc(doc(db, "characters", charId), { gallery: arrayUnion(url) });
-        document.getElementById('new-img-url').value = "";
-    };
-
-    window.deleteImg = async (url) => {
-        if(confirm("Remove image?")) await updateDoc(doc(db, "characters", charId), { gallery: arrayRemove(url) });
+    window.confirmDelete = async () => {
+        if (confirm("Are you sure you want to delete this character? This cannot be undone.")) {
+            await deleteDoc(doc(db, "characters", charId));
+            alert("Character deleted.");
+            window.location.href = "characters.html";
+        }
     };
 </script>
 </body>
