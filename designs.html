@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        /* ... REUSE CSS FROM ART.HTML ... */
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 2000; }
@@ -64,7 +63,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, collection, query, where, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
@@ -87,26 +86,36 @@
             onSnapshot(doc(db, "users", targetUserId), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
-                    document.getElementById('side-user-text').innerText = data.username;
+                    const targetUsername = data.username;
+                    document.getElementById('side-user-text').innerText = targetUsername;
                     if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+
+                    // QUERY BY DESIGNER NAME (Case-Insensitive check)
+                    loadDesigns(targetUsername);
                 }
             });
+        }
+    });
 
-            // LOGIC: Filter characters by creatorId (Designers)
-            const q = query(collection(db, "characters"), where("creatorId", "==", targetUserId));
-            const snap = await getDocs(q);
-            const grid = document.getElementById('design-display');
-            grid.innerHTML = snap.empty ? '<div style="grid-column:1/-1;">No designs found.</div>' : '';
-            snap.forEach(doc => {
-                const char = doc.data();
+    async function loadDesigns(username) {
+        const q = query(collection(db, "characters"));
+        const snap = await getDocs(q);
+        const grid = document.getElementById('design-display');
+        grid.innerHTML = "";
+        
+        snap.forEach(doc => {
+            const char = doc.data();
+            // Check if designer string matches target username (case insensitive)
+            if (char.designer && char.designer.toLowerCase() === username.toLowerCase()) {
                 grid.innerHTML += `
                     <a href="character.html?id=${doc.id}" class="char-card">
                         <div class="char-img" style="background-image: url('${char.avatar || 'https://via.placeholder.com/150'}')"></div>
                         <div class="char-name">${char.name || 'Unnamed'}</div>
                     </a>`;
-            });
-        }
-    });
+            }
+        });
+        if (grid.innerHTML === "") grid.innerHTML = '<div style="grid-column:1/-1;">No designs found.</div>';
+    }
 </script>
 </body>
 </html>
