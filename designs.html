@@ -6,32 +6,91 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
-        body { margin: 0; font-family: sans-serif; background: var(--th-bg); }
-        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
-        .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; overflow-x: hidden; }
+
+        /* Navbar: Restored Blogs, Info, News (Screenshot 1.10.01) */
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
+        .nav-left { display: flex; gap: 10px; align-items: center; height: 100%; }
+        .nav-left a, .nav-item { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; }
+        .nav-left a:hover, .nav-item:hover { color: white; background: rgba(255,255,255,0.1); }
+        
+        .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
+        .dropdown-content { display: none; position: absolute; top: 50px; left: 0; background: white; border: 1px solid var(--border); min-width: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1001; }
+        .dropdown-content a { display: block; padding: 10px 15px; color: #333 !important; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; }
+        .show { display: block; }
+
+        /* Wrapper & Sidebar: Full Flush Layout (Screenshot 1.08.55) */
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-top: none; min-height: calc(100vh - 50px); align-items: stretch; }
+        .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
+        .side-user-header { background: #427e95; padding: 10px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .side-avatar-box { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; flex-shrink: 0; }
+        .side-user-name { font-weight: bold; font-size: 15px; color: white; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .main { flex: 1; padding: 30px; }
-        .page-header { font-size: 18px; font-weight: bold; color: var(--th-blue); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .side-nav a:hover, .side-nav a.active { background: rgba(0,0,0,0.1); }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
+
+        .main { flex: 1; padding: 30px; background: white; }
+        .page-header { font-size: 24px; color: var(--th-blue); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 15px; padding: 20px 0; }
         .char-card { text-align: center; text-decoration: none; color: inherit; }
-        .char-thumb { width: 140px; height: 140px; background: #eee; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; margin-bottom: 5px; }
-        .char-name-badge { background: var(--th-blue); color: white; padding: 4px 8px; font-size: 11px; font-weight: bold; border-radius: 4px; display: inline-block; }
+        .char-thumb { width: 135px; height: 135px; background: #eee; border: 1px solid var(--border); border-radius: 4px; background-size: cover; margin-bottom: 5px; }
+        .char-name-badge { background: var(--th-blue); color: white; padding: 4px 8px; font-size: 11px; font-weight: bold; border-radius: 4px; display: inline-flex; }
     </style>
 </head>
 <body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
+        <a href="#"><i class="fa fa-eye"></i> Browse</a>
+        <div class="dropdown">
+            <div class="nav-item" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></div>
+            <div id="drop-submit" class="dropdown-content">
+                <a href="create_character.html"><i class="fa fa-user"></i> Character</a>
+                <a href="create_bulletin.html"><i class="fa fa-newspaper"></i> Bulletin</a>
+            </div>
+        </div>
+        <a href="#"><i class="fa fa-search"></i> Search</a>
+        <a href="#"><i class="fa fa-info-circle"></i> Info</a>
+        <a href="#"><i class="fa fa-newspaper"></i> Blogs</a>
+        <a href="#"><i class="fa fa-bullhorn"></i> News</a>
+    </div>
+</nav>
+
 <div class="wrapper">
     <aside class="sidebar">
-        <div style="padding:15px; background:rgba(0,0,0,0.1); font-weight:bold;">militarygrade</div>
+        <div class="side-user-header">
+            <div class="side-avatar-box" id="side-pfp"></div>
+            <div class="side-user-name" id="side-user-text">militarygrade</div>
+        </div>
         <div class="side-nav">
             <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
-            <a href="designs.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a href="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
+            <a href="characters.html"><i class="fa fa-users"></i> Characters</a>
+            <a href="#"><i class="fa fa-link"></i> Links</a>
+            <a href="#"><i class="fa fa-globe"></i> Worlds</a>
+            <a href="#"><i class="fa fa-star"></i> Favorites</a>
+            <div class="side-label">Portfolio</div>
+            <a href="designs.html" class="active"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a href="art.html"><i class="fa fa-image"></i> Art</a>
+            <a href="#"><i class="fa fa-book"></i> Library</a>
+            <div class="side-label">Interaction</div>
+            <a href="profile_comments.html"><i class="fa fa-comments"></i> Comments</a>
+            <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
         </div>
     </aside>
+
     <main class="main">
-        <div class="page-header"><i class="fa fa-user"></i> militarygrade's Designs</div>
+        <div class="page-header"><i class="fa fa-paint-brush"></i> militarygrade's Designs</div>
         <div class="char-grid" id="design-list">
-            </div>
+             </div>
     </main>
 </div>
+
+<script>
+    function toggleDrop(id) { document.getElementById(id).classList.toggle('show'); }
+</script>
 </body>
 </html>
