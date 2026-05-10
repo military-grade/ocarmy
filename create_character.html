@@ -10,147 +10,172 @@
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
         .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
+        
+        /* Sidebar */
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
         .side-nav a { display: block; padding: 12px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .main { flex: 1; padding: 30px; }
-        .card-header { background: #f9f9f9; font-weight: bold; border-bottom: 1px solid var(--border); }
         
-        /* Avatar Drag Area */
-        #pfp-zone { width: 200px; height: 200px; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #eee; cursor: pointer; background-size: cover; background-position: center; }
+        /* Layout Cards */
+        .card { border: 1px solid var(--border); border-radius: 4px; margin-bottom: 25px; box-shadow: none; }
+        .card-header { background: #f9f9f9; font-weight: bold; border-bottom: 1px solid var(--border); padding: 10px 15px; font-size: 14px; }
         
-        .btn-wysiwyg { background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; font-size: 11px; }
-        .btn-wysiwyg.active { background: #007bff; }
+        /* Image Upload Area */
+        .upload-zone { border: 1px solid #ccc; padding: 20px; background: #fff; display: flex; align-items: center; gap: 15px; border-radius: 4px; }
+        #preview-img { width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; display: none; border-radius: 4px; }
+        
+        /* Credit System Buttons */
+        .credit-toggle { display: flex; gap: 0; border: 1px solid var(--th-blue); border-radius: 4px; overflow: hidden; margin-bottom: 10px; width: fit-content; }
+        .credit-btn { padding: 8px 15px; font-size: 12px; cursor: pointer; border: none; background: #fff; color: var(--th-blue); transition: 0.2s; }
+        .credit-btn.active { background: var(--th-blue); color: #fff; }
+        
+        .invalid-user { color: #d9534f; font-size: 11px; font-weight: bold; margin-top: 5px; display: none; }
+        label { font-weight: bold; font-size: 13px; margin-bottom: 5px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
     <aside class="sidebar">
-        <a href="dashboard.html" class="side-nav" style="background: rgba(0,0,0,0.2);"><i class="fa fa-arrow-left"></i> Back to Profile</a>
+        <a href="dashboard.html" class="side-nav"><i class="fa fa-arrow-left"></i> Back to Profile</a>
         <div style="padding: 15px; font-weight: bold; opacity: 0.8;">SUBMIT</div>
         <a href="create_character.html" class="side-nav" style="background: rgba(255,255,255,0.1);">Character</a>
         <a href="create_folder.html" class="side-nav">Folder</a>
     </aside>
 
     <main class="main">
-        <h2 class="mb-4">Create Character</h2>
+        <h2 class="mb-4" style="font-size: 24px;">Create Character</h2>
 
-        <div class="card mb-4">
-            <div class="card-header">Avatar</div>
-            <div class="card-body d-flex gap-4">
-                <div id="pfp-zone" onclick="document.getElementById('file-input').click()">
-                    <span id="pfp-text">Click to Upload</span>
-                    <input type="file" id="file-input" hidden accept="image/*">
-                </div>
-                <div class="flex-grow-1">
-                    <label class="fw-bold">Import from File</label>
-                    <input type="file" class="form-control mb-2" id="import-json">
-                    <p class="text-muted small">Upload a .json character file to auto-fill fields.</p>
+        <div class="card">
+            <div class="card-header">Upload Image (Optional)</div>
+            <div class="card-body">
+                <div class="upload-zone">
+                    <input type="file" id="char-file" class="form-control" accept="image/*" onchange="previewFile()">
+                    <img id="preview-img" src="">
                 </div>
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card">
+            <div class="card-header">Designer Credit</div>
+            <div class="card-body">
+                <div class="credit-toggle">
+                    <button class="credit-btn active" id="btn-self" onclick="setCredit('self')">I am the creator</button>
+                    <button class="credit-btn" id="btn-onsite" onclick="setCredit('onsite')">On-Site Creator</button>
+                    <button class="credit-btn" id="btn-offsite" onclick="setCredit('offsite')">Off-Site Creator</button>
+                </div>
+
+                <div id="onsite-box" style="display:none;" class="mt-3">
+                    <label>Creator's Username</label>
+                    <input type="text" id="onsite-input" class="form-control" placeholder="Enter OCARMY username" onkeyup="validateUser()">
+                    <div id="user-error" class="invalid-user">Invalid username! No user found on site.</div>
+                </div>
+
+                <div id="offsite-box" style="display:none;" class="mt-3">
+                    <label>Creator's Name or Link</label>
+                    <input type="text" id="offsite-input" class="form-control" placeholder="Artist's social media link or name">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
             <div class="card-header">Basics</div>
             <div class="card-body row">
                 <div class="col-md-6 mb-3">
-                    <label class="fw-bold">Name</label>
+                    <label>Character Name</label>
                     <input type="text" id="char-name" class="form-control" placeholder="Character Name">
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="fw-bold">Total Worth ($)</label>
-                    <input type="number" id="char-worth" class="form-control" placeholder="0.00">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="fw-bold">Tags</label>
-                    <input type="text" id="char-tags" class="form-control" placeholder="tag1, tag2, tag3">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="fw-bold">Designer</label>
-                    <input type="text" id="char-designer" class="form-control" placeholder="Username or Link">
+                    <label>Design Tradeability</label>
+                    <select id="char-trade" class="form-control">
+                        <option value="Cannot transfer">Cannot transfer</option>
+                        <option value="Trading">Trading</option>
+                        <option value="Selling">Selling</option>
+                        <option value="Gifting">Gifting</option>
+                    </select>
                 </div>
             </div>
         </div>
 
-        <div class="card mb-4">
-            <div class="card-header">
-                Advanced
-                <button class="btn-wysiwyg active" id="wysiwyg-btn" onclick="toggleWYSIWYG()">Disable WYSIWYG</button>
-            </div>
+        <div class="card">
+            <div class="card-header">Profile Content</div>
             <div class="card-body">
-                <label class="fw-bold">Profile Content</label>
                 <textarea id="char-desc"></textarea>
-                
-                <div class="mt-4">
-                    <label class="fw-bold">Reference Images</label>
-                    <div id="extra-images-container"></div>
-                    <button class="btn btn-outline-secondary btn-sm mt-2" onclick="addImageField()">+ Add Image URL</button>
-                </div>
             </div>
         </div>
 
-        <button class="btn btn-primary w-100 p-3 fw-bold" id="submit-btn" style="background: var(--th-blue);">CREATE CHARACTER</button>
+        <button class="btn btn-primary w-100 p-3 fw-bold" id="submit-btn" style="background: var(--th-blue); border: none;">CREATE CHARACTER</button>
     </main>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db", appId: "1:848883355194:web:361e9fe8eb9e01f350af03" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth();
 
-    let uploadedPfpBase64 = "";
+    let creditMode = 'self';
+    let base64Image = "";
 
-    // PFP Upload Logic
-    document.getElementById('file-input').onchange = (e) => {
+    // TinyMCE Init
+    tinymce.init({ selector: '#char-desc', height: 350, menubar: false, plugins: 'code link image lists', toolbar: 'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link image code' });
+
+    // File Preview
+    window.previewFile = () => {
+        const file = document.getElementById('char-file').files[0];
         const reader = new FileReader();
         reader.onload = () => {
-            uploadedPfpBase64 = reader.result;
-            document.getElementById('pfp-zone').style.backgroundImage = `url(${reader.result})`;
-            document.getElementById('pfp-text').style.display = "none";
+            base64Image = reader.result;
+            const preview = document.getElementById('preview-img');
+            preview.src = reader.result;
+            preview.style.display = "block";
         };
-        reader.readAsDataURL(e.target.files[0]);
+        if (file) reader.readAsDataURL(file);
     };
 
-    tinymce.init({ selector: '#char-desc', height: 300, menubar: true, plugins: 'code link image lists table', toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code link image' });
-
-    window.toggleWYSIWYG = () => {
-        const ed = tinymce.get('char-desc');
-        const btn = document.getElementById('wysiwyg-btn');
-        if(ed.isHidden()) { ed.show(); btn.innerText = "Disable WYSIWYG"; btn.classList.add('active'); }
-        else { ed.hide(); btn.innerText = "Enable WYSIWYG"; btn.classList.remove('active'); }
+    // Credit Toggle Logic
+    window.setCredit = (mode) => {
+        creditMode = mode;
+        document.querySelectorAll('.credit-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${mode}`).classList.add('active');
+        document.getElementById('onsite-box').style.display = (mode === 'onsite') ? 'block' : 'none';
+        document.getElementById('offsite-box').style.display = (mode === 'offsite') ? 'block' : 'none';
     };
 
-    window.addImageField = () => {
-        const container = document.getElementById('extra-images-container');
-        const input = document.createElement('input');
-        input.type = "text";
-        input.className = "form-control mb-2 extra-img";
-        input.placeholder = "Image URL";
-        container.appendChild(input);
+    // On-site Validation Logic
+    window.validateUser = async () => {
+        const username = document.getElementById('onsite-input').value.trim();
+        const errorMsg = document.getElementById('user-error');
+        if (username.length < 1) { errorMsg.style.display = "none"; return; }
+
+        const q = query(collection(db, "users"), where("username", "==", username));
+        const snap = await getDocs(q);
+        errorMsg.style.display = snap.empty ? "block" : "none";
     };
 
     document.getElementById('submit-btn').onclick = async () => {
         const user = auth.currentUser;
-        if(!user) return alert("Please log in!");
+        if (!user) return alert("Log in first.");
 
         tinymce.triggerSave();
-        const extraImgs = Array.from(document.querySelectorAll('.extra-img')).map(i => i.value).filter(v => v);
+        let designerFinal = "Creator Self";
+        if(creditMode === 'onsite') designerFinal = document.getElementById('onsite-input').value;
+        if(creditMode === 'offsite') designerFinal = document.getElementById('offsite-input').value;
 
         try {
             await addDoc(collection(db, "characters"), {
                 ownerId: user.uid,
+                ownerName: user.displayName || "User",
                 name: document.getElementById('char-name').value,
-                worth: document.getElementById('char-worth').value,
-                tags: document.getElementById('char-tags').value.split(',').map(t => t.trim()),
-                avatar: uploadedPfpBase64,
-                designer: document.getElementById('char-designer').value,
-                description: document.getElementById('char-desc').value,
-                gallery: extraImgs,
+                avatar: base64Image,
+                designer: designerFinal,
+                tradeability: document.getElementById('char-trade').value,
+                description: tinymce.get('char-desc').getContent(),
+                gallery: base64Image ? [base64Image] : [],
                 createdAt: serverTimestamp()
             });
             window.location.href = "characters.html";
