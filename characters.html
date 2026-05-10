@@ -16,7 +16,7 @@
         .side-header { background: #427e95; padding: 10px 15px; font-weight: bold; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.1); }
         .side-user-info { padding: 12px 15px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); }
         .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
-        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .side-nav a:hover, .side-nav a.active { background: rgba(0,0,0,0.1); }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
 
@@ -34,7 +34,7 @@
 </head>
 <body>
 
-<nav class="navbar"><div class="fw-bold">OCARMY</div></nav>
+<nav class="navbar"><div class="fw-bold px-2">OCARMY</div></nav>
 
 <div class="wrapper">
     <aside class="sidebar">
@@ -44,8 +44,8 @@
             <a href="#" id="side-username" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
         </div>
         <div class="side-nav" id="folder-list">
-            <a href="javascript:void(0)" onclick="loadCharacters('all')" class="active"><i class="fa fa-folder"></i> All Characters</a>
-            <a href="javascript:void(0)" onclick="loadCharacters('unsorted')"><i class="fa fa-folder-open"></i> Unsorted</a>
+            <a onclick="loadCharacters('all')" id="all-link"><i class="fa fa-folder"></i> All Characters</a>
+            <a onclick="loadCharacters('unsorted')" id="unsorted-link"><i class="fa fa-folder-open"></i> Unsorted</a>
             <div class="side-label">Folders</div>
             </div>
     </aside>
@@ -76,9 +76,19 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     let targetUserId = urlParams.get('user');
+    let targetName = urlParams.get('name'); // This captures the name from your new 404 redirect
 
     onAuthStateChanged(auth, async (user) => {
-        // If no user in URL, default to the logged-in user
+        // 1. Resolve User ID from Name if needed
+        if (!targetUserId && targetName) {
+            const userQ = query(collection(db, "users"), where("username", "==", targetName));
+            const userSnap = await getDocs(userQ);
+            if (!userSnap.empty) {
+                targetUserId = userSnap.docs[0].id;
+            }
+        }
+
+        // 2. Default to logged in user if still no target
         if (!targetUserId && user) targetUserId = user.uid;
         
         if (targetUserId) {
@@ -86,12 +96,11 @@
             loadCharacters('all');
             loadFolders(targetUserId);
             
-            // Show create button only if viewing your own list
             if (user && user.uid === targetUserId) {
                 document.getElementById('owner-tools').style.display = "block";
             }
         } else {
-            document.getElementById('character-display').innerHTML = "<div class='p-3'>Please log in to view your characters.</div>";
+            document.getElementById('character-display').innerHTML = "<div class='p-3'>Please log in or specify a user profile.</div>";
         }
     });
 
@@ -100,7 +109,7 @@
         if (snap.exists()) {
             const data = snap.data();
             document.getElementById('side-username').innerText = data.username;
-            document.getElementById('side-username').href = `user.html?id=${uid}`;
+            document.getElementById('side-username').href = `profile.html?user=${uid}`;
             if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
         }
     }
@@ -111,28 +120,31 @@
         const list = document.getElementById('folder-list');
         snap.forEach(doc => {
             const folder = doc.data();
-            list.innerHTML += `<a href="javascript:void(0)" onclick="loadCharacters('${doc.id}', '${folder.name}')"><i class="fa fa-folder"></i> ${folder.name}</a>`;
+            list.innerHTML += `<a onclick="loadCharacters('${doc.id}', '${folder.name}')"><i class="fa fa-folder"></i> ${folder.name}</a>`;
         });
     }
 
     window.loadCharacters = async (folderId, folderName = "All Characters") => {
-        document.getElementById('folder-title').innerText = folderName === "unsorted" ? "Unsorted" : folderName;
+        // UI Handling
+        document.getElementById('folder-title').innerText = folderId === "unsorted" ? "Unsorted" : folderName;
+        document.querySelectorAll('.side-nav a').forEach(a => a.classList.remove('active'));
+        
         const grid = document.getElementById('character-display');
-        grid.innerHTML = "<div class='text-muted'>Loading...</div>";
+        grid.innerHTML = "<div class='text-muted'>Loading characters...</div>";
 
         let q;
         if (folderId === 'all') {
             q = query(collection(db, "characters"), where("ownerId", "==", targetUserId));
         } else if (folderId === 'unsorted') {
-            // This pulls characters where folderId is empty or non-existent
-            q = query(collection(db, "characters"), where("ownerId", "==", targetUserId), where("folderId", "in", ["", null]));
+            // FIX: Filters for characters with no folder set
+            q = query(collection(db, "characters"), where("ownerId", "==", targetUserId), where("folderId", "==", ""));
         } else {
             q = query(collection(db, "characters"), where("ownerId", "==", targetUserId), where("folderId", "==", folderId));
         }
 
         try {
             const snap = await getDocs(q);
-            grid.innerHTML = snap.empty ? "<div class='text-muted'>No characters found in this folder.</div>" : "";
+            grid.innerHTML = snap.empty ? "<div class='p-3 text-muted'>This folder is empty.</div>" : "";
             
             snap.forEach(doc => {
                 const char = doc.data();
@@ -143,8 +155,8 @@
                     </a>`;
             });
         } catch (err) {
-            console.error(err);
-            grid.innerHTML = "<div class='text-danger'>Error loading characters. Check console.</div>";
+            console.error("Fetch Error:", err);
+            grid.innerHTML = "<div class='text-danger'>Error loading characters.</div>";
         }
     };
 </script>
