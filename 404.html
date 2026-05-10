@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>OCARMY | Redirecting...</title>
+    <script type="text/javascript">
+        // This script takes the "broken" URL and turns it into a username search
+        var pathSegments = window.location.pathname.split('/');
+        var lastSegment = pathSegments[pathSegments.length - 1];
+
+        if (lastSegment && !lastSegment.includes('.')) {
+            // If the URL ends in a name without .html, assume it's a username
+            window.location.replace("/profile.html?name=" + lastSegment);
+        } else {
+            // Otherwise, just go home
+            window.location.replace("/");
+        }
+    </script>
+</head>
+<body>
+    Redirecting to profile...
+</body>
+</html>
