@@ -5,30 +5,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
-        :root { --th-teal: #5bc0de; --th-dark: #212529; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: Arial, sans-serif; background: #1a1523; color: #eee; display: flex; }
+        :root { --th-blue: #008eb0; --th-teal: #5bc0de; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; display: flex; }
 
-        /* Sidebar Navigation */
-        .sidebar { width: 240px; background: #3b2a51; min-height: 100vh; border-right: 1px solid #332c3d; position: sticky; top: 0; }
-        .side-header { padding: 15px; background: rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        .nav-link { display: block; padding: 12px 20px; color: #bbb; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.1); }
-        .nav-link.active { background: var(--th-teal); color: white; border-left: 4px solid white; }
+        /* Sidebar: White & Blue */
+        .sidebar { width: 240px; background: #fff; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; }
+        .side-header { padding: 15px; background: var(--th-blue); color: white; display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .nav-link { display: block; padding: 12px 20px; color: #555; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; }
+        .nav-link.active { background: #f0f0f0; border-left: 4px solid var(--th-blue); font-weight: bold; color: #333; }
 
-        /* Main Area */
         .main { flex-grow: 1; padding: 30px; max-width: 1100px; margin: 0 auto; }
-        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; margin-top: 20px; }
         
-        /* The Editor Container Background */
-        .editor-container { background: #251e2e; padding: 2px; border-radius: 4px; margin-bottom: 25px; }
-
-        /* Profile Block Cards */
-        .card { background: #251e2e; border: 1px solid #332c3d; border-radius: 4px; padding: 20px; margin-top: 30px; }
-        .card-header { font-size: 12px; font-weight: bold; color: #ccc; margin-bottom: 15px; border-bottom: 1px solid #332c3d; padding-bottom: 10px; text-transform: uppercase; }
-        .block-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .block-row select { background: #1a1523; color: white; border: 1px solid #443c50; padding: 8px; border-radius: 4px; width: 350px; }
-
-        .btn-save { background: var(--th-teal); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; font-size: 15px; margin-top: 20px; }
-        .btn-save:hover { background: #46b8da; }
+        .btn-save { background: var(--th-blue); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -39,62 +28,44 @@
         <span id="side-user">User</span>
     </div>
     <a href="dashboard.html" class="nav-link"><i class="fa fa-arrow-left"></i> Back to Profile</a>
-    <a href="settings.html" class="nav-link">General Settings</a>
+    <a href="settings.html" class="nav-link">Account Settings</a>
     <a href="#" class="nav-link active">Profile Content</a>
 </div>
 
 <div class="main">
-    <div class="header-flex">
-        <h2 style="margin:0;">Edit Profile</h2>
-    </div>
+    <h2 style="color: #444;">Edit Profile Content</h2>
 
-    <div class="editor-container">
+    <div style="border: 1px solid #ccc; border-radius: 4px; overflow: hidden;">
         <textarea id="editor-body">
-            hello! I am the owner of ocarmy this website is a work in progress, so please PM me if you have any inquiries!
+            hello! I am the owner of ocarmy.
         </textarea>
     </div>
 
     <div class="card">
-        <div class="card-header">Profile Page Blocks</div>
-        <div class="block-row">
-            <span>Display recent characters</span>
-            <select id="block-recent">
-                <option value="all">Display recent characters and designs</option>
-                <option value="none">Hide</option>
-            </select>
-        </div>
+        <div style="font-size: 12px; font-weight: bold; color: #666; margin-bottom: 15px; text-transform: uppercase;">Profile Page Blocks</div>
+        <select id="block-recent" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="all">Display recent characters and designs</option>
+            <option value="none">Hide</option>
+        </select>
     </div>
 
     <button class="btn-save" onclick="saveChanges()">Save Changes</button>
 </div>
 
 <script>
-    // Initialize the TinyMCE Editor
     tinymce.init({
         selector: '#editor-body',
         height: 500,
-        plugins: 'lists link image charmap emoticons table code fullscreen',
-        // This toolbar string dictates exactly which buttons appear and in what order
-        toolbar: 'undo redo | blocks fontfamily | bold italic underline strikethrough | subscript superscript | forecolor backcolor emoticons charmap | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote customSpoiler hr | link image table | removeformat | code fullscreen',
+        plugins: 'lists link image charmap emoticons table code fullscreen hr',
+        // All 27 functions requested
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | subscript superscript | forecolor backcolor | emoticons charmap | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote hr | link image table | removeformat | code fullscreen',
         menubar: false,
-        skin: 'oxide-dark', // Automatically gives it a dark mode aesthetic
-        content_css: 'dark', // Makes the text area background dark to match your site
-        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px; text-align:center; }', // Defaults to centered text
-        setup: function (editor) {
-            // Creating a custom button for the "Spoiler" feature
-            editor.ui.registry.addButton('customSpoiler', {
-                text: 'Spoiler',
-                tooltip: 'Insert Spoiler Box',
-                onAction: function (_) {
-                    editor.insertContent('<details style="background:#1a1523; padding:10px; border: 1px solid #443c50; border-radius:4px; margin: 10px 0;"><summary style="cursor:pointer; font-weight:bold; color: #5bc0de;">Spoiler (Click to open)</summary><p>Replace this with your spoiler text...</p></details><p></p>');
-                }
-            });
-        }
+        content_style: 'body { font-family:Arial; font-size:14px; text-align:center; white-space: pre-wrap; }',
+        branding: false
     });
 </script>
 
 <script type="module">
-    // Firebase Logic
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -105,15 +76,13 @@
         projectId: "ocarmy-db",
         storageBucket: "ocarmy-db.firebasestorage.app",
         messagingSenderId: "848883355194",
-        appId: "1:848883355194:web:361e9fe8eb9e01f350af03",
-        measurementId: "G-9G2WV3NXV1"
+        appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth();
 
-    // Load data when user logs in
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -122,32 +91,21 @@
                 document.getElementById('side-user').innerText = data.username;
                 if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
                 
-                // Wait for TinyMCE to finish loading, then set the content from the database
-                tinymce.get('editor-body').on('init', function() {
-                    if(data.profileHTML) {
-                        tinymce.get('editor-body').setContent(data.profileHTML);
-                    }
+                tinymce.get('editor-body').on('init', () => {
+                    if(data.profileHTML) tinymce.get('editor-body').setContent(data.profileHTML);
                 });
             }
         }
     });
 
-    // Custom Save Function
     window.saveChanges = async () => {
         const user = auth.currentUser;
-        if (!user) {
-            alert("You must be logged in to save.");
-            return;
-        }
-
-        // We pull the raw HTML directly from the TinyMCE editor
         const content = tinymce.get('editor-body').getContent();
-        
         await updateDoc(doc(db, "users", user.uid), {
             profileHTML: content,
             blockRecent: document.getElementById('block-recent').value
         });
-        alert("Profile saved successfully!");
+        alert("Profile saved!");
     };
 </script>
 </body>
