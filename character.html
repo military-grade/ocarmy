@@ -2,68 +2,192 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>OC Profile | OCARMY</title>
+    <title>Character Profile | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
-        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); }
-        .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; min-height: 100vh; border: 1px solid var(--border); }
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
 
-        /* Character Sidebar (Image 18) */
+        /* Sidebar */
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
-        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        .main { flex: 1; padding: 30px; }
-        .profile-header { display: flex; gap: 25px; margin-bottom: 30px; align-items: flex-start; }
-        .char-img { width: 120px; height: 120px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; flex-shrink: 0; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         
-        .char-info { flex: 1; }
-        .char-title { font-size: 32px; font-weight: bold; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .char-owner { color: var(--th-blue); text-decoration: none; font-weight: bold; font-size: 14px; }
-
-        /* Stats Box (Image 18) */
+        .main { flex: 1; padding: 30px; border-left: 1px solid var(--border); }
+        .char-header { display: flex; gap: 25px; margin-bottom: 30px; align-items: flex-start; }
+        .char-img { width: 120px; height: 120px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
+        
+        /* Stats Box */
         .stats-box { width: 280px; border: 1px solid var(--border); border-radius: 4px; background: #fdfdfd; padding: 15px; font-size: 13px; }
         .stats-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
-        .stats-row:last-child { border: 0; }
         .stats-label { color: #666; font-weight: bold; }
+
+        /* Comment System (Screenshot 64 Style) */
+        .comment-header { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: bold; color: var(--th-blue); margin-top: 40px; margin-bottom: 15px; }
+        .comment-box-outer { border: 1px solid var(--border); border-radius: 4px; padding: 15px; background: #fff; margin-bottom: 20px; }
+        .comment-list-item { border: 1px solid var(--border); padding: 15px; margin-bottom: 10px; border-radius: 4px; }
+        .reply-btn { font-size: 11px; color: var(--th-blue); cursor: pointer; text-decoration: underline; margin-top: 5px; display: inline-block; }
+
+        .btn-fav { color: white; background: rgba(0,0,0,0.1); }
+        .fav-active { color: #ffc107 !important; }
     </style>
 </head>
 <body>
+
 <div class="wrapper">
     <aside class="sidebar">
         <div style="padding:15px; background:rgba(0,0,0,0.1); font-weight:bold;"><i class="fa fa-user"></i> Character</div>
         <div class="side-nav">
-            <a href="dashboard.html" style="background:rgba(0,0,0,0.2);"><i class="fa fa-arrow-left"></i> fourteendays</a>
+            <a id="owner-link"><i class="fa fa-arrow-left"></i> <span id="side-owner-name">Owner</span></a>
             <a href="#"><i class="fa fa-folder"></i> Unsorted</a>
             <div style="font-size:10px; padding:15px 15px 5px; text-transform:uppercase; opacity:0.7;">Character</div>
             <a href="#"><i class="fa fa-image"></i> Gallery</a>
+            <a href="#" id="fav-button"><i class="fa fa-star" id="fav-icon"></i> Favorite</a>
             <a href="#"><i class="fa fa-comments"></i> Comments</a>
-            <div style="font-size:10px; padding:15px 15px 5px; text-transform:uppercase; opacity:0.7;">Control Panel</div>
-            <a href="#" style="color:#d9f3ff;">Manage Character <i class="fa fa-caret-right" style="float:right;"></i></a>
         </div>
     </aside>
 
     <main class="main">
-        <div class="profile-header">
-            <div class="char-img" style="background-image: url('https://via.placeholder.com/150');"></div>
-            <div class="char-info">
-                <div class="char-title"><i class="fa fa-lock" style="font-size: 20px;"></i> DOBIE</div>
-                <a href="#" class="char-owner">@fourteendays</a>
+        <div class="char-header">
+            <div class="char-img" id="char-avatar-display"></div>
+            <div style="flex:1;">
+                <h1 style="margin:0; font-size: 28px;"><i class="fa fa-lock" id="privacy-lock"></i> <span id="char-name-display">Name</span></h1>
+                <a id="creator-link" style="color:var(--th-blue); font-weight:bold; text-decoration:none;">fourteendays</a>
             </div>
             <div class="stats-box">
-                <div class="stats-row"><span class="stats-label">Created</span> <span>8 hours ago</span></div>
-                <div class="stats-row"><span class="stats-label">Creator</span> <span style="color:var(--th-blue);">@fourteendays</span></div>
-                <div class="stats-row"><span class="stats-label">Favorites</span> <span>1</span></div>
+                <div class="stats-row"><span class="stats-label">Created</span> <span id="stat-created">---</span></div>
+                <div class="stats-row"><span class="stats-label">Creator</span> <a id="stat-creator-link" style="color:var(--th-blue); text-decoration:none;">fourteendays</a></div>
+                <div class="stats-row"><span class="stats-label">Favorites</span> <span id="stat-favs">0</span></div>
             </div>
         </div>
 
-        <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px; color: #444;">Profile</h3>
-        <div id="description-area" style="text-align: center;">
-            <p><strong>Dobie / pot</strong></p>
-            <p>He/him/they</p>
-            <p>weedpuppy</p>
+        <div id="char-description-display" style="min-height: 100px;"></div>
+
+        <div class="comment-header">
+            <i class="fa fa-lock" style="font-size: 14px;"></i> <span id="comment-title-name">Character</span>'s Comments
         </div>
+
+        <div class="comment-box-outer">
+            <textarea id="comment-editor"></textarea>
+            <button onclick="postComment()" style="background:var(--th-blue); color:white; border:none; padding:8px 20px; margin-top:10px; border-radius:4px; cursor:pointer; font-weight:bold; width:100%;">Post Comment</button>
+        </div>
+
+        <div id="real-comment-list">
+            </div>
     </main>
 </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, query, where, onSnapshot, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const charId = urlParams.get('id');
+
+    // Initialize TinyMCE for comments
+    tinymce.init({
+        selector: '#comment-editor',
+        height: 200,
+        menubar: false,
+        toolbar_mode: 'wrap',
+        plugins: 'link emoticons code lists',
+        toolbar: 'bold italic underline | emoticons link | bullist numlist | code',
+        branding: false
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!charId) return;
+        const charRef = doc(db, "characters", charId);
+        const charSnap = await getDoc(charRef);
+
+        if (charSnap.exists()) {
+            const data = charSnap.data();
+            
+            // Fill Content
+            document.getElementById('char-name-display').innerText = data.name;
+            document.getElementById('comment-title-name').innerText = data.name;
+            document.getElementById('char-description-display').innerHTML = data.description;
+            if(data.avatar) document.getElementById('char-avatar-display').style.backgroundImage = `url('${data.avatar}')`;
+            
+            // Creator Links & Profile Logic
+            const creatorName = data.ownerName;
+            const ownerId = data.ownerId;
+            document.getElementById('creator-link').innerText = creatorName;
+            document.getElementById('creator-link').href = `profile.html?id=${ownerId}`;
+            document.getElementById('stat-creator-link').innerText = creatorName;
+            document.getElementById('stat-creator-link').href = `profile.html?id=${ownerId}`;
+            document.getElementById('owner-link').href = `profile.html?id=${ownerId}`;
+            document.getElementById('side-owner-name').innerText = creatorName;
+
+            // Stats
+            document.getElementById('stat-favs').innerText = data.favCount || 0;
+            if(data.createdAt) document.getElementById('stat-created').innerText = new Date(data.createdAt.toDate()).toLocaleDateString();
+
+            // Favorite Logic
+            const favBtn = document.getElementById('fav-button');
+            const favIcon = document.getElementById('fav-icon');
+            let isFaved = data.favoritedBy?.includes(user.uid);
+            if(isFaved) favIcon.classList.add('fav-active');
+
+            favBtn.onclick = async () => {
+                if(isFaved) {
+                    await updateDoc(charRef, { favoritedBy: arrayRemove(user.uid), favCount: increment(-1) });
+                    favIcon.classList.remove('fav-active');
+                } else {
+                    await updateDoc(charRef, { favoritedBy: arrayUnion(user.uid), favCount: increment(1) });
+                    favIcon.classList.add('fav-active');
+                }
+                location.reload();
+            };
+
+            // Load Comments
+            loadComments(charId);
+        }
+    });
+
+    function loadComments(id) {
+        const q = query(collection(db, "comments"), where("characterId", "==", id), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const list = document.getElementById('real-comment-list');
+            list.innerHTML = "";
+            snapshot.forEach(doc => {
+                const c = doc.data();
+                list.innerHTML += `
+                    <div class="comment-list-item">
+                        <div style="font-size:12px; margin-bottom:5px;"><strong>${c.userName}</strong> • ${new Date(c.timestamp?.toDate()).toLocaleString()}</div>
+                        <div style="font-size:13px;">${c.text}</div>
+                        <span class="reply-btn" onclick="setReply('${c.userName}')">Reply</span>
+                    </div>
+                `;
+            });
+        });
+    }
+
+    window.postComment = async () => {
+        const text = tinymce.get('comment-editor').getContent();
+        if(!text) return;
+        const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+        
+        await addDoc(collection(db, "comments"), {
+            characterId: charId,
+            userId: auth.currentUser.uid,
+            userName: userDoc.data().username,
+            text: text,
+            timestamp: serverTimestamp()
+        });
+        tinymce.get('comment-editor').setContent("");
+    };
+
+    window.setReply = (name) => {
+        tinymce.get('comment-editor').execCommand('mceInsertContent', false, `<strong>@${name}</strong> `);
+    };
+</script>
 </body>
 </html>
