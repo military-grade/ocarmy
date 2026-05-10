@@ -3,26 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Profile | OCARMY</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/awesome/6.0.0/css/all.min.css">
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; overflow-x: hidden; }
 
-        /* Navbar & Dropdowns */
+        /* Navbar */
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .nav-left { display: flex; gap: 15px; align-items: center; height: 100%; }
         .nav-left a, .nav-item { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 5px; }
+        .nav-left a:hover, .nav-item:hover { color: white; }
         
+        /* Dropdowns */
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
         .dropdown-content { display: none; position: absolute; top: 50px; left: 0; background: white; border: 1px solid var(--border); min-width: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1001; }
         .dropdown-right { left: auto; right: 0; }
-        .dropdown-content a { display: block; padding: 10px 15px; color: #333 !important; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; }
+        .dropdown-content a { display: block; padding: 10px 15px; color: #333 !important; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; height: auto; }
         .show { display: block; }
 
-        /* GAP FIX: Wrapper uses align-items: stretch */
+        .nav-pfp { width: 30px; height: 30px; background: #eee; border-radius: 2px; background-size: cover; margin-left: 8px; }
+
+        /* Wrapper - FIXED GAP */
         .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); align-items: stretch; }
 
-        /* Sidebar with User Header */
+        /* Sidebar Header */
         .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-user-header { background: #427e95; padding: 10px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .side-avatar-box { width: 50px; height: 50px; background: #eee; border-radius: 2px; background-size: cover; flex-shrink: 0; }
@@ -30,15 +34,22 @@
 
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
 
         /* Main Content */
         .main { flex: 1; padding: 30px; background: white; }
+        
+        .section-header { background: #f9f9f9; padding: 8px 15px; border: 1px solid var(--border); border-radius: 4px 4px 0 0; font-weight: bold; font-size: 14px; margin-top: 40px; }
+        .comment-input-area { border: 1px solid var(--border); border-top: none; padding: 15px; background: white; }
     </style>
 </head>
 <body>
+
 <nav class="navbar">
     <div class="nav-left">
         <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
+        <a href="#"><i class="fa fa-eye"></i> Browse</a>
+        
         <div class="dropdown">
             <div class="nav-item" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></div>
             <div id="drop-submit" class="dropdown-content">
@@ -47,6 +58,26 @@
                 <a href="create_bulletin.html">Bulletin</a>
                 <a href="create_ad.html">Ad</a>
             </div>
+        </div>
+
+        <a href="#"><i class="fa fa-search"></i> Search</a>
+        <a href="#"><i class="fa fa-info-circle"></i> Info</a>
+        <a href="#"><i class="fa fa-newspaper"></i> Blogs</a>
+    </div>
+
+    <div class="dropdown">
+        <div class="nav-item" onclick="toggleDrop('drop-user')">
+            <span id="nav-username">User</span>
+            <div class="nav-pfp" id="nav-pfp-img"></div>
+            <i class="fa fa-caret-down" style="margin-left: 5px;"></i>
+        </div>
+        <div id="drop-user" class="dropdown-content dropdown-right">
+            <a href="dashboard.html">Profile</a>
+            <a href="messages.html">Inbox</a>
+            <a href="profile_content.html">Edit Profile</a>
+            <a href="settings.html">Settings</a>
+            <div style="border-top:1px solid #eee; margin: 5px 0;"></div>
+            <a href="#" id="logout-btn">Logout</a>
         </div>
     </div>
 </nav>
@@ -58,20 +89,48 @@
             <div class="side-user-name" id="side-user-text">User</div>
         </div>
         <div class="side-nav">
-            <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
+            <a href="dashboard.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-user"></i> Profile</a>
             <a href="#"><i class="fa fa-comment"></i> Bulletins</a>
             <a href="#"><i class="fa fa-users"></i> Characters</a>
+            <a href="#"><i class="fa fa-link"></i> Links</a>
+            <a href="#"><i class="fa fa-star"></i> Favorites</a>
+            
+            <div class="side-label">Library</div>
+            <a href="#"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a href="#"><i class="fa fa-image"></i> Art</a>
+            <a href="#"><i class="fa fa-book"></i> Library</a>
+            
+            <div class="side-label">Interaction</div>
+            <a href="#comments-section"><i class="fa fa-comments"></i> Comments</a>
             <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
         </div>
     </aside>
+
     <main class="main">
         <div id="profile-blurb"></div>
+        <div id="comments-section">
+            <div class="section-header">Comments</div>
+            <div id="comment-list"></div>
+            <div class="comment-input-area">
+                <textarea id="comment-input" style="width:100%; height:80px; border:1px solid #ddd; padding:10px;" placeholder="Leave a comment..."></textarea>
+                <button style="background:var(--th-blue); color:white; border:none; padding:8px 20px; margin-top:10px; cursor:pointer; font-weight:bold;">Post Comment</button>
+            </div>
+        </div>
     </main>
 </div>
 
 <script>
     function toggleDrop(id) {
+        document.querySelectorAll('.dropdown-content').forEach(d => {
+            if(d.id !== id) d.classList.remove('show');
+        });
         document.getElementById(id).classList.toggle('show');
+    }
+    // Close dropdowns on outside click
+    window.onclick = function(event) {
+        if (!event.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+        }
     }
 </script>
 </body>
