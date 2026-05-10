@@ -3,41 +3,38 @@
 <head>
     <title>Settings | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
-        :root { --th-teal: #5bc0de; --th-dark: #212529; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
+        :root { --th-blue: #008eb0; --th-teal: #5bc0de; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; display: flex; }
 
-        /* SIDEBAR */
+        /* Sidebar: White & Blue */
         .sidebar { width: 250px; background: white; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; }
-        .sidebar-header { background: var(--th-teal); padding: 15px; color: white; display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .sidebar-header { background: var(--th-blue); padding: 15px; color: white; display: flex; align-items: center; gap: 10px; font-weight: bold; }
         .avatar-mini { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; border: 1px solid rgba(0,0,0,0.1); }
         
         .side-link { display: block; padding: 12px 20px; color: #555; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; cursor: pointer; }
         .side-link:hover { background: #f9f9f9; }
-        .side-link.active { background: #eee; font-weight: bold; border-left: 4px solid var(--th-teal); }
+        .side-link.active { background: #f0f0f0; font-weight: bold; border-left: 4px solid var(--th-blue); color: #333; }
 
-        /* MAIN AREA */
+        /* Main Area */
         .main { flex-grow: 1; padding: 30px; max-width: 1100px; }
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .section-title { font-size: 1.5rem; margin: 0; color: #444; }
 
-        /* CARDS & FORMS */
+        /* Cards & Forms */
         .card { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; margin-bottom: 20px; }
         .card-title { font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; color: #555; text-transform: uppercase; font-size: 12px; }
         
         label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #666; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #eee; margin-bottom: 5px; box-sizing: border-box; font-family: inherit; }
-        textarea { height: 250px; background: white; text-align: center; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #eee; margin-bottom: 5px; box-sizing: border-box; }
         
-        .btn-teal { background: var(--th-teal); color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-wysiwyg { background: var(--th-dark); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        .btn-teal { background: var(--th-blue); color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-wysiwyg { background: #333; color: white; border: none; padding: 6px 15px; border-radius: 4px; font-size: 11px; cursor: pointer; }
 
-        /* TABS */
+        /* Tab Content Logic */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        /* AVATAR BOX */
-        .avatar-preview-large { width: 150px; height: 150px; background: #eee; margin: 0 auto 15px; border: 1px solid #ddd; background-size: cover; }
     </style>
 </head>
 <body>
@@ -49,14 +46,13 @@
     </div>
     <a href="dashboard.html" class="side-link"><i class="fa fa-arrow-left"></i> Back to Profile</a>
     <div class="side-link active" onclick="openTab(event, 'general')">General Settings</div>
-    <div class="side-link" onclick="openTab(event, 'alerts')">Interaction & Alerts</div>
     <div class="side-link" onclick="openTab(event, 'content')">Profile Content</div>
 </div>
 
 <div class="main">
     <div class="page-header">
         <h2 id="tab-title" class="section-title">Account Management</h2>
-        <button id="wysiwyg-btn" class="btn-wysiwyg" style="display:none;">Disable WYSIWYG</button>
+        <button id="toggle-wysiwyg" class="btn-wysiwyg" style="display:none;" onclick="toggleEditor()">Disable WYSIWYG</button>
     </div>
 
     <div id="general" class="tab-content active">
@@ -66,51 +62,37 @@
                     <div class="card-title">Account Details</div>
                     <label>Name</label>
                     <input type="text" id="username-field" readonly>
-                    <a href="javascript:void(0)" onclick="changeUsername()" style="font-size:11px; color:var(--th-teal);">Change Username</a>
-                    
                     <label style="margin-top:15px;">Email</label>
                     <input type="text" id="email-field" readonly>
-                    
-                    <label style="margin-top:15px;">DOB</label>
-                    <input type="text" value="Not set" readonly>
                 </div>
                 <div class="card">
                     <div class="card-title">Password</div>
-                    <p style="font-size:12px; color:#666;">This will send instructions to your email address to reset your password.</p>
-                    <button class="btn-teal" onclick="sendReset()">Change Password</button>
+                    <p style="font-size:12px; color:#666;">This sends instructions to reset your password via email.</p>
+                    <button class="btn-teal" style="width:auto;" onclick="sendReset()">Change Password</button>
                 </div>
             </div>
             <div style="flex:1;">
                 <div class="card" style="text-align:center;">
                     <div class="card-title">Avatar</div>
-                    <div class="avatar-preview-large" id="large-pfp"></div>
+                    <div id="large-pfp" style="width:150px; height:150px; background:#eee; margin:0 auto 15px; border-radius:2px; background-size:cover;"></div>
                     <input type="text" id="pfp-url" placeholder="Paste Image URL..." style="background:white;">
-                    <button class="btn-teal" style="width:100%;" onclick="saveData()">Upload Avatar</button>
+                    <button class="btn-teal" onclick="saveData()">Update Avatar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="alerts" class="tab-content">
-        <div class="card">
-            <div class="card-title">Profile Interactions</div>
-            <label>Profile Comments</label>
-            <select id="comment-pref">
-                <option value="all">Allow comments, with notifications</option>
-                <option value="none">Disable comments</option>
-            </select>
-            <button class="btn-teal" onclick="saveData()">Update Interactions</button>
-        </div>
-    </div>
-
     <div id="content" class="tab-content">
-        <div class="card">
-            <div class="card-title">Edit Profile Blurb</div>
-            <textarea id="profile-blurb" placeholder="Write your profile description here..."></textarea>
-            <label style="margin-top:15px;">Custom CSS</label>
-            <textarea id="custom-css" style="height:100px; text-align:left;" placeholder="<style> ... </style>"></textarea>
-            <button class="btn-teal" style="margin-top:15px;" onclick="saveData()">Update Profile</button>
+        <div class="card" style="padding: 0; border: none;">
+            <textarea id="editor-body">hello! I am the owner of ocarmy.</textarea>
         </div>
+        
+        <div class="card">
+            <div class="card-title">Custom CSS</div>
+            <textarea id="custom-css" style="width:100%; height:100px; padding:10px; border:1px solid #ccc; font-family:monospace;" placeholder="<style> ... </style>"></textarea>
+        </div>
+        
+        <button class="btn-teal" onclick="saveData()">Save Profile Changes</button>
     </div>
 </div>
 
@@ -123,14 +105,25 @@
     apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
     authDomain: "ocarmy-db.firebaseapp.com",
     projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.appspot.com",
+    storageBucket: "ocarmy-db.firebasestorage.app",
     messagingSenderId: "848883355194",
-    appId: "1:848883355194:web:51254de3c4992d7750af03"
+    appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
   };
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth();
   const db = getFirestore(app);
+
+  // Initialize TinyMCE
+  tinymce.init({
+    selector: '#editor-body',
+    height: 500,
+    plugins: 'lists link image charmap emoticons table code fullscreen hr',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | subscript superscript | forecolor backcolor | emoticons charmap | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote hr | link image table | removeformat | code fullscreen',
+    menubar: false,
+    content_style: 'body { font-family:Arial; font-size:14px; text-align:center; white-space: pre-wrap; }',
+    branding: false
+  });
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) window.location.href = "index.html";
@@ -145,8 +138,12 @@
         document.getElementById('large-pfp').style.backgroundImage = `url('${data.pfp}')`;
         document.getElementById('pfp-url').value = data.pfp;
       }
-      document.getElementById('profile-blurb').value = data.blurb || "";
       document.getElementById('custom-css').value = data.customCode || "";
+      
+      // Load editor content
+      tinymce.get('editor-body').on('init', () => {
+        if(data.profileHTML) tinymce.get('editor-body').setContent(data.profileHTML);
+      });
     }
   });
 
@@ -157,27 +154,33 @@
     evt.currentTarget.classList.add('active');
     
     document.getElementById('tab-title').innerText = tabName === 'content' ? 'Edit Profile' : 'Account Management';
-    document.getElementById('wysiwyg-btn').style.display = tabName === 'content' ? 'block' : 'none';
+    document.getElementById('toggle-wysiwyg').style.display = tabName === 'content' ? 'block' : 'none';
+  };
+
+  window.toggleEditor = () => {
+    const btn = document.getElementById('toggle-wysiwyg');
+    if (tinymce.get('editor-body').isHidden()) {
+      tinymce.get('editor-body').show();
+      btn.innerText = "Disable WYSIWYG";
+    } else {
+      tinymce.get('editor-body').hide();
+      btn.innerText = "Enable WYSIWYG";
+    }
   };
 
   window.saveData = async () => {
     const user = auth.currentUser;
+    const content = tinymce.get('editor-body').getContent();
     await updateDoc(doc(db, "users", user.uid), {
       pfp: document.getElementById('pfp-url').value,
-      blurb: document.getElementById('profile-blurb').value,
+      profileHTML: content,
       customCode: document.getElementById('custom-css').value
     });
-    alert("Settings updated!");
-    location.reload();
+    alert("Saved successfully!");
   };
 
   window.sendReset = () => {
     sendPasswordResetEmail(auth, auth.currentUser.email).then(() => alert("Reset email sent!"));
-  };
-
-  window.changeUsername = () => {
-    const name = prompt("Enter new username:");
-    if(name) updateDoc(doc(db, "users", auth.currentUser.uid), { username: name }).then(() => location.reload());
   };
 </script>
 </body>
