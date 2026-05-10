@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Character Profile | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: sans-serif; background: var(--th-bg); display: flex; }
+        .sidebar { width: 220px; background: var(--th-blue); color: white; min-height: 100vh; }
+        .main { flex: 1; padding: 30px; background: white; max-width: 1000px; margin: 0 auto; border: 1px solid var(--border); }
+        
+        .profile-header { display: flex; gap: 20px; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .char-avatar { width: 250px; height: 250px; background-size: cover; background-position: center; border: 1px solid var(--border); }
+        
+        /* New Credit Box */
+        .credit-box { background: #f9f9f9; border: 1px solid var(--border); padding: 15px; margin-top: 40px; border-radius: 4px; }
+        .credit-label { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; }
+        
+        /* Gallery Editor */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
+        .gallery-item { position: relative; width: 120px; height: 120px; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .delete-btn { position: absolute; top: 2px; right: 2px; background: rgba(255,0,0,0.8); color: white; border: none; cursor: pointer; border-radius: 2px; font-size: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="main">
+    <div class="profile-header">
+        <div class="char-avatar" id="display-avatar"></div>
+        <div>
+            <h1 id="display-name" style="margin-top:0;">Loading...</h1>
+            <div id="display-description"></div>
+        </div>
+    </div>
+
+    <div class="credit-box">
+        <div style="display:flex; justify-content: space-between;">
+            <div>
+                <div class="credit-label">Designer Credit</div>
+                <div id="display-designer" style="font-weight:bold;">-</div>
+            </div>
+            <div>
+                <div class="credit-label">Tradeability</div>
+                <div id="display-trade" style="font-weight:bold;">-</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gallery-editor" style="display:none; margin-top: 30px; border-top: 2px dashed #eee; padding-top: 20px;">
+        <h3 style="font-size: 16px;">Gallery Editor</h3>
+        <div class="gallery-grid" id="manage-grid"></div>
+        <div style="margin-top:15px;">
+            <input type="text" id="add-img-url" placeholder="Paste image URL to add to gallery..." style="width: 70%; padding: 8px;">
+            <button onclick="addToGallery()" style="padding: 8px 15px; background: var(--th-blue); color: white; border: none; cursor: pointer;">Add Image</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { /* SAME AS ABOVE */ };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    const charId = new URLSearchParams(window.location.search).get('id');
+
+    async function loadChar() {
+        if (!charId) return;
+        const snap = await getDoc(doc(db, "characters", charId));
+        if (snap.exists()) {
+            const data = snap.data();
+            document.getElementById('display-name').innerText = data.name;
+            document.getElementById('display-description').innerHTML = data.description;
+            document.getElementById('display-avatar').style.backgroundImage = `url('${data.avatar}')`;
+            document.getElementById('display-designer').innerText = data.designer || "None Listed";
+            document.getElementById('display-trade').innerText = data.tradeability || "Not for Trade";
+
+            onAuthStateChanged(auth, (user) => {
+                if (user && user.uid === data.ownerId) {
+                    document.getElementById('gallery-editor').style.display = 'block';
+                    renderManageGallery(data.gallery || []);
+                }
+            });
+        }
+    }
+
+    function renderManageGallery(gallery) {
+        const grid = document.getElementById('manage-grid');
+        grid.innerHTML = "";
+        gallery.forEach(img => {
+            const div = document.createElement('div');
+            div.className = "gallery-item";
+            div.innerHTML = `<img src="${img}"><button class="delete-btn" onclick="deleteImg('${img}')">Delete</button>`;
+            grid.appendChild(div);
+        });
+    }
+
+    window.addToGallery = async () => {
+        const url = document.getElementById('add-img-url').value;
+        if(!url) return;
+        await updateDoc(doc(db, "characters", charId), { gallery: arrayUnion(url) });
+        location.reload();
+    };
+
+    window.deleteImg = async (url) => {
+        if(confirm("Delete this image?")) {
+            await updateDoc(doc(db, "characters", charId), { gallery: arrayRemove(url) });
+            location.reload();
+        }
+    };
+
+    loadChar();
+</script>
+</body>
+</html>
