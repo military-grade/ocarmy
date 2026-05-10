@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Folder Management | OCARMY</title>
+    <style>
+        /* Add specific filter styling for the "Order by" dropdown in Screenshot 11.45.10 */
+        .filter-bar { background: #f9f9f9; padding: 10px; border: 1px solid #ddd; margin-bottom: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+        select { padding: 5px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <main class="main">
+        <h2 id="folder-name-heading"><i class="fa fa-folder"></i> Loading Folder...</h2>
+        
+        <div class="filter-bar">
+            <label style="font-size:12px; font-weight:bold;">Order by:</label>
+            <select id="sort-order">
+                <option value="name">Name</option>
+                <option value="oldest">Oldest</option>
+                <option value="newest">Newest</option>
+            </select>
+        </div>
+
+        <div class="char-grid" id="folder-list"></div>
+    </main>
+
+<script type="module">
+    // Logic to parse URL parameter ?folder=unsorted and filter characters
+    // Matches logic from Screenshot 11.45.10 (Sorting) and 11.45.22 (Privacy)
+</script>
+</body>
+</html>
