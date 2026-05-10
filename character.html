@@ -1,1 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Character | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
 
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; }
+        .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
+
+        /* Character Sidebar (Screenshot 4 Match) */
+        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .char-nav-header { padding: 10px 15px; background: rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .side-nav a:hover { background: rgba(0,0,0,0.1); }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
+
+        .main { flex: 1; padding: 30px; }
+        .char-header { display: flex; gap: 20px; margin-bottom: 30px; }
+        .char-avatar { width: 100px; height: 100px; background: #eee; border-radius: 4px; background-size: cover; border: 1px solid var(--border); }
+        
+        /* Info Box */
+        .info-box { background: #fdfdfd; border: 1px solid var(--border); border-radius: 4px; padding: 15px; font-size: 13px; margin-bottom: 20px; }
+        .info-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f0f0f0; }
+        .info-row span:first-child { font-weight: bold; color: #666; }
+
+        .char-name { font-size: 28px; font-weight: bold; margin: 0; }
+        .char-owner { color: var(--th-blue); text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="dashboard.html" style="color:white; text-decoration:none; font-weight:bold;">OCARMY</a>
+</nav>
+
+<div class="wrapper">
+    <aside class="sidebar">
+        <div class="char-nav-header">
+            <i class="fa fa-user"></i> <span id="side-char-name">Character</span>
+        </div>
+        <div class="side-nav">
+            <a href="dashboard.html" style="background:rgba(0,0,0,0.2);"><i class="fa fa-arrow-left"></i> <span id="side-owner-name">Owner</span></a>
+            <a href="#" style="background:rgba(255,255,255,0.1);"><i class="fa fa-folder-open"></i> Unsorted</a>
+            
+            <div class="side-label">Character</div>
+            <a href="#"><i class="fa fa-image"></i> Gallery</a>
+            <a href="#"><i class="fa fa-book"></i> Library</a>
+            <a href="#"><i class="fa fa-comments"></i> Comments</a>
+            <a href="#"><i class="fa fa-star"></i> Favorites</a>
+
+            <div class="side-label">Control Panel</div>
+            <a href="#" style="color:#d9f3ff;">Manage Character <i class="fa fa-caret-right" style="float:right;"></i></a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div style="display:flex; gap:30px;">
+            <div style="flex:1;">
+                <div class="char-header">
+                    <div class="char-avatar" id="display-avatar"></div>
+                    <div>
+                        <h1 class="char-name" id="display-name">Name</h1>
+                        <a href="#" class="char-owner" id="display-owner">Owner</a>
+                    </div>
+                </div>
+                <div id="display-description"></div>
+            </div>
+
+            <div style="width: 280px;">
+                <div class="info-box">
+                    <div class="info-row"><span>Created</span> <span id="info-created">-</span></div>
+                    <div class="info-row"><span>Creator</span> <span id="info-creator">-</span></div>
+                    <div class="info-row"><span>Favorites</span> <span>0</span></div>
+                    <div class="info-row"><span>Worth</span> <span id="info-worth">-</span></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const charId = urlParams.get('id');
+
+    if (charId) {
+        const fetchChar = async () => {
+            const charSnap = await getDoc(doc(db, "characters", charId));
+            if (charSnap.exists()) {
+                const data = charSnap.data();
+                document.getElementById('display-name').innerText = data.name;
+                document.getElementById('side-char-name').innerText = data.name;
+                document.getElementById('display-owner').innerText = data.ownerName;
+                document.getElementById('side-owner-name').innerText = data.ownerName;
+                document.getElementById('display-description').innerHTML = data.description;
+                document.getElementById('info-creator').innerText = data.ownerName;
+                document.getElementById('info-worth').innerText = data.worth || "None";
+                if(data.avatar) document.getElementById('display-avatar').style.backgroundImage = `url('${data.avatar}')`;
+                
+                if(data.createdAt) {
+                    const date = data.createdAt.toDate();
+                    document.getElementById('info-created').innerText = date.toLocaleDateString();
+                }
+            }
+        };
+        fetchChar();
+    }
+</script>
+</body>
+</html>
