@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Ad | OCARMY</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
+    <style>
+        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; }
+        body { font-family: sans-serif; background: var(--th-bg); padding: 20px; }
+        .card { background: white; border: 1px solid var(--border); border-radius: 4px; max-width: 900px; margin: 0 auto 20px; }
+        .card-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); }
+        .card-body { padding: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+        input, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">Create New Advertisement</div>
+        <div class="card-body">
+            <label>Ad Subject</label>
+            <input type="text" placeholder="Looking for trades, commissions open, etc.">
+            
+            <label>Payment Options</label>
+            <textarea style="height: 80px;" placeholder="Paypal, Points, Art Trades..."></textarea>
+            
+            <label>Description</label>
+            <textarea id="ad-editor"></textarea>
+            
+            <button class="btn-submit">Create Ad</button>
+        </div>
+    </div>
+    <script>
+        tinymce.init({ selector: '#ad-editor', height: 300, toolbar_mode: 'wrap', menubar: false });
+    </script>
+</body>
+</html>
