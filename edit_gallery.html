@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Gallery | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; }
+        body { font-family: sans-serif; background: var(--th-bg); padding: 20px; }
+        .card { background: white; border: 1px solid var(--border); border-radius: 4px; max-width: 1000px; margin: 0 auto 20px; }
+        .card-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); }
+        .card-body { padding: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #666; text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        .upload-row { display: flex; gap: 20px; }
+        .credit-box { background: #fcfcfc; padding: 15px; border: 1px solid #eee; flex: 1; }
+        .btn-group { display: flex; margin-bottom: 10px; }
+        .btn-group button { flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+        .btn-group button.active { background: var(--th-blue); color: white; border-color: var(--th-blue); }
+        
+        .img-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .manage-item { border: 1px solid #ddd; padding: 10px; background: white; text-align: center; }
+        .manage-item img { width: 100%; height: 120px; object-fit: cover; margin-bottom: 10px; }
+        .btn-del { color: #d9534f; cursor: pointer; font-size: 12px; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="card-header">Upload Gallery Image</div>
+    <div class="card-body">
+        <div class="upload-row">
+            <div style="flex:2;">
+                <label>Select File</label>
+                <input type="file" id="file-upload" accept="image/*">
+                <label>Caption</label>
+                <textarea id="caption" placeholder="Image caption..."></textarea>
+                <label>Privacy</label>
+                <select id="privacy">
+                    <option value="full">Full-size</option>
+                    <option value="watermark">Watermarked</option>
+                    <option value="hidden">Hidden</option>
+                </select>
+            </div>
+            <div class="credit-box">
+                <label>Artist Credit</label>
+                <div class="btn-group">
+                    <button id="btn-onsite" class="active" onclick="setCredit('on')">On-site</button>
+                    <button id="btn-offsite" onclick="setCredit('off')">Off-site</button>
+                </div>
+                <input type="text" id="artist-val" placeholder="Username">
+            </div>
+        </div>
+        <button onclick="uploadImage()" style="background:var(--th-blue); color:white; border:none; padding:15px; width:100%; cursor:pointer; font-weight:bold; border-radius:4px;">Upload Image</button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Manage Images</div>
+    <div class="card-body img-grid" id="manage-list"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, where, onSnapshot, serverTimestamp, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    const charId = new URLSearchParams(window.location.search).get('id');
+    let creditType = 'on';
+
+    window.setCredit = (t) => {
+        creditType = t;
+        document.getElementById('btn-onsite').classList.toggle('active', t === 'on');
+        document.getElementById('btn-offsite').classList.toggle('active', t === 'off');
+        document.getElementById('artist-val').placeholder = t === 'on' ? "Username" : "https://...";
+    };
+
+    window.uploadImage = async () => {
+        const file = document.getElementById('file-upload').files[0];
+        if(!file) return alert("Select a file!");
+        
+        // Simulating upload to get a URL (You'd usually use Firebase Storage here)
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            await addDoc(collection(db, "images"), {
+                characterId: charId,
+                url: e.target.result,
+                caption: document.getElementById('caption').value,
+                privacy: document.getElementById('privacy').value,
+                artist: document.getElementById('artist-val').value,
+                creditType: creditType,
+                timestamp: serverTimestamp()
+            });
+            alert("Uploaded!");
+        };
+        reader.readAsDataURL(file);
+    };
+
+    onSnapshot(query(collection(db, "images"), where("characterId", "==", charId)), (snap) => {
+        const list = document.getElementById('manage-list');
+        list.innerHTML = "";
+        snap.forEach(d => {
+            const data = d.data();
+            list.innerHTML += `<div class="manage-item">
+                <img src="${data.url}">
+                <div class="btn-del" onclick="deleteImg('${d.id}')">Delete</div>
+            </div>`;
+        });
+    });
+
+    window.deleteImg = async (id) => {
+        if(confirm("Delete this image?")) await deleteDoc(doc(db, "images", id));
+    };
+</script>
+</body>
+</html>
