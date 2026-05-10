@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transfer Character | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { background: var(--th-bg); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; }
+        .main-container { max-width: 800px; margin: 30px auto; background: white; border: 1px solid var(--border); border-radius: 4px; }
+        .page-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 20px; font-weight: 500; }
+        .info-box { background: #68a3b9; color: white; padding: 15px; margin: 20px; border-radius: 4px; font-size: 14px; }
+        .form-section { padding: 20px; border-bottom: 1px solid var(--border); }
+        .section-title { font-weight: bold; margin-bottom: 15px; color: #444; font-size: 16px; background: #f9f9f9; padding: 10px; border: 1px solid var(--border); border-radius: 4px 4px 0 0; margin: -20px -20px 20px -20px; }
+        .owner-box { text-align: center; padding: 20px; }
+        .owner-avatar { width: 60px; height: 60px; background: #eee; border-radius: 4px; display: inline-block; margin-bottom: 10px; background-size: cover; background-position: center; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar"><div class="fw-bold">OCARMY</div></nav>
+
+<div class="main-container">
+    <div class="page-header" id="char-title">Loading Character... Ownership</div>
+    
+    <div class="info-box">
+        <i class="fa fa-info-circle"></i> Please read the Characters FAQ for further information on permissions and original ownership.
+    </div>
+
+    <div class="form-section">
+        <div class="section-title">Current Owner</div>
+        <div class="owner-box">
+            <div class="owner-avatar" id="current-owner-avatar"></div><br>
+            <a href="#" id="current-owner-name" style="color: var(--th-blue); text-decoration: none;">Loading...</a>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="section-title">Transfer Character</div>
+        <form id="transfer-form">
+            <div class="mb-3">
+                <input type="text" class="form-control" id="recipient-username" placeholder="Recipient's username" required>
+            </div>
+            <div class="mb-3">
+                <input type="text" class="form-control" id="transfer-reason" placeholder="Reason">
+                <div class="form-text mt-2">A short description of the transaction (e.g. gift, sale, trade) that will show up in the transfer log.</div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100" style="background: var(--th-blue); border: none;">Transfer</button>
+        </form>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDoc, getDocs, doc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const db = getFirestore(initializeApp(firebaseConfig));
+    const auth = getAuth();
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const charId = urlParams.get('id');
+    let currentUser = null;
+    let characterData = null;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user || !charId) return window.location.href = "index.html";
+        currentUser = user;
+
+        // Load Character Data
+        const charSnap = await getDoc(doc(db, "characters", charId));
+        if (charSnap.exists()) {
+            characterData = charSnap.data();
+            document.getElementById('char-title').innerText = `${characterData.name}'s Ownership`;
+
+            // Load Current Owner Info
+            const ownerSnap = await getDoc(doc(db, "users", characterData.ownerId));
+            if (ownerSnap.exists()) {
+                document.getElementById('current-owner-name').innerText = ownerSnap.data().username;
+                if(ownerSnap.data().pfp) document.getElementById('current-owner-avatar').style.backgroundImage = `url('${ownerSnap.data().pfp}')`;
+            }
+        }
+    });
+
+    // Handle Transfer Submission
+    document.getElementById('transfer-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const recipientName = document.getElementById('recipient-username').value.trim();
+        const reason = document.getElementById('transfer-reason').value.trim();
+
+        if (characterData.ownerId !== currentUser.uid) return alert("You don't own this character!");
+
+        try {
+            // 1. Find the recipient by username
+            const userQ = query(collection(db, "users"), where("username", "==", recipientName));
+            const userSnap = await getDocs(userQ);
+            
+            if (userSnap.empty) {
+                return alert("User not found! Please check the spelling.");
+            }
+            
+            const recipientId = userSnap.docs[0].id;
+
+            // 2. Create the Transfer Request in the database
+            await addDoc(collection(db, "transfers"), {
+                characterId: charId,
+                characterName: characterData.name,
+                characterAvatar: characterData.avatar,
+                fromUserId: currentUser.uid,
+                fromUsername: document.getElementById('current-owner-name').innerText,
+                toUserId: recipientId,
+                toUsername: recipientName,
+                reason: reason,
+                status: "pending", // Can be pending, accepted, or declined
+                createdAt: serverTimestamp()
+            });
+
+            alert("Transfer request sent successfully!");
+            window.location.href = `character.html?id=${charId}`;
+
+        } catch (error) {
+            console.error(error);
+            alert("Error sending transfer request.");
+        }
+    });
+</script>
+</body>
+</html>
