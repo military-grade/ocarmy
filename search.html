@@ -8,27 +8,29 @@
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: sans-serif; background: var(--th-bg); padding: 20px; }
-        .container { max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-radius: 4px; padding: 25px; }
-        .search-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 25px; }
-        .mode-btn { background: var(--th-blue); color: white; border: none; padding: 10px; border-radius: 4px; opacity: 0.6; font-weight: bold; cursor: pointer; }
+        .container { max-width: 1140px; margin: 40px auto; background: white; border: 1px solid var(--border); border-radius: 4px; padding: 25px; }
+        
+        .mode-btn { background: var(--th-blue); color: white; border: none; padding: 10px 20px; border-radius: 4px; opacity: 0.6; font-weight: bold; cursor: pointer; }
         .mode-btn.active { opacity: 1; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; margin-top: 10px; }
+        .result-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; }
+        .result-avatar { width: 40px; height: 40px; background: #eee; border-radius: 2px; background-size: cover; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2 style="margin-bottom: 20px;">Search</h2>
-    <div class="search-modes">
+    <h2 style="font-size: 24px; color: #555; margin-bottom: 20px;">Search</h2>
+    <div style="display: flex; gap: 10px; margin-bottom: 25px;">
         <button class="mode-btn active" id="m-user" onclick="setMode('user')"><i class="fa fa-check"></i> Profile Search</button>
         <button class="mode-btn" id="m-oc" onclick="setMode('oc')"><i class="fa fa-check"></i> Original Characters</button>
     </div>
     <div class="row">
         <div class="col-md-6">
-            <label style="font-weight:bold; font-size:12px;">NAME</label>
+            <label style="font-weight:bold; font-size:12px; color: #666;">NAME</label>
             <input type="text" id="query" placeholder="Enter name..." onkeyup="doSearch()">
         </div>
         <div class="col-md-6">
-            <label style="font-weight:bold; font-size:12px;">TAGS</label>
+            <label style="font-weight:bold; font-size:12px; color: #666;">TAGS</label>
             <input type="text" placeholder="Enter tags...">
         </div>
     </div>
@@ -58,10 +60,12 @@
             const d = doc.data();
             const name = (mode === 'user' ? d.username : d.name) || "";
             if (name.toLowerCase().includes(val)) {
-                results.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">
-                    <a href="${mode === 'user' ? 'dashboard.html?user=' + doc.id : 'character.html?id=' + doc.id}" 
-                       style="color:#4e92ac; font-weight:bold; text-decoration:none;">${name}</a>
-                </div>`;
+                results.innerHTML += `
+                    <div class="result-item">
+                        <div class="result-avatar" style="background-image: url('${d.pfp || d.avatar || ''}')"></div>
+                        <a href="${mode === 'user' ? 'profile.html?user=' + doc.id : 'character.html?id=' + doc.id}" 
+                           style="color:#4e92ac; font-weight:bold; text-decoration:none;">${name}</a>
+                    </div>`;
             }
         });
     };
