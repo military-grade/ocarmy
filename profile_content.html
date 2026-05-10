@@ -5,16 +5,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
-        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; }
+        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --btn-blue: #007bff; --btn-dark: #333; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); display: flex; min-height: 100vh; }
-        .sidebar { width: 220px; background: var(--th-blue); color: white; display: flex; flex-direction: column; }
-        .back-link { display: block; padding: 12px 15px; color: white; text-decoration: none; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.2); }
-        .side-nav a { display: block; padding: 8px 15px; color: white; text-decoration: none; font-size: 13px; }
-        .main { flex: 1; padding: 30px; }
-        .editor-card { background: white; border: 1px solid #ddd; border-radius: 4px; padding: 25px; }
+
+        /* Sidebar Styling */
+        .sidebar { width: 230px; background: var(--th-blue); color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        .back-link { display: block; padding: 15px; color: white; text-decoration: none; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.05); }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; transition: 0.2s; }
+        .side-nav a:hover, .side-nav a.active { background: rgba(0,0,0,0.1); }
+        .side-nav a i { width: 20px; margin-right: 8px; opacity: 0.9; }
+
+        /* Main Area */
+        .main { flex: 1; padding: 30px; max-width: 1000px; }
+        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .editor-card { background: white; border: 1px solid #ddd; border-radius: 4px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        /* Toggle Button States */
+        .btn-wysiwyg { border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: background 0.3s; color: white; }
+        .btn-enabled { background: var(--btn-blue); } /* Blue when enabled */
+        .btn-disabled { background: var(--btn-dark); } /* Black when disabled */
+
         .label-group { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #666; margin: 25px 0 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .css-box { width: 100%; height: 120px; font-family: monospace; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; }
-        .btn-save { background: #7cc1d8; color: white; border: none; padding: 15px 30px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; }
+        .css-box { width: 100%; height: 150px; font-family: 'Courier New', monospace; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; background: #fff; font-size: 13px; }
+        .btn-save { background: #7cc1d8; color: white; border: none; padding: 15px 30px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 25px; width: 100%; font-size: 16px; transition: 0.3s; }
+        .btn-save:hover { background: #66a9be; }
+
+        /* Preview Rendering Box */
+        #profile-preview { border: 1px solid #ddd; padding: 20px; min-height: 400px; background: white; display: none; overflow-x: auto; }
     </style>
 </head>
 <body>
@@ -22,18 +40,50 @@
 <div class="sidebar">
     <a href="dashboard.html" class="back-link"><i class="fa fa-arrow-left"></i> Back to Profile</a>
     <div class="side-nav">
-        <a href="profile_content.html" style="background:rgba(0,0,0,0.1);">Profile Content</a>
+        <div class="side-label">General Settings</div>
+        <a href="settings.html"><i class="fa fa-cog"></i> Account Settings</a>
+        
+        <div class="side-label">Profile Settings</div>
+        <a href="profile_content.html" class="active"><i class="fa fa-id-card"></i> Profile Content</a>
+        <a href="#"><i class="fa fa-code"></i> Profile CSS</a>
+        
+        <div class="side-label">Management</div>
+        <a href="#"><i class="fa fa-folder"></i> Folders</a>
+        <a href="characters.html"><i class="fa fa-users"></i> Characters</a>
+        <a href="#"><i class="fa fa-link"></i> Links</a>
+        <a href="#"><i class="fa fa-globe"></i> Worlds</a>
+        <a href="#"><i class="fa fa-star"></i> Favorites</a>
+
+        <div class="side-label">Portfolio</div>
+        <a href="designs.html"><i class="fa fa-paint-brush"></i> Designs</a>
+        <a href="art.html"><i class="fa fa-image"></i> Art</a>
+        <a href="#"><i class="fa fa-book"></i> Library</a>
+
+        <div class="side-label">Interaction</div>
+        <a href="#"><i class="fa fa-comments"></i> Comments</a>
+        <a href="#"><i class="fa fa-envelope"></i> Inbox</a>
     </div>
 </div>
 
 <div class="main">
-    <h2 style="color: #444;">Edit Profile Content</h2>
+    <div class="editor-header">
+        <h2 style="margin: 0; color: #444;">Edit Profile Content</h2>
+        <button id="toggle-btn" class="btn-wysiwyg btn-enabled" onclick="toggleWYSIWYG()">Disable WYSIWYG</button>
+    </div>
+
     <div class="editor-card">
-        <div class="label-group">Profile Blurb (HTML Supported)</div>
-        <textarea id="profile-editor"></textarea>
+        <div class="label-group">Profile Blurb</div>
+        
+        <div id="editor-container">
+            <textarea id="profile-editor"></textarea>
+        </div>
+        
+        <div id="profile-preview"></div>
+
         <div class="label-group">Custom Profile CSS</div>
-        <textarea class="css-box" id="profile-css"></textarea>
-        <button class="btn-save" onclick="updateProfile()">Update Profile</button>
+        <textarea class="css-box" id="profile-css" placeholder="/* Custom CSS here will apply to your profile... */"></textarea>
+
+        <button class="btn-save" onclick="updateProfile()"><i class="fa fa-save"></i> Update Profile</button>
     </div>
 </div>
 
@@ -42,48 +92,93 @@
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
+        authDomain: "ocarmy-db.firebaseapp.com",
+        projectId: "ocarmy-db",
+        appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth();
 
+    // 1. Initialize TinyMCE with ALL requested tools
     tinymce.init({
         selector: '#profile-editor',
-        height: 400,
-        menubar: false,
-        plugins: 'code link image lists',
-        toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code link image',
-        branding: false
+        height: 450,
+        menubar: true,
+        plugins: 'link image code lists table emoticons charmap fullscreen preview media',
+        toolbar: 'undo redo | formatselect | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table emoticons | spoiler code fullscreen',
+        branding: false,
+        setup: function(editor) {
+            editor.ui.registry.addButton('spoiler', {
+                text: 'Spoiler',
+                onAction: function () {
+                    const selected = editor.selection.getContent() || 'Hidden content';
+                    editor.insertContent(`<details style="border:1px solid #ccc;padding:10px;border-radius:4px;"><summary style="cursor:pointer;color:#4e92ac;font-weight:bold;">Spoiler</summary>${selected}</details>`);
+                }
+            });
+        }
     });
 
+    // 2. Load Existing Content (Ensures it stays in the box)
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (userDoc.exists()) {
                 const data = userDoc.data();
-                // THIS KEEPS THE CONTENT SAVED IN THE BOX
                 if(data.profileCSS) document.getElementById('profile-css').value = data.profileCSS;
                 
-                // Wait for TinyMCE to be ready before putting the text back in
-                const editor = tinymce.get('profile-editor');
-                if (editor) {
-                    editor.setContent(data.profileHTML || "");
-                } else {
-                    tinymce.on('init', () => tinymce.get('profile-editor').setContent(data.profileHTML || ""));
-                }
+                // Set editor content once loaded
+                setTimeout(() => {
+                    if(data.profileHTML) tinymce.get('profile-editor').setContent(data.profileHTML);
+                }, 1000);
             }
         }
     });
 
+    // 3. Save Function
     window.updateProfile = async () => {
         const newHTML = tinymce.get('profile-editor').getContent();
         const newCSS = document.getElementById('profile-css').value;
+
         await setDoc(doc(db, "users", auth.currentUser.uid), {
             profileHTML: newHTML,
             profileCSS: newCSS
         }, { merge: true });
-        alert("Saved!");
-        window.location.href = "dashboard.html";
+        
+        alert("Profile Updated Successfully!");
+    };
+
+    // 4. Toggle WYSIWYG Function
+    window.toggleWYSIWYG = function() {
+        const editor = tinymce.get('profile-editor');
+        const btn = document.getElementById('toggle-btn');
+        const preview = document.getElementById('profile-preview');
+        const editorContainer = document.getElementById('editor-container');
+        const customCSS = document.getElementById('profile-css').value;
+
+        if (editor.isHidden()) {
+            // ENABLE WYSIWYG (Visual Mode)
+            editor.show();
+            preview.style.display = 'none';
+            editorContainer.style.display = 'block';
+            btn.innerText = "Disable WYSIWYG";
+            btn.className = "btn-wysiwyg btn-enabled";
+        } else {
+            // DISABLE WYSIWYG (Raw Code/Preview Mode)
+            const content = editor.getContent();
+            editor.hide();
+            
+            // Render the HTML and CSS into the preview box
+            preview.innerHTML = `<style>${customCSS}</style>` + content;
+            
+            preview.style.display = 'block';
+            editorContainer.style.display = 'none';
+            btn.innerText = "Enable WYSIWYG";
+            btn.className = "btn-wysiwyg btn-disabled";
+        }
     };
 </script>
 </body>
