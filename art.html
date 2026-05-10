@@ -3,25 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>Art Gallery | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Art Grid Styling (Screenshot 12.52.08) */
-        .art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-        .art-item { border: 1px solid #ddd; border-radius: 4px; padding: 5px; position: relative; }
-        .art-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; }
-        .page-btn { padding: 5px 10px; border: 1px solid #ddd; background: white; cursor: pointer; color: var(--th-blue); }
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: sans-serif; background: var(--th-bg); }
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; min-height: 100vh; border: 1px solid var(--border); }
+        .main { flex: 1; padding: 30px; }
+        .page-header { font-size: 18px; font-weight: bold; color: var(--th-blue); margin-bottom: 20px; }
+        .pagination { display: flex; justify-content: center; gap: 5px; margin-bottom: 25px; }
+        .page-btn { padding: 5px 12px; border: 1px solid #ddd; background: white; cursor: pointer; color: var(--th-blue); text-decoration: none; font-size: 13px; }
         .page-btn.active { background: var(--th-blue); color: white; border-color: var(--th-blue); }
+        .art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .art-item { border: 1px solid #ddd; padding: 5px; border-radius: 4px; position: relative; }
+        .art-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .edit-icon { position: absolute; bottom: 8px; right: 8px; background: white; padding: 3px; border-radius: 3px; border: 1px solid #ccc; font-size: 10px; }
     </style>
 </head>
 <body>
+<div class="wrapper">
     <main class="main">
-        <div class="page-header"><i class="fa fa-image"></i> <span id="user-header-art">User</span>'s Art</div>
+        <div class="page-header"><i class="fa fa-image"></i> militarygrade's Art</div>
         <div class="pagination">
-            <div class="page-btn active">1</div>
-            <div class="page-btn">2</div>
-            <div class="page-btn">»</div>
+            <a href="#" class="page-btn">«</a>
+            <a href="#" class="page-btn active">1</a>
+            <a href="#" class="page-btn">2</a>
+            <a href="#" class="page-btn">»</a>
         </div>
-        <div class="art-grid" id="art-list"></div>
+        <div class="art-grid" id="art-gallery">
+            </div>
     </main>
+</div>
 </body>
 </html>
