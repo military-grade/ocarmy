@@ -69,8 +69,9 @@
 
     <main class="main">
         <div class="mb-2">
-            <a href="dashboard.html" class="text-muted small text-decoration-none"><i class="fa fa-arrow-left"></i> Back to Profile</a>
+            <a href="#" id="dynamic-back-btn" class="text-muted small text-decoration-none"><i class="fa fa-arrow-left"></i> Back to Profile</a>
         </div>
+        
         <div class="d-flex gap-3 mb-4">
             <div class="char-main-pfp" id="main-pfp"></div>
             <div>
@@ -95,6 +96,7 @@
 
     onAuthStateChanged(auth, (user) => {
         onSnapshot(doc(db, "characters", charId), async (snap) => {
+            if(!snap.exists()) return;
             const data = snap.data();
             
             // Warning Logic
@@ -112,9 +114,14 @@
             document.getElementById('main-pfp').style.backgroundImage = `url('${data.avatar}')`;
             document.getElementById('bio-content').innerHTML = data.description || "";
             
+            // Sync Owner Data & Links
             const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
             if(ownerSnap.exists()){
                 const oData = ownerSnap.data();
+                
+                // --- THE BACK BUTTON FIX APPLIED HERE ---
+                document.getElementById('dynamic-back-btn').href = `user.html?id=${data.ownerId}`;
+                
                 document.getElementById('side-user-link').innerText = oData.username;
                 document.getElementById('side-user-link').href = `user.html?id=${data.ownerId}`;
                 document.getElementById('creator-link').innerText = oData.username;
@@ -126,6 +133,7 @@
             document.getElementById('link-gallery').href = `character_gallery.html?id=${charId}`;
             document.getElementById('gallery-preview').innerHTML = gallery.slice(0,6).map(img => `<div class="col-4"><div style="aspect-ratio:1/1; background:url('${img}') center/cover; border:1px solid #ddd;"></div></div>`).join('');
 
+            // Control Panel Display logic
             if (user && user.uid === data.ownerId) {
                 document.getElementById('owner-panel').style.display = "block";
                 document.getElementById('edit-char-link').href = `edit_character.html?id=${charId}`;
