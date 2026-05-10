@@ -4,69 +4,50 @@
     <title>Settings | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --th-blue: #008eb0; --th-teal: #5bc0de; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
+        :root { --th-blue: #008eb0; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; display: flex; }
 
-        /* Sidebar Styling */
-        .sidebar { width: 250px; background: white; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; }
-        .sidebar-header { background: var(--th-blue); padding: 15px; color: white; display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        .avatar-mini { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; border: 1px solid rgba(0,0,0,0.1); }
-        
-        .side-link { display: block; padding: 12px 20px; color: #555; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; }
-        .side-link:hover { background: #f9f9f9; }
-        .side-link.active { background: #f0f0f0; font-weight: bold; border-left: 4px solid var(--th-blue); color: #333; }
+        .sidebar { width: 250px; background: white; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; padding: 20px; box-sizing: border-box; }
+        .side-header { font-weight: bold; color: var(--th-blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .back-link { display: block; margin-bottom: 20px; color: blue; text-decoration: underline; font-weight: bold; font-size: 15px; }
 
-        /* Fixed Back to Profile Link */
-        .back-link { display: block; padding: 15px 20px; color: blue; text-decoration: underline; font-size: 16px; font-weight: bold; }
-
-        .main { flex-grow: 1; padding: 30px; max-width: 1100px; }
-        .section-title { font-size: 1.5rem; margin: 0 0 25px 0; color: #444; }
-
-        .card { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; margin-bottom: 20px; }
-        .card-title { font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; color: #555; text-transform: uppercase; font-size: 12px; }
-        
-        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #666; }
-        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #eee; margin-bottom: 5px; box-sizing: border-box; }
-        
-        .btn-teal { background: var(--th-blue); color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+        .main { flex-grow: 1; padding: 40px; max-width: 1000px; margin: 0 auto; }
+        .card { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 25px; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; margin-top: 5px; box-sizing: border-box; }
+        .btn-teal { background: var(--th-blue); color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="sidebar-header">
-        <div class="avatar-mini" id="sidebar-pfp"></div>
+    <div class="side-header">
+        <div id="side-pfp" style="width:30px; height:30px; background:#eee; background-size:cover;"></div>
         <span id="sidebar-user">User</span>
     </div>
     <a href="dashboard.html" class="back-link">← Back to Profile</a>
-    <a href="settings.html" class="side-link active">General Settings</a>
-    <a href="profile_content.html" class="side-link">Profile Content</a>
+    <div style="border-top: 1px solid #eee; padding-top: 10px;">
+        <a href="settings.html" style="display:block; padding:10px 0; color:var(--th-blue); font-weight:bold; text-decoration:none;">Account Settings</a>
+        <a href="profile_content.html" style="display:block; padding:10px 0; color:#555; text-decoration:none;">Profile Content</a>
+    </div>
 </div>
 
 <div class="main">
-    <h2 class="section-title">Account Management</h2>
-
-    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+    <h2 style="margin-top:0;">Account Settings</h2>
+    
+    <div style="display:flex; gap:20px;">
         <div style="flex:2;">
             <div class="card">
-                <div class="card-title">Account Details</div>
-                <label>Name</label>
+                <label>Username</label>
                 <input type="text" id="username-field" readonly>
-                <label style="margin-top:15px;">Email</label>
+                <label style="display:block; margin-top:15px;">Email</label>
                 <input type="text" id="email-field" readonly>
-            </div>
-            <div class="card">
-                <div class="card-title">Password</div>
-                <p style="font-size:12px; color:#666;">This sends instructions to reset your password via email.</p>
-                <button class="btn-teal" style="width:auto;" onclick="sendReset()">Change Password</button>
             </div>
         </div>
         <div style="flex:1;">
             <div class="card" style="text-align:center;">
-                <div class="card-title">Avatar</div>
-                <div id="large-pfp" style="width:150px; height:150px; background:#eee; margin:0 auto 15px; border-radius:2px; background-size:cover;"></div>
-                <input type="text" id="pfp-url" placeholder="Paste Image URL..." style="background:white;">
-                <button class="btn-teal" onclick="saveData()">Update Avatar</button>
+                <div id="large-pfp" style="width:120px; height:120px; background:#eee; border-radius:4px; margin:0 auto 15px; background-size:cover;"></div>
+                <input type="text" id="pfp-url" placeholder="New Image URL...">
+                <button class="btn-teal" onclick="saveAvatar()">Update Avatar</button>
             </div>
         </div>
     </div>
@@ -74,15 +55,13 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
     authDomain: "ocarmy-db.firebaseapp.com",
     projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.firebasestorage.app",
-    messagingSenderId: "848883355194",
     appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
   };
 
@@ -91,32 +70,28 @@
   const db = getFirestore(app);
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user) window.location.href = "index.html";
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (userDoc.exists()) {
-      const data = userDoc.data();
-      document.getElementById('sidebar-user').innerText = data.username || "User";
-      document.getElementById('username-field').value = data.username || "";
-      document.getElementById('email-field').value = user.email;
-      if (data.pfp) {
-        document.getElementById('sidebar-pfp').style.backgroundImage = `url('${data.pfp}')`;
-        document.getElementById('large-pfp').style.backgroundImage = `url('${data.pfp}')`;
-        document.getElementById('pfp-url').value = data.pfp;
+    if (user) {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        document.getElementById('sidebar-user').innerText = data.username || "User";
+        document.getElementById('username-field').value = data.username || "";
+        document.getElementById('email-field').value = user.email;
+        if (data.pfp) {
+          document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+          document.getElementById('large-pfp').style.backgroundImage = `url('${data.pfp}')`;
+        }
       }
     }
   });
 
-  window.saveData = async () => {
+  window.saveAvatar = async () => {
     const user = auth.currentUser;
     await updateDoc(doc(db, "users", user.uid), {
       pfp: document.getElementById('pfp-url').value
     });
     alert("Avatar updated!");
     location.reload();
-  };
-
-  window.sendReset = () => {
-    sendPasswordResetEmail(auth, auth.currentUser.email).then(() => alert("Reset email sent!"));
   };
 </script>
 </body>
