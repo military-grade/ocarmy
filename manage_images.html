@@ -1,59 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Upload Image | OCARMY</title>
+    <title>Manage Images | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; }
-        body { background: var(--th-bg); padding: 40px; }
-        .upload-card { background: white; border: 1px solid #ddd; padding: 25px; border-radius: 4px; }
-        .btn-th { background: var(--th-blue); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; }
+        body { margin: 0; background: var(--th-bg); font-family: sans-serif; }
+        .wrapper { display: flex; max-width: 1140px; margin: auto; background: white; min-height: 100vh; }
+        .sidebar { width: 220px; background: var(--th-blue); color: white; }
+        .side-avatar { width: 35px; height: 35px; background-size: cover; border-radius: 2px; }
+        .main { flex: 1; padding: 25px; }
     </style>
 </head>
 <body>
-    <div class="container" style="max-width: 1000px;">
-        <h3>Upload Image</h3>
-        <div class="upload-card">
-            <div class="row">
-                <div class="col-md-7 border-end">
-                    <label class="fw-bold mb-2">Basics</label>
-                    <input type="file" id="img-file" class="form-control mb-3">
-                    <textarea id="caption" class="form-control mb-3" placeholder="Caption (optional)"></textarea>
-                    
-                    <label class="fw-bold mb-2">Privacies</label>
-                    <select class="form-control mb-3"><option>Public</option></select>
-                </div>
-                <div class="col-md-5 ps-4">
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="set-avatar">
-                        <label class="form-check-label">Set as Character Avatar</label>
-                    </div>
-                    <button class="btn-th w-100" onclick="uploadImg()">Upload Image</button>
-                </div>
-            </div>
+<div class="wrapper">
+    <aside class="sidebar">
+        <div style="background:#427e95; padding:10px 15px; font-weight:bold;">Character</div>
+        <div class="p-3 d-flex align-items-center gap-2" style="background:rgba(0,0,0,0.05);">
+            <div class="side-avatar" id="side-pfp"></div>
+            <a href="#" id="side-user-link" style="color:white; font-weight:bold; font-size:13px; text-decoration:none;">User</a>
         </div>
-    </div>
+        <div class="p-3"><a href="#" id="back-link" style="color:white; text-decoration:none; font-size:13px;"><i class="fa fa-arrow-left"></i> Back to Character</a></div>
+    </aside>
+
+    <main class="main">
+        <h3>Upload Character Image</h3>
+        <input type="file" id="img-file" class="form-control mb-3">
+        <label><input type="checkbox" id="set-avatar"> Set as Profile Picture</label>
+        <button class="btn btn-primary w-100 mt-4" onclick="uploadImg()">Upload to Gallery</button>
+    </main>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const charId = new URLSearchParams(window.location.search).get('id');
 
-    window.uploadImg = () => {
+    async function loadSidebar() {
+        const charSnap = await getDoc(doc(db, "characters", charId));
+        const charData = charSnap.data();
+        document.getElementById('back-link').href = `character.html?id=${charId}`;
+        const ownerSnap = await getDoc(doc(db, "users", charData.ownerId));
+        if(ownerSnap.exists()){
+            const oData = ownerSnap.data();
+            document.getElementById('side-user-link').innerText = oData.username;
+            if(oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
+        }
+    }
+
+    window.uploadImg = async () => {
         const file = document.getElementById('img-file').files[0];
+        if(!file) return alert("Select a file!");
+
         const reader = new FileReader();
         reader.onload = async (e) => {
             const updates = { gallery: arrayUnion(e.target.result) };
             if(document.getElementById('set-avatar').checked) updates.avatar = e.target.result;
-            
             await updateDoc(doc(db, "characters", charId), updates);
             window.location.href = `character.html?id=${charId}`;
         };
         reader.readAsDataURL(file);
     };
+    loadSidebar();
 </script>
 </body>
 </html>
