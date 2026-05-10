@@ -7,120 +7,63 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        
-        .wrapper { max-width: 1140px; margin: 40px auto; background: white; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-        .search-header { background: #f9f9f9; padding: 15px 20px; border-bottom: 1px solid var(--border); font-weight: bold; font-size: 1.2rem; color: #555; }
-        .search-body { padding: 25px; }
-
-        /* Mode Selection Buttons (Matches Screenshot 1.55.05) */
-        .search-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 30px; }
-        .mode-btn { background: var(--th-blue); color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; opacity: 0.6; transition: 0.2s; }
-        .mode-btn.active { opacity: 1; box-shadow: inset 0 3px 5px rgba(0,0,0,0.2); }
-        .mode-btn i { font-size: 12px; }
-
-        /* Input Grid (Matches Screenshot 1.55.05) */
-        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 25px; }
-        label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 8px; color: #333; }
-        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background: #fff; }
-        
-        /* Result Styling */
-        .results-container { margin-top: 30px; }
-        .result-item { display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #eee; border-radius: 4px; margin-bottom: 10px; text-decoration: none; color: inherit; transition: background 0.2s; }
-        .result-item:hover { background: #fcfcfc; border-color: var(--th-blue); }
-        .result-avatar { width: 50px; height: 50px; background: #eee; border-radius: 2px; background-size: cover; }
-        .result-info b { color: var(--th-blue); font-size: 16px; }
-        .result-info p { margin: 0; font-size: 12px; color: #777; }
+        body { margin: 0; font-family: sans-serif; background: var(--th-bg); padding: 20px; }
+        .container { max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-radius: 4px; padding: 25px; }
+        .search-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 25px; }
+        .mode-btn { background: var(--th-blue); color: white; border: none; padding: 10px; border-radius: 4px; opacity: 0.6; font-weight: bold; cursor: pointer; }
+        .mode-btn.active { opacity: 1; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
     </style>
 </head>
 <body>
-
-<div class="wrapper">
-    <div class="search-header">Search</div>
-    <div class="search-body">
-        
-        <div class="search-modes">
-            <button class="mode-btn active" id="mode-user" onclick="setSearchMode('user')"><i class="fa fa-check"></i> Profile Search</button>
-            <button class="mode-btn" id="mode-oc" onclick="setSearchMode('oc')"><i class="fa fa-check"></i> Original Characters</button>
-            <button class="mode-btn" disabled><i class="fa fa-check"></i> Resources</button>
-            <button class="mode-btn" disabled><i class="fa fa-check"></i> Ads/Services</button>
+<div class="container">
+    <h2 style="margin-bottom: 20px;">Search</h2>
+    <div class="search-modes">
+        <button class="mode-btn active" id="m-user" onclick="setMode('user')"><i class="fa fa-check"></i> Profile Search</button>
+        <button class="mode-btn" id="m-oc" onclick="setMode('oc')"><i class="fa fa-check"></i> Original Characters</button>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label style="font-weight:bold; font-size:12px;">NAME</label>
+            <input type="text" id="query" placeholder="Enter name..." onkeyup="doSearch()">
         </div>
-
-        <div class="input-grid">
-            <div id="search-input-box">
-                <label id="search-label">Username</label>
-                <input type="text" id="query-input" placeholder="Enter name to search..." onkeyup="executeSearch()">
-            </div>
-            <div>
-                <label>Tags</label>
-                <input type="text" placeholder="Tags (optional)">
-            </div>
-        </div>
-
-        <div class="results-container" id="search-results">
-            <div style="text-align: center; color: #999; padding: 40px;">Type above to begin searching...</div>
+        <div class="col-md-6">
+            <label style="font-weight:bold; font-size:12px;">TAGS</label>
+            <input type="text" placeholder="Enter tags...">
         </div>
     </div>
+    <div id="results" style="margin-top: 30px;"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
+    let mode = 'user';
 
-    let currentMode = 'user';
-
-    window.setSearchMode = (mode) => {
-        currentMode = mode;
+    window.setMode = (m) => {
+        mode = m;
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`mode-${mode}`).classList.add('active');
-        document.getElementById('search-label').innerText = mode === 'user' ? 'Username' : 'Character Name';
-        document.getElementById('query-input').value = "";
-        document.getElementById('search-results').innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">Type above to begin searching...</div>';
+        document.getElementById(`m-${m}`).classList.add('active');
     };
 
-    window.executeSearch = async () => {
-        const val = document.getElementById('query-input').value.toLowerCase();
-        const resultsBox = document.getElementById('search-results');
-
+    window.doSearch = async () => {
+        const val = document.getElementById('query').value.toLowerCase();
         if (val.length < 2) return;
-
-        // Determine collection based on mode
-        const colName = currentMode === 'user' ? "users" : "characters";
-        const snap = await getDocs(collection(db, colName));
-        
-        resultsBox.innerHTML = "";
-        let found = false;
-
+        const snap = await getDocs(collection(db, mode === 'user' ? "users" : "characters"));
+        const results = document.getElementById('results');
+        results.innerHTML = "";
         snap.forEach(doc => {
-            const data = doc.data();
-            const name = (currentMode === 'user' ? data.username : data.name) || "";
-            
-            // SIMILAR USERNAME LOGIC: Checks if the typed value exists anywhere in the name
+            const d = doc.data();
+            const name = (mode === 'user' ? d.username : d.name) || "";
             if (name.toLowerCase().includes(val)) {
-                found = true;
-                const link = currentMode === 'user' ? `profile.html?user=${doc.id}` : `character.html?id=${doc.id}`;
-                const subtext = currentMode === 'user' ? `View Profile` : `Owned by ${data.ownerName || 'Unknown'}`;
-                const img = data.pfp || data.avatar || 'https://via.placeholder.com/50';
-
-                resultsBox.innerHTML += `
-                    <a href="${link}" class="result-item">
-                        <div class="result-avatar" style="background-image: url('${img}')"></div>
-                        <div class="result-info">
-                            <b>${name}</b>
-                            <p>${subtext}</p>
-                        </div>
-                    </a>
-                `;
+                results.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">
+                    <a href="${mode === 'user' ? 'dashboard.html?user=' + doc.id : 'character.html?id=' + doc.id}" 
+                       style="color:#4e92ac; font-weight:bold; text-decoration:none;">${name}</a>
+                </div>`;
             }
         });
-
-        if (!found) {
-            resultsBox.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">No matches found.</div>';
-        }
     };
 </script>
 </body>
