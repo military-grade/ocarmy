@@ -6,115 +6,80 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
+        .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
         
-        .main-container { max-width: 900px; margin: 30px auto; background: white; border: 1px solid var(--border); padding: 30px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .page-title { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; font-size: 24px; }
-        
-        /* Toyhouse-style Box Sections */
-        .th-section { border: 1px solid var(--border); border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        /* Sidebar */
+        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .side-nav a { display: block; padding: 12px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .main { flex: 1; padding: 30px; }
+
+        /* Toyhouse Box Sections */
+        .th-section { border: 1px solid var(--border); border-radius: 4px; margin-bottom: 25px; }
         .th-section-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); font-size: 14px; }
         .th-section-body { padding: 20px; }
 
-        /* Custom Toggle Buttons */
-        .btn-group-custom .btn { border: 1px solid #ced4da; color: #495057; font-size: 13px; }
-        .btn-group-custom .btn.active { background-color: #6c98a8; color: white; border-color: #5b8797; }
+        /* Avatar Cropper */
+        #cropper-box { width: 200px; height: 200px; border: 1px solid #ccc; overflow: hidden; position: relative; background: #eee; cursor: move; }
+        #avatar-img { position: absolute; width: 100%; top: 0; left: 0; user-select: none; pointer-events: none; }
 
-        .form-label { font-size: 13px; font-weight: bold; color: #555; }
-        .form-control, .form-select { font-size: 14px; border-radius: 3px; }
-        .form-text { font-size: 11px; }
+        /* Tag system */
+        .tag-pill { background: var(--th-blue); color: white; padding: 2px 10px; border-radius: 20px; font-size: 12px; margin-right: 5px; display: inline-flex; align-items: center; gap: 5px; }
+        .tag-remove { cursor: pointer; opacity: 0.7; }
         
-        .hidden-input { display: none; margin-top: 15px; }
+        .btn-credit.active { background-color: var(--th-blue); color: white; }
     </style>
 </head>
 <body>
+<div class="wrapper">
+    <aside class="sidebar">
+        <a href="dashboard.html" class="side-nav"><i class="fa fa-arrow-left"></i> Back to Dashboard</a>
+        <div style="padding: 15px; font-weight: bold; opacity: 0.8;">SUBMIT</div>
+        <a href="#" class="side-nav" style="background: rgba(255,255,255,0.1);">Character</a>
+    </aside>
 
-<nav class="navbar"><div class="fw-bold px-2">OCARMY</div></nav>
+    <main class="main">
+        <h2 class="mb-4"><i class="fa fa-plus-circle"></i> Create Character</h2>
 
-<div class="main-container">
-    <div class="page-title"><i class="fa fa-plus-circle"></i> Create Character</div>
-
-    <form id="create-form">
-        
         <div class="th-section">
-            <div class="th-section-header">Images</div>
-            <div class="th-section-body row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Avatar / Main Image URL</label>
-                    <input type="url" class="form-control" id="char-avatar" placeholder="https://..." required>
+            <div class="th-section-header">Upload Avatar</div>
+            <div class="th-section-body d-flex gap-4">
+                <div id="cropper-box" onmousedown="startDrag(event)">
+                    <img id="avatar-img" src="">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Reference Sheet URL <span class="text-muted fw-normal">(Optional)</span></label>
-                    <input type="url" class="form-control" id="char-ref">
+                <div class="flex-grow-1">
+                    <input type="file" id="char-file" class="form-control mb-3" accept="image/*" onchange="previewAvatar(event)">
+                    <label class="form-label fw-bold small">Zoom</label>
+                    <input type="range" id="zoom-slider" class="form-range" min="100" max="500" value="100" oninput="applyZoom()">
+                    <p class="small text-muted mt-2">Drag the image inside the box to crop.</p>
                 </div>
+            </div>
+        </div>
+
+        <div class="th-section">
+            <div class="th-section-header">Tags</div>
+            <div class="th-section-body">
+                <div id="tag-container" class="mb-2"></div>
+                <input type="text" id="tag-input" class="form-control" placeholder="Type a tag and press Enter...">
             </div>
         </div>
 
         <div class="th-section">
             <div class="th-section-header">Designer Credit</div>
             <div class="th-section-body">
-                <div class="btn-group btn-group-custom w-100 mb-2" role="group">
-                    <button type="button" class="btn active" id="btn-me" onclick="setCredit('me')">I am the creator</button>
-                    <button type="button" class="btn" id="btn-onsite" onclick="setCredit('onsite')">On-Site Creator</button>
-                    <button type="button" class="btn" id="btn-offsite" onclick="setCredit('offsite')">Off-Site Creator</button>
+                <div class="btn-group w-100 mb-3">
+                    <button class="btn btn-outline-secondary active btn-credit" id="btn-self" onclick="setCredit('self')">I am the creator</button>
+                    <button class="btn btn-outline-secondary btn-credit" id="btn-onsite" onclick="setCredit('onsite')">On-Site Creator</button>
                 </div>
-
-                <div id="credit-onsite-div" class="hidden-input">
-                    <label class="form-label">On-Site Username</label>
-                    <input type="text" class="form-control" id="credit-onsite" placeholder="Enter OCARMY username">
-                </div>
-
-                <div id="credit-offsite-div" class="hidden-input">
-                    <label class="form-label">Off-Site URL</label>
-                    <input type="url" class="form-control" id="credit-offsite" placeholder="https://twitter.com/...">
-                </div>
-                
-                <input type="hidden" id="designer-type" value="me">
-            </div>
-        </div>
-
-        <div class="th-section">
-            <div class="th-section-header">Basics</div>
-            <div class="th-section-body row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Character Name</label>
-                    <input type="text" class="form-control" id="char-name" required>
-                </div>
-                
-                <div class="col-md-6">
-                    <label class="form-label">Folder</label>
-                    <select class="form-select" id="char-folder">
-                        <option value="">Unsorted</option>
-                        </select>
-                </div>
-
-                <div class="col-md-8">
-                    <label class="form-label">Tags</label>
-                    <input type="text" class="form-control" id="char-tags" placeholder="feline, warrior, custom...">
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Total Worth ($)</label>
-                    <input type="number" step="0.01" class="form-control" id="char-worth" value="0.00">
+                <div id="onsite-input-div" style="display:none;">
+                    <input type="text" id="designer-name" class="form-control" placeholder="Enter username">
                 </div>
             </div>
         </div>
 
-        <div class="th-section">
-            <div class="th-section-header">Profile</div>
-            <div class="th-section-body">
-                <label class="form-label">Description / Bio</label>
-                <textarea class="form-control" id="char-desc" rows="6" placeholder="Write their story here..."></textarea>
-            </div>
-        </div>
-
-        <div class="text-end">
-            <button type="submit" class="btn btn-primary px-4" style="background-color: var(--th-blue); border: none;">Create Character</button>
-        </div>
-
-    </form>
+        <button class="btn btn-primary w-100 p-3 fw-bold" onclick="submitCharacter()" style="background:var(--th-blue); border:none;">CREATE CHARACTER</button>
+    </main>
 </div>
 
 <script type="module">
@@ -122,87 +87,81 @@
     import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
-    let currentUser = null;
 
-    // 1. Authenticate and Load Folders
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            currentUser = user;
-            const q = query(collection(db, "folders"), where("ownerId", "==", user.uid));
-            const snap = await getDocs(q);
-            const folderSelect = document.getElementById('char-folder');
-            
-            snap.forEach(doc => {
-                const folder = doc.data();
-                folderSelect.innerHTML += `<option value="${doc.id}">${folder.name}</option>`;
-            });
-        } else {
-            alert("You must be logged in to create a character.");
-            window.location.href = "index.html"; // Redirect to home/login
-        }
-    });
+    let currentTags = [];
+    let isDragging = false;
+    let startX, startY, imgX = 0, imgY = 0;
 
-    // 2. Handle the "Credit" Toggle Buttons
-    window.setCredit = (type) => {
-        // Reset all buttons
-        document.getElementById('btn-me').classList.remove('active');
-        document.getElementById('btn-onsite').classList.remove('active');
-        document.getElementById('btn-offsite').classList.remove('active');
-        
-        // Hide all inputs
-        document.getElementById('credit-onsite-div').style.display = 'none';
-        document.getElementById('credit-offsite-div').style.display = 'none';
-
-        // Activate selected
-        document.getElementById(`btn-${type}`).classList.add('active');
-        document.getElementById('designer-type').value = type;
-
-        if (type === 'onsite') document.getElementById('credit-onsite-div').style.display = 'block';
-        if (type === 'offsite') document.getElementById('credit-offsite-div').style.display = 'block';
+    // --- AVATAR LOGIC ---
+    window.previewAvatar = (e) => {
+        const reader = new FileReader();
+        reader.onload = () => { document.getElementById('avatar-img').src = reader.result; };
+        reader.readAsDataURL(e.target.files[0]);
     };
 
-    // 3. Submit the Form to Firebase
-    document.getElementById('create-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!currentUser) return;
+    window.applyZoom = () => {
+        document.getElementById('avatar-img').style.width = document.getElementById('zoom-slider').value + "%";
+    };
 
-        // Gather Credit Data
-        const designerType = document.getElementById('designer-type').value;
-        let designerLink = "";
-        if (designerType === 'onsite') designerLink = document.getElementById('credit-onsite').value;
-        if (designerType === 'offsite') designerLink = document.getElementById('credit-offsite').value;
-        if (designerType === 'me') designerLink = currentUser.uid;
+    window.startDrag = (e) => {
+        isDragging = true;
+        startX = e.clientX - imgX;
+        startY = e.clientY - imgY;
+    };
 
-        // Build the new character object
-        const newChar = {
-            ownerId: currentUser.uid,
-            name: document.getElementById('char-name').value,
-            folderId: document.getElementById('char-folder').value, // This is "" for Unsorted
-            avatar: document.getElementById('char-avatar').value,
-            refSheet: document.getElementById('char-ref').value,
-            designerType: designerType,
-            designerLink: designerLink,
-            tags: document.getElementById('char-tags').value,
-            worth: document.getElementById('char-worth').value,
-            description: document.getElementById('char-desc').value,
-            createdAt: serverTimestamp(),
-            gallery: [], // Initializes an empty gallery
-            subscribers: [] // Initializes empty favorites list
-        };
+    window.onmousemove = (e) => {
+        if (!isDragging) return;
+        imgX = e.clientX - startX;
+        imgY = e.clientY - startY;
+        document.getElementById('avatar-img').style.transform = `translate(${imgX}px, ${imgY}px)`;
+    };
 
-        try {
-            // Save to Firestore and redirect to the new character's page!
-            const docRef = await addDoc(collection(db, "characters"), newChar);
-            window.location.href = `character.html?id=${docRef.id}`;
-        } catch (error) {
-            console.error("Error adding character: ", error);
-            alert("Failed to create character. Check console.");
+    window.onmouseup = () => { isDragging = false; };
+
+    // --- TAG LOGIC ---
+    document.getElementById('tag-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.target.value.trim()) {
+            const tag = e.target.value.trim();
+            if (!currentTags.includes(tag)) {
+                currentTags.push(tag);
+                renderTags();
+            }
+            e.target.value = '';
         }
     });
+
+    function renderTags() {
+        document.getElementById('tag-container').innerHTML = currentTags.map(t => `
+            <span class="tag-pill">${t} <i class="fa fa-times tag-remove" onclick="removeTag('${t}')"></i></span>
+        `).join('');
+    }
+    window.removeTag = (tag) => {
+        currentTags = currentTags.filter(t => t !== tag);
+        renderTags();
+    };
+
+    window.setCredit = (mode) => {
+        document.querySelectorAll('.btn-credit').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + mode).classList.add('active');
+        document.getElementById('onsite-input-div').style.display = mode === 'onsite' ? 'block' : 'none';
+    };
+
+    window.submitCharacter = async () => {
+        const user = auth.currentUser;
+        if (!user) return alert("Log in first!");
+
+        const charData = {
+            ownerId: user.uid,
+            name: document.querySelector('h2').innerText, // Placeholder
+            tags: currentTags,
+            avatar: document.getElementById('avatar-img').src,
+            createdAt: serverTimestamp()
+        };
+        await addDoc(collection(db, "characters"), charData);
+        window.location.href = "characters.html";
+    };
 </script>
 </body>
 </html>
