@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Character | OCARMY</title>
+    <title>Character Profile | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
@@ -16,26 +16,30 @@
         .side-header { background: #427e95; padding: 10px 15px; font-weight: bold; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.1); }
         .side-user-info { padding: 12px 15px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); }
         .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
-        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .side-folder-header { background: #56a0ba; padding: 8px 15px; font-weight: bold; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .side-oc-link { padding: 10px 15px; display: flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-size: 13px; background: rgba(255,255,255,0.05); }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
-        
-        /* Control Panel Dropdown */
+        .badge-count { background: rgba(255,255,255,0.2); font-size: 10px; padding: 2px 6px; border-radius: 10px; float: right; }
+
+        /* Control Panel */
         .cp-header { background: var(--side-teal); color: white; padding: 10px 15px; font-weight: bold; font-size: 13px; cursor: pointer; }
         .cp-subnav { background: #f1f8fb; display: none; }
-        .cp-subnav a { display: block; padding: 8px 20px; color: #4e92ac !important; font-size: 12px; border-bottom: 1px solid #e1eef2; }
+        .cp-subnav a { display: block; padding: 8px 20px; color: #4e92ac !important; font-size: 12px; border-bottom: 1px solid #e1eef2; text-decoration: none; }
         .cp-active .cp-subnav { display: block; }
 
         /* Main Content */
         .main { flex: 1; padding: 25px; border-right: 1px solid #eee; }
         .char-main-pfp { width: 100px; height: 100px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
-        
-        /* Warning Overlay */
-        #warning-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; padding: 50px 20px; overflow-y: auto; }
-        
-        /* Stats Right Column */
+        .section-title { font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin: 30px 0 15px; font-weight: 500; }
+
+        /* Stats Column */
         .stats-col { width: 260px; padding: 25px; background: #fafafa; flex-shrink: 0; font-size: 13px; }
         .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #eee; }
         .stat-label { font-weight: bold; color: #666; }
+
+        /* Warning Overlay */
+        #warning-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; padding: 50px 20px; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -49,7 +53,7 @@
     </div>
 </div>
 
-<nav class="navbar"><div class="px-3 fw-bold">OCARMY</div></nav>
+<nav class="navbar"><div class="fw-bold">OCARMY</div></nav>
 
 <div class="wrapper">
     <aside class="sidebar">
@@ -58,23 +62,29 @@
             <div class="side-avatar" id="side-pfp"></div>
             <a href="#" id="side-user-link" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
         </div>
+        <div class="side-folder-header" id="side-folder"><i class="fa fa-folder-open"></i> Unsorted</div>
+        <a href="#" class="side-oc-link" id="side-name-link"><i class="fa fa-id-card"></i> <span id="side-name">OC</span></a>
+
         <div class="side-nav">
             <a href="#" class="active"><i class="fa fa-file-alt"></i> Profile</a>
-            <a href="#" id="link-gallery"><i class="fa fa-image"></i> Gallery <span id="count-gallery" class="badge bg-light text-dark float-end">0</span></a>
-            <div class="p-2">
-                 <button class="btn btn-sm btn-outline-light w-100" id="fav-btn" onclick="toggleFavorite()"><i class="fa-regular fa-heart"></i> Favorite</button>
-            </div>
+            <a href="#" id="link-gallery"><i class="fa fa-image"></i> Gallery <span class="badge-count" id="count-gallery">0</span></a>
             
+            <div class="p-2">
+                <button class="btn btn-sm btn-outline-light w-100" id="fav-btn" onclick="toggleFavorite()"><i class="fa-regular fa-heart"></i> Favorite</button>
+            </div>
+
             <div id="owner-panel" style="display:none; margin-top:10px;">
                 <div class="cp-header" onclick="this.parentElement.classList.toggle('cp-active')">
-                    <i class="fa fa-wrench"></i> Control Panel <i class="fa fa-caret-down float-end"></i>
+                    <i class="fa fa-wrench"></i> Control Panel <i class="fa fa-caret-down float-end mt-1"></i>
                 </div>
                 <div class="cp-subnav">
                     <a href="#" id="edit-char-link"><i class="fa fa-pencil"></i> Manage Character</a>
                     <a href="#" id="edit-imgs-link"><i class="fa fa-images"></i> Manage Images</a>
                     <a href="#" id="edit-warnings-link"><i class="fa fa-exclamation-triangle"></i> Character Warnings</a>
                 </div>
-                <div class="p-2"><button class="btn btn-sm btn-link text-danger fw-bold" onclick="confirmDelete()">Delete Character</button></div>
+                <div class="p-2 text-center">
+                    <button class="btn btn-sm btn-link text-danger fw-bold text-decoration-none" onclick="confirmDelete()"><i class="fa fa-trash"></i> Delete Character</button>
+                </div>
             </div>
         </div>
     </aside>
@@ -83,15 +93,24 @@
         <div class="mb-2">
             <a href="#" id="dynamic-back-btn" class="text-muted small text-decoration-none"><i class="fa fa-arrow-left"></i> Back to Profile</a>
         </div>
-        <div class="d-flex gap-3 mb-4">
+
+        <div class="char-header-row d-flex gap-3 mb-4">
             <div class="char-main-pfp" id="main-pfp"></div>
             <div>
-                <h2 class="m-0" id="display-name">Loading...</h2>
-                <div class="small"><i class="fa fa-user"></i> <a href="#" id="creator-link" style="color:#4e92ac; font-weight:bold; text-decoration:none;">User</a></div>
+                <h2 class="m-0"><a href="#" id="clickable-name" class="text-dark text-decoration-none"><i class="fa fa-lock"></i> <span id="display-name">Loading...</span></a></h2>
+                <div class="small"><i class="fa fa-user"></i> <a href="#" id="creator-link" style="color:var(--th-blue); text-decoration:none; font-weight:bold;">User</a></div>
             </div>
         </div>
+
+        <div class="section-title">Basic Info</div>
+        <div class="mb-4"><span class="fw-bold me-3">Worth</span> <span id="display-worth">$0.00</span></div>
+
+        <div class="section-title">Profile</div>
         <div id="bio-content"></div>
-        <h5 class="border-bottom pb-2 mt-4">Recent Images</h5>
+
+        <div class="section-title d-flex justify-content-between align-items-center">
+            Recent Images <a href="#" id="view-more-gallery" class="btn btn-sm btn-outline-secondary" style="font-size:11px;">View More</a>
+        </div>
         <div class="row g-2" id="gallery-preview"></div>
     </main>
 
@@ -107,81 +126,97 @@
     import { getFirestore, doc, onSnapshot, getDoc, updateDoc, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
     const auth = getAuth();
     const charId = new URLSearchParams(window.location.search).get('id');
 
-    // Load Data - PUBLIC ACCESS FIRST
-    onSnapshot(doc(db, "characters", charId), async (snap) => {
-        if (!snap.exists()) {
-            document.querySelector('.main').innerHTML = "<h3>Character not found.</h3>";
-            return;
-        }
-        const data = snap.data();
+    // 1. DATA LOADER (PUBLIC ACCESS)
+    if (charId) {
+        onSnapshot(doc(db, "characters", charId), async (snap) => {
+            if (!snap.exists()) {
+                document.querySelector('.main').innerHTML = "<h3>Character not found.</h3>";
+                return;
+            }
+            const data = snap.data();
 
-        // 1. Load basic info (Visible to everyone)
-        document.getElementById('display-name').innerText = data.name;
-        document.getElementById('main-pfp').style.backgroundImage = `url('${data.avatar || ''}')`;
-        document.getElementById('bio-content').innerHTML = data.description || "No description.";
-        document.getElementById('stat-creator').innerText = data.designer || "Unknown";
-        document.getElementById('stat-favs').innerText = (data.subscribers || []).length;
-        document.getElementById('stat-date').innerText = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : "-";
-        
-        // 2. Fetch Owner Info for Sidebar
-        const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
-        if (ownerSnap.exists()) {
-            const oData = ownerSnap.data();
-            document.getElementById('side-user-link').innerText = oData.username;
-            document.getElementById('side-user-link').href = `user.html?id=${data.ownerId}`;
-            document.getElementById('creator-link').innerText = oData.username;
-            document.getElementById('creator-link').href = `user.html?id=${data.ownerId}`;
-            document.getElementById('dynamic-back-btn').href = `user.html?id=${data.ownerId}`;
-            if (oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
-        }
+            // Populate Text Info
+            document.getElementById('display-name').innerText = data.name;
+            document.getElementById('side-name').innerText = data.name;
+            document.getElementById('clickable-name').href = `character.html?id=${charId}`;
+            document.getElementById('side-name-link').href = `character.html?id=${charId}`;
+            document.getElementById('main-pfp').style.backgroundImage = `url('${data.avatar || ''}')`;
+            document.getElementById('display-worth').innerText = `$${data.worth || "0.00"}`;
+            document.getElementById('bio-content').innerHTML = data.description || "<i>No profile description.</i>";
+            document.getElementById('stat-creator').innerText = data.designer || "Unknown";
+            document.getElementById('stat-date').innerText = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : "-";
+            document.getElementById('stat-favs').innerText = (data.subscribers || []).length;
 
-        // 3. Load Gallery
-        const gallery = data.gallery || [];
-        document.getElementById('count-gallery').innerText = gallery.length;
-        document.getElementById('link-gallery').href = `character_gallery.html?id=${charId}`;
-        document.getElementById('gallery-preview').innerHTML = gallery.slice(0, 6).map(img => `
-            <div class="col-4"><div style="aspect-ratio:1/1; background:url('${img}') center/cover; border:1px solid #ddd;"></div></div>
-        `).join('');
-
-        // 4. Handle Warnings
-        if (data.warningActive && !sessionStorage.getItem(`warn_${charId}`)) {
-            document.getElementById('warning-overlay').style.display = 'block';
-            document.getElementById('warning-text').innerHTML = data.warningContent || "Sensitive Content Warning.";
-            document.getElementById('proceed-btn').onclick = () => {
-                sessionStorage.setItem(`warn_${charId}`, 'true');
-                document.getElementById('warning-overlay').style.display = 'none';
-            };
-        }
-
-        // 5. Auth-specific items (Control Panel & Favorite Button state)
-        onAuthStateChanged(auth, (user) => {
-            const ownerPanel = document.getElementById('owner-panel');
-            if (user && user.uid === data.ownerId) {
-                ownerPanel.style.display = "block";
-                document.getElementById('edit-char-link').href = `edit_character.html?id=${charId}`;
-                document.getElementById('edit-imgs-link').href = `manage_images.html?id=${charId}`;
-                document.getElementById('edit-warnings-link').href = `edit_warnings.html?id=${charId}`;
-            } else {
-                ownerPanel.style.display = "none";
+            // Sync Creator/Owner Profile Links
+            const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
+            if(ownerSnap.exists()){
+                const oData = ownerSnap.data();
+                document.getElementById('side-user-link').innerText = oData.username;
+                document.getElementById('side-user-link').href = `user.html?id=${data.ownerId}`;
+                document.getElementById('creator-link').innerText = oData.username;
+                document.getElementById('creator-link').href = `user.html?id=${data.ownerId}`;
+                document.getElementById('dynamic-back-btn').href = `user.html?id=${data.ownerId}`;
+                if(oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
             }
 
-            const favBtn = document.getElementById('fav-btn');
-            if (user && (data.subscribers || []).includes(user.uid)) {
-                favBtn.innerHTML = '<i class="fa fa-heart text-danger"></i> Unfavorite';
-            } else {
-                favBtn.innerHTML = '<i class="fa-regular fa-heart"></i> Favorite';
+            // Gallery Preview
+            const gallery = data.gallery || [];
+            document.getElementById('count-gallery').innerText = gallery.length;
+            document.getElementById('link-gallery').href = `character_gallery.html?id=${charId}`;
+            document.getElementById('view-more-gallery').href = `character_gallery.html?id=${charId}`;
+            document.getElementById('gallery-preview').innerHTML = gallery.slice(0, 6).map(img => `
+                <div class="col-4 mb-2"><div style="aspect-ratio:1/1; background:url('${img}') center/cover; border:1px solid #ddd; border-radius:4px;"></div></div>
+            `).join('');
+
+            // 2. AUTH CHECK (OWNER & FAVORITE TOOLS)
+            onAuthStateChanged(auth, (user) => {
+                const ownerPanel = document.getElementById('owner-panel');
+                const favBtn = document.getElementById('fav-btn');
+
+                if (user) {
+                    // Show Control Panel if owner or if ownerId is missing (bug fix)
+                    if (user.uid === data.ownerId || !data.ownerId) {
+                        ownerPanel.style.display = "block";
+                        document.getElementById('edit-char-link').href = `edit_character.html?id=${charId}`;
+                        document.getElementById('edit-imgs-link').href = `manage_images.html?id=${charId}`;
+                        document.getElementById('edit-warnings-link').href = `edit_warnings.html?id=${charId}`;
+                    } else {
+                        ownerPanel.style.display = "none";
+                    }
+
+                    // Check favorite state
+                    if ((data.subscribers || []).includes(user.uid)) {
+                        favBtn.innerHTML = '<i class="fa fa-heart text-danger"></i> Unfavorite';
+                    } else {
+                        favBtn.innerHTML = '<i class="fa-regular fa-heart"></i> Favorite';
+                    }
+                } else {
+                    ownerPanel.style.display = "none";
+                }
+            });
+
+            // 3. WARNING LOGIC
+            if (data.warningActive && !sessionStorage.getItem(`warn_${charId}`)) {
+                document.getElementById('warning-overlay').style.display = 'block';
+                document.getElementById('warning-text').innerHTML = data.warningContent || "Sensitive content warning.";
+                document.getElementById('proceed-btn').onclick = () => {
+                    sessionStorage.setItem(`warn_${charId}`, 'true');
+                    document.getElementById('warning-overlay').style.display = 'none';
+                };
             }
         });
-    });
+    }
 
-    // Interaction Functions
+    // INTERACTION SCRIPTS
     window.toggleFavorite = async () => {
         const user = auth.currentUser;
-        if (!user) return alert("Log in to favorite characters!");
+        if (!user) return alert("Log in to favorite!");
         const charRef = doc(db, "characters", charId);
         const charSnap = await getDoc(charRef);
         const subs = charSnap.data().subscribers || [];
