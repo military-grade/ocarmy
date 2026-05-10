@@ -196,18 +196,31 @@
         });
     }
 
-    window.toggleFavorite = async () => {
-        const user = auth.currentUser;
-        if (!user) return alert("Log in to favorite!");
-        const charRef = doc(db, "characters", charId);
-        const charSnap = await getDoc(charRef);
-        const subs = charSnap.data().subscribers || [];
-        if (subs.includes(user.uid)) {
-            await updateDoc(charRef, { subscribers: arrayRemove(user.uid) });
-        } else {
-            await updateDoc(charRef, { subscribers: arrayUnion(user.uid) });
-        }
-    };
+   window.toggleFavorite = async () => {
+    const user = auth.currentUser;
+    if (!user) return alert("Log in to favorite!");
+    const charRef = doc(db, "characters", charId);
+    const charSnap = await getDoc(charRef);
+    const data = charSnap.data();
+    const subs = data.subscribers || [];
+
+    if (subs.includes(user.uid)) {
+        await updateDoc(charRef, { subscribers: arrayRemove(user.uid) });
+    } else {
+        await updateDoc(charRef, { subscribers: arrayUnion(user.uid) });
+        
+        // --- TRIGGER FAVORITE NOTIFICATION ---
+        await addDoc(collection(db, "notifications"), {
+            toUserId: data.ownerId,
+            fromUsername: user.displayName || "A user",
+            type: "favorite",
+            characterName: data.name,
+            characterId: charId,
+            status: "unread",
+            createdAt: serverTimestamp()
+        });
+    }
+};
 
     window.confirmDelete = async () => {
         if (confirm("Permanently delete character?")) {
