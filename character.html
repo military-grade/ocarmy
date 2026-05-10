@@ -6,112 +6,133 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; --side-teal: #7cc1d8; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
 
-        /* Left Sidebar - Full Toyhouse Restore */
-        .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
+        /* Left Sidebar - Exact Toyhouse Replication */
+        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-header { background: #427e95; padding: 10px 15px; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(0,0,0,0.1); }
-        .side-user-info { padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.05); }
-        .side-avatar { width: 40px; height: 40px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
-        .side-nav a { display: block; padding: 8px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
+        .side-user-info { padding: 12px 15px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); }
+        .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
+        .side-folder-header { background: #56a0ba; padding: 8px 15px; font-weight: bold; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .side-oc-link { padding: 10px 15px; display: flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-size: 13px; background: rgba(255,255,255,0.05); }
+        
+        .side-nav a { display: block; padding: 8px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.1s; }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
-        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
-        
-        /* Control Panel Restoration */
-        .cp-header { background: #7cc1d8; color: white; padding: 10px 15px; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-        .btn-delete-oc { color: #ffb3b3 !important; font-weight: bold; margin-top: auto; padding: 15px; cursor: pointer; border-top: 1px solid rgba(255,255,255,0.1); }
+        .side-nav a i { width: 18px; text-align: center; margin-right: 5px; opacity: 0.8; }
+        .badge-count { background: rgba(255,255,255,0.2); font-size: 10px; padding: 2px 6px; border-radius: 10px; float: right; }
 
-        /* Main Content */
-        .main { flex: 1; padding: 25px; border-right: 1px solid #eee; }
-        .char-info-header { display: flex; gap: 20px; align-items: flex-start; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
-        .char-main-thumb { width: 120px; height: 120px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; letter-spacing: 0.5px; }
         
-        /* Gallery Styles */
-        .gallery-item { position: relative; width: 100px; height: 100px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-        .del-img-btn { position: absolute; top: 0; right: 0; background: rgba(255,0,0,0.8); color: white; border: none; font-size: 10px; padding: 2px 5px; cursor: pointer; }
+        /* Control Panel Dropdown */
+        .cp-header { background: var(--side-teal); color: white; padding: 10px 15px; font-weight: bold; font-size: 13px; cursor: pointer; }
+        .cp-subnav { background: #f1f8fb; display: none; }
+        .cp-subnav a { display: block; padding: 8px 20px; color: #4e92ac; text-decoration: none; font-size: 12px; border-bottom: 1px solid #e1eef2; }
+        .cp-subnav a:hover { background: #e6f2f6; }
+        .cp-active .cp-subnav { display: block; }
+
+        /* Main Content Area */
+        .main { flex: 1; padding: 25px; border-right: 1px solid #eee; }
+        .char-header-row { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 25px; }
+        .char-main-pfp { width: 100px; height: 100px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
+        .char-name-area h2 { margin: 0; font-size: 26px; font-weight: normal; color: #444; }
+        .char-name-area h2 a { color: #444; text-decoration: none; }
+        
+        .section-title { font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin: 30px 0 15px; font-weight: 500; }
+        .bio-render { line-height: 1.6; }
 
         /* Stats Right Column */
-        .stats-col { width: 250px; padding: 20px; background: #fafafa; flex-shrink: 0; font-size: 13px; }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .stats-col { width: 260px; padding: 25px; background: #fafafa; flex-shrink: 0; font-size: 13px; }
+        .stat-box { margin-bottom: 20px; }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #eee; }
         .stat-label { font-weight: bold; color: #666; }
+        
+        .btn-delete-final { color: #d9534f !important; font-weight: bold; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
-    <div style="font-weight: bold;">OCARMY</div>
-    <a href="characters.html" style="color:white; text-decoration:none; font-size:12px;">Back to Characters</a>
+    <div class="px-3 fw-bold">OCARMY</div>
 </nav>
 
 <div class="wrapper">
     <aside class="sidebar">
         <div class="side-header"><i class="fa fa-heart"></i> Character</div>
         <div class="side-user-info">
-            <div class="side-avatar" id="side-owner-pfp"></div>
-            <div id="side-owner-name" style="font-weight: bold; font-size: 13px;">User</div>
+            <div class="side-avatar" id="side-pfp"></div>
+            <a href="#" id="side-username" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
         </div>
-        
+        <div class="side-folder-header" id="side-folder"><i class="fa fa-folder-open"></i> Unsorted</div>
+        <a href="#" class="side-oc-link" id="side-name-link"><i class="fa fa-id-card"></i> <span id="side-name">OC</span></a>
+
         <div class="side-nav">
-            <a href="#" class="active"><i class="fa fa-id-card"></i> Profile</a>
-            <a href="#"><i class="fa fa-image"></i> Gallery <span class="badge bg-light text-dark float-end" id="count-gallery">0</span></a>
+            <a href="#" class="active"><i class="fa fa-file-alt"></i> Profile</a>
+            <a href="#" id="link-gallery"><i class="fa fa-image"></i> Gallery <span class="badge-count" id="count-gallery">0</span></a>
             <a href="#"><i class="fa fa-book"></i> Library</a>
             <a href="#"><i class="fa fa-globe"></i> Worlds</a>
             <a href="#"><i class="fa fa-link"></i> Links</a>
             
             <div class="side-label">Interaction</div>
             <a href="#"><i class="fa fa-comments"></i> Comments</a>
-            <a href="#"><i class="fa fa-star"></i> Favorite</a>
+            <a href="#"><i class="fa fa-star"></i> Favorite <span class="badge-count">0</span></a>
             <a href="#"><i class="fa fa-check-square"></i> Ownership</a>
+            <a href="#"><i class="fa fa-exclamation-triangle"></i> Report</a>
             
-            <div id="owner-cp" style="display:none; margin-top: 10px;">
-                <div class="cp-header"><i class="fa fa-wrench"></i> Control Panel</div>
-                <a href="#"><i class="fa fa-pencil"></i> Manage Character</a>
-                <a href="javascript:void(0)" onclick="toggleGalleryEditor()"><i class="fa fa-images"></i> Manage Images</a>
-                <a href="#"><i class="fa fa-book"></i> Manage Literatures</a>
-                <a href="#" class="btn-delete-oc" onclick="confirmDelete()"><i class="fa fa-trash"></i> Delete Character</a>
+            <div id="owner-panel" style="display:none; margin-top:10px;">
+                <div class="cp-header" onclick="this.parentElement.classList.toggle('cp-active')">
+                    <i class="fa fa-wrench"></i> Control Panel <i class="fa fa-caret-down float-end mt-1"></i>
+                </div>
+                <div class="cp-subnav">
+                    <a href="#" id="edit-char-link">Manage Character</a>
+                    <a href="#" id="edit-imgs-link">Manage Images</a>
+                    <a href="#">Manage Literatures</a>
+                </div>
+                <div class="btn-delete-final" onclick="confirmDelete()"><i class="fa fa-trash"></i> Delete Character</div>
             </div>
         </div>
     </aside>
 
     <main class="main">
-        <div class="char-info-header">
-            <div class="char-main-thumb" id="main-thumb"></div>
-            <div class="char-title-area">
-                <h2><a href="#" id="name-link" style="color:#333; text-decoration:none;"><i class="fa fa-lock"></i> <span id="display-name">Loading...</span></a></h2>
-                <a href="#" style="color:var(--th-blue); text-decoration:none; font-weight:bold;"><i class="fa fa-user"></i> <span id="display-owner">User</span></a>
+        <div class="char-header-row">
+            <div class="char-main-pfp" id="main-pfp"></div>
+            <div class="char-name-area">
+                <h2><a href="#" id="clickable-name"><i class="fa fa-lock"></i> <span id="display-name">Loading...</span></a></h2>
+                <div style="font-size: 14px;">
+                    <i class="fa fa-user"></i> <a href="#" id="creator-link" style="color:var(--th-blue); text-decoration:none; font-weight:bold;">User</a>
+                </div>
             </div>
         </div>
 
-        <div id="gallery-editor-box" style="display:none; background:#f9f9f9; border:1px solid #ddd; padding:15px; margin-bottom:20px; border-radius:4px;">
-            <h5 style="font-size:14px; font-weight:bold;">Add Image to Gallery</h5>
-            <div class="input-group mb-3">
-                <input type="text" id="new-img-url" class="form-control form-control-sm" placeholder="Paste Image URL">
-                <button class="btn btn-primary btn-sm" onclick="addToGallery()">Add</button>
-            </div>
-            <div class="d-flex flex-wrap gap-2" id="manage-grid"></div>
+        <div class="section-title">Basic Info</div>
+        <div class="d-flex gap-5">
+            <div><span class="fw-bold me-3">Worth</span> <span id="display-worth">$0.00</span></div>
         </div>
 
-        <h4 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 5px;">Profile</h4>
-        <div id="display-bio" style="padding: 15px 0;"></div>
+        <div class="section-title">Profile</div>
+        <div id="bio-content" class="bio-render"></div>
 
-        <h4 style="font-size: 18px; font-weight: bold; margin-top:30px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Recent Images</h4>
-        <div class="d-flex flex-wrap gap-2 mt-3" id="public-gallery-grid"></div>
+        <div class="section-title d-flex justify-content-between align-items-center">
+            Recent Images
+            <button class="btn btn-sm btn-outline-secondary" style="font-size:11px;">View More</button>
+        </div>
+        <div class="row g-2" id="gallery-preview"></div>
     </main>
 
     <aside class="stats-col">
-        <div class="stat-row"><span class="stat-label">Created</span><span id="stat-created">-</span></div>
-        <div class="stat-row"><span class="stat-label">Creator</span><span id="stat-creator">-</span></div>
-        <div class="stat-row"><span class="stat-label">Worth</span><span id="stat-worth">$0.00</span></div>
+        <div class="stat-box">
+            <div class="stat-row"><span class="stat-label">Created</span><span id="stat-date">-</span></div>
+            <div class="stat-row"><span class="stat-label">Creator</span><span id="stat-creator">-</span></div>
+            <div class="stat-row"><span class="stat-label">Favorites</span><span>0</span></div>
+        </div>
     </aside>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
@@ -120,59 +141,47 @@
     const auth = getAuth();
     const charId = new URLSearchParams(window.location.search).get('id');
 
-    onAuthStateChanged(auth, (user) => {
-        onSnapshot(doc(db, "characters", charId), (snap) => {
+    onAuthStateChanged(auth, async (user) => {
+        onSnapshot(doc(db, "characters", charId), async (snap) => {
             if (!snap.exists()) return;
             const data = snap.data();
 
-            // Update UI
+            // Sync Header & Sidebar
             document.getElementById('display-name').innerText = data.name;
-            document.getElementById('display-bio').innerHTML = data.description || "No bio.";
-            document.getElementById('display-owner').innerText = data.ownerName || "Unknown";
-            document.getElementById('stat-creator').innerText = data.designer || "None";
-            document.getElementById('stat-worth').innerText = `$${data.worth || "0.00"}`;
-            document.getElementById('main-thumb').style.backgroundImage = `url('${data.avatar}')`;
+            document.getElementById('side-name').innerText = data.name;
+            document.getElementById('clickable-name').href = `character.html?id=${charId}`;
+            document.getElementById('main-pfp').style.backgroundImage = `url('${data.avatar}')`;
+            document.getElementById('display-worth').innerText = `$${data.worth || "0.00"}`;
+            document.getElementById('bio-content').innerHTML = data.description || "<i>No profile description.</i>";
             
-            // Gallery Logic
+            // Sync Stats
+            document.getElementById('stat-creator').innerText = data.designer || "Unknown";
+            document.getElementById('stat-date').innerText = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : "-";
+
+            // Sync User/Owner Info
+            const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
+            if(ownerSnap.exists()){
+                const oData = ownerSnap.data();
+                document.getElementById('side-username').innerText = oData.username;
+                document.getElementById('creator-link').innerText = oData.username;
+                if(oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
+            }
+
+            // Gallery Preview
             const gallery = data.gallery || [];
             document.getElementById('count-gallery').innerText = gallery.length;
-            
-            // Public Gallery Display
-            const publicGrid = document.getElementById('public-gallery-grid');
-            publicGrid.innerHTML = gallery.map(img => `<div class="gallery-item"><img src="${img}"></div>`).join('');
+            document.getElementById('gallery-preview').innerHTML = gallery.slice(0, 6).map(img => `
+                <div class="col-4"><div style="aspect-ratio:1/1; border:1px solid #ddd; background:url('${img}') center/cover;"></div></div>
+            `).join('');
 
-            // Private Management Grid
-            const manageGrid = document.getElementById('manage-grid');
-            manageGrid.innerHTML = gallery.map(img => `
-                <div class="gallery-item">
-                    <img src="${img}">
-                    <button class="del-img-btn" onclick="deleteImg('${img}')">×</button>
-                </div>`).join('');
-
-            // Show Owner Tools
+            // Owner Panel Logic
             if (user && (user.uid === data.ownerId || !data.ownerId)) {
-                document.getElementById('owner-cp').style.display = "block";
+                document.getElementById('owner-panel').style.display = "block";
+                document.getElementById('edit-char-link').href = `edit_character.html?id=${charId}`;
+                document.getElementById('edit-imgs-link').href = `manage_images.html?id=${charId}`;
             }
         });
     });
-
-    window.toggleGalleryEditor = () => {
-        const box = document.getElementById('gallery-editor-box');
-        box.style.display = box.style.display === "none" ? "block" : "none";
-    };
-
-    window.addToGallery = async () => {
-        const url = document.getElementById('new-img-url').value;
-        if(!url) return;
-        await updateDoc(doc(db, "characters", charId), { gallery: arrayUnion(url) });
-        document.getElementById('new-img-url').value = "";
-    };
-
-    window.deleteImg = async (url) => {
-        if(confirm("Remove this image?")) {
-            await updateDoc(doc(db, "characters", charId), { gallery: arrayRemove(url) });
-        }
-    };
 
     window.confirmDelete = async () => {
         if (confirm("Are you sure you want to delete this character? This cannot be undone.")) {
