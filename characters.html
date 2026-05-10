@@ -9,13 +9,11 @@
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
 
-        /* Full Navbar */
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 2000; }
         .nav-left { display: flex; gap: 5px; align-items: center; height: 100%; }
         .nav-left a, .nav-item-btn { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
         .nav-left a:hover, .nav-item-btn:hover { color: white; background: rgba(255,255,255,0.1); }
         
-        /* Notif Bar */
         .notif-bar { display: flex; align-items: center; gap: 2px; margin-right: 10px; }
         .notif-item { padding: 4px 8px; font-size: 11px; border-radius: 3px; color: white; display: flex; align-items: center; gap: 5px; background: #337ab7; text-decoration: none; }
         .notif-world { background: #f0ad4e; }
@@ -25,7 +23,6 @@
         .dropdown-content a { display: block; padding: 8px 20px; color: #333 !important; text-decoration: none; font-size: 13px; width: 100%; text-align: left; }
         .show { display: block !important; }
 
-        /* Sidebar & Wrapper */
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); align-items: stretch; }
         .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -35,7 +32,6 @@
 
         .main { flex: 1; padding: 30px; background: white; }
         
-        /* Character Grid Styles */
         .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; margin-top: 20px; }
         .char-card { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; text-align: center; text-decoration: none; color: inherit; transition: 0.2s; }
         .char-card:hover { border-color: var(--th-blue); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
@@ -94,7 +90,7 @@
         <div class="side-nav" id="sidebar-links">
             <a href="dashboard.html" data-base="profile.html"><i class="fa fa-user"></i> Profile</a>
             <a href="bulletins.html" data-base="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
-            <a href="characters.html" data-base="characters.html"><i class="fa fa-users"></i> Characters</a>
+            <a href="characters.html" data-base="characters.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-users"></i> Characters</a>
             <a href="#" data-base="#"><i class="fa fa-link"></i> Links</a>
             <a href="#" data-base="#"><i class="fa fa-globe"></i> Worlds</a>
             <a href="#" data-base="#"><i class="fa fa-star"></i> Favorites</a>
@@ -111,7 +107,6 @@
 
     <main class="main">
         <h2 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 0;"><i class="fa fa-users"></i> Characters</h2>
-        
         <div class="char-grid" id="character-display">
             <div style="grid-column: 1 / -1; color: #999; padding: 20px;">Loading characters...</div>
         </div>
@@ -133,12 +128,10 @@
         document.getElementById(id).classList.toggle('show');
     };
 
-    // 1. CHECK THE URL FIRST
     const urlParams = new URLSearchParams(window.location.search);
     let targetUserId = urlParams.get('user');
 
     onAuthStateChanged(auth, async (authUser) => {
-        // Setup Navbar for the person currently logged into the computer
         if (authUser) {
              onSnapshot(doc(db, "users", authUser.uid), (snap) => {
                 if(snap.exists()) {
@@ -147,29 +140,17 @@
                     if (data.pfp) document.getElementById('nav-avatar').style.backgroundImage = `url('${data.pfp}')`;
                 }
              });
-             
-             // If there is NO ?user= in the URL, that means we are looking at our own page.
-             // So, set the targetUserId to our own logged-in ID.
-             if (!targetUserId) {
-                 targetUserId = authUser.uid;
-             }
+             if (!targetUserId) { targetUserId = authUser.uid; }
         }
 
-        // 2. LOAD DATA FOR THE TARGET USER
         if (targetUserId) {
-            
-            // Fix the sidebar links so they stay on this user's profile
             const links = document.querySelectorAll('#sidebar-links a');
             links.forEach(link => {
                 const base = link.getAttribute('data-base');
-                if(base !== "#" && base !== "dashboard.html") {
-                    link.href = `${base}?user=${targetUserId}`;
-                } else if (base === "dashboard.html") {
-                    link.href = `profile.html?user=${targetUserId}`;
-                }
+                if(base !== "#" && base !== "dashboard.html") { link.href = `${base}?user=${targetUserId}`; } 
+                else if (base === "dashboard.html") { link.href = `profile.html?user=${targetUserId}`; }
             });
 
-            // Load Sidebar Info
             onSnapshot(doc(db, "users", targetUserId), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
@@ -178,11 +159,11 @@
                 }
             });
 
-            // Fetch Characters belonging to this target user
+            // QUERY FOR CHARACTERS OWNED BY USER
             const q = query(collection(db, "characters"), where("ownerId", "==", targetUserId));
             const querySnapshot = await getDocs(q);
             const grid = document.getElementById('character-display');
-            grid.innerHTML = ""; // Clear loading text
+            grid.innerHTML = "";
             
             if (querySnapshot.empty) {
                 grid.innerHTML = `<div style="grid-column: 1 / -1; color: #999; padding: 20px;">This user has no characters yet.</div>`;
@@ -193,13 +174,9 @@
                         <a href="character.html?id=${doc.id}" class="char-card">
                             <div class="char-img" style="background-image: url('${char.avatar || 'https://via.placeholder.com/150'}')"></div>
                             <div class="char-name">${char.name || 'Unnamed'}</div>
-                        </a>
-                    `;
+                        </a>`;
                 });
             }
-        } else {
-            // Failsafe if not logged in and no URL param
-             document.getElementById('character-display').innerHTML = `<div style="grid-column: 1 / -1; color: red; padding: 20px;">Please log in or specify a user.</div>`;
         }
     });
 </script>
