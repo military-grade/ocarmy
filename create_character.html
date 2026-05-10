@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Character | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
+    <style>
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
+
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .container { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+        
+        .card { background: white; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 20px; }
+        .card-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); }
+        .card-body { padding: 20px; }
+
+        label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; background: #fff; }
+        
+        .btn-create { background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-wysiwyg { background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; float: right; }
+        
+        .checkbox-group { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: bold; }
+        .checkbox-group input { width: auto; margin: 0; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div style="font-weight: bold;">OCARMY</div>
+    <a href="dashboard.html" style="color:white; text-decoration:none; font-size:13px;">Cancel</a>
+</nav>
+
+<div class="container">
+    <h2>Create Character</h2>
+
+    <div class="card">
+        <div class="card-header">Upload Avatar (Optional)</div>
+        <div class="card-body">
+            <input type="text" id="char-avatar" placeholder="Paste Image URL for Avatar...">
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Basics</div>
+        <div class="card-body">
+            <label>Worth (Optional)</label>
+            <input type="text" id="char-worth" placeholder="e.g. $50 or 5000 Points">
+
+            <label>Name</label>
+            <input type="text" id="char-name" required>
+
+            <label>Folder</label>
+            <select id="char-folder">
+                <option value="Unsorted">Unsorted</option>
+            </select>
+
+            <label>Visible to...</label>
+            <select id="char-visibility">
+                <option value="Public">Public</option>
+                <option value="Private">Private</option>
+            </select>
+
+            <label>Tags</label>
+            <input type="text" id="char-tags" placeholder="Separate tags with commas">
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="char-listing" checked>
+                <label for="char-listing" style="margin:0;">Enable listing (Show on front page & search)</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Fields
+            <button class="btn-wysiwyg" onclick="toggleWYSIWYG()">Disable WYSIWYG</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+            <textarea id="char-description"></textarea>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Designer Credit</div>
+        <div class="card-body">
+            <label>Terms of Use</label>
+            <textarea id="char-tou" style="height: 80px;" placeholder="Custom terms of trading/ownership..."></textarea>
+            
+            <label>Design Tradeability</label>
+            <select id="char-tradeable">
+                <option value="Can transfer">Can transfer</option>
+                <option value="Cannot transfer">Cannot transfer</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="btn-create" onclick="submitCharacter()">Create Character</button>
+</div>
+
+<script>
+    tinymce.init({
+        selector: '#char-description',
+        height: 400,
+        menubar: false,
+        toolbar_mode: 'wrap',
+        plugins: 'link image code lists table emoticons charmap fullscreen',
+        toolbar: 'undo redo removeformat | bold italic underline strikethrough subscript superscript | fontfamily fontsize forecolor backcolor | charmap emoticons | blocks | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote hr | link image table | code fullscreen',
+        branding: false
+    });
+
+    function toggleWYSIWYG() {
+        const ed = tinymce.get('char-description');
+        ed.isHidden() ? ed.show() : ed.hide();
+    }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    window.submitCharacter = async () => {
+        const user = auth.currentUser;
+        if (!user) return alert("Please log in first.");
+
+        tinymce.triggerSave();
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const username = userDoc.data()?.username || "Unknown";
+
+        const charData = {
+            ownerId: user.uid,
+            ownerName: username,
+            name: document.getElementById('char-name').value,
+            avatar: document.getElementById('char-avatar').value,
+            worth: document.getElementById('char-worth').value,
+            folder: document.getElementById('char-folder').value,
+            visibility: document.getElementById('char-visibility').value,
+            tags: document.getElementById('char-tags').value,
+            isListed: document.getElementById('char-listing').checked,
+            description: tinymce.get('char-description').getContent(),
+            tou: document.getElementById('char-tou').value,
+            tradeable: document.getElementById('char-tradeable').value,
+            createdAt: serverTimestamp()
+        };
+
+        try {
+            const docRef = await addDoc(collection(db, "characters"), charData);
+            alert("Character Created!");
+            window.location.href = `character.html?id=${docRef.id}`;
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    };
+</script>
+</body>
+</html>
