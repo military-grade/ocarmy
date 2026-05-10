@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Gallery | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: sans-serif; background: var(--th-bg); }
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; min-height: 100vh; }
+        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .main { flex: 1; padding: 25px; }
+        
+        /* Gallery Grid - Screenshot 3.09.13 */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .gallery-card { border: 1px solid var(--border); padding: 5px; border-radius: 4px; position: relative; }
+        .gallery-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 2px; }
+        .edit-pencil { position: absolute; bottom: 10px; right: 10px; background: white; border: 1px solid #ddd; padding: 2px 6px; border-radius: 3px; font-size: 10px; color: #666; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <aside class="sidebar">/* ... Sidebar Code ... */</aside>
+
+    <main class="main">
+        <h2 class="border-bottom pb-2 mb-4"><i class="fa fa-image"></i> <span id="char-name">Character</span>'s Gallery</h2>
+        <div class="gallery-grid" id="gallery-display"></div>
+    </main>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
+    const auth = getAuth();
+    const charId = new URLSearchParams(window.location.search).get('id');
+
+    onAuthStateChanged(auth, (user) => {
+        onSnapshot(doc(db, "characters", charId), (snap) => {
+            const data = snap.data();
+            document.getElementById('char-name').innerText = data.name;
+            const grid = document.getElementById('gallery-display');
+            grid.innerHTML = (data.gallery || []).map(img => `
+                <div class="gallery-card">
+                    <img src="${img}">
+                    ${user && user.uid === data.ownerId ? `<div class="edit-pencil"><i class="fa fa-pencil"></i></div>` : ''}
+                </div>
+            `).join('');
+        });
+    });
+</script>
+</body>
+</html>
