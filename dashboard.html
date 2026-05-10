@@ -4,46 +4,45 @@
     <meta charset="UTF-8">
     <title>Profile | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; overflow-x: hidden; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
 
-        /* Navbar: Restored Blogs, Info, News (Screenshot 1.10.01) */
+        /* Navbar - EVERY button restored from Screenshot 1.24.10 */
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .nav-left { display: flex; gap: 10px; align-items: center; height: 100%; }
-        .nav-left a, .nav-item { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; }
+        .nav-left a, .nav-item { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
         .nav-left a:hover, .nav-item:hover { color: white; background: rgba(255,255,255,0.1); }
         
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
         .dropdown-content { display: none; position: absolute; top: 50px; left: 0; background: white; border: 1px solid var(--border); min-width: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1001; }
         .dropdown-right { left: auto; right: 0; }
-        .dropdown-content a { display: block; padding: 10px 15px; color: #333 !important; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; }
+        .dropdown-content a { display: block; padding: 10px 15px; color: #333 !important; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; height: auto; }
         .show { display: block; }
 
-        .nav-pfp { width: 30px; height: 30px; background: #eee; border-radius: 2px; background-size: cover; margin-left: 8px; }
+        /* Layout - Zero Gap Flush (Screenshot 1.08.55) */
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); align-items: stretch; }
 
-        /* Wrapper & Sidebar: Full 200px Flush Layout (Screenshot 1.08.55) */
-        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-top: none; min-height: calc(100vh - 50px); align-items: stretch; }
+        /* Sidebar - ALL components restored from Screenshot 1.08.55 */
         .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
-        .side-user-header { background: #427e95; padding: 10px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .side-avatar-box { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; flex-shrink: 0; }
-        .side-user-name { font-weight: bold; font-size: 15px; color: white; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-
+        .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .side-avatar { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; flex-shrink: 0; }
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .side-nav a:hover, .side-nav a.active { background: rgba(0,0,0,0.1); }
+        .side-nav a:hover { background: rgba(0,0,0,0.1); }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
 
-        /* Main Content */
+        /* Content Area */
         .main { flex: 1; padding: 30px; background: white; }
-        #profile-blurb { margin-bottom: 30px; min-height: 50px; }
-        
-        /* Grid (Screenshot 12.49.10) */
-        .folder-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 10px; }
-        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 15px; padding: 20px 0; }
-        .char-card { text-align: center; text-decoration: none; color: inherit; }
-        .char-thumb { width: 135px; height: 135px; background: #eee; border: 1px solid var(--border); border-radius: 4px; background-size: cover; margin-bottom: 5px; }
-        .char-name-badge { background: var(--th-blue); color: white; padding: 4px 8px; font-size: 11px; font-weight: bold; border-radius: 4px; display: inline-flex; }
+
+        /* HTML/CSS Render Zone */
+        #profile-raw-html { width: 100%; min-height: 100px; }
+
+        /* Folder Grid Styling (Matches Screenshot 1.24.10) */
+        .folder-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 40px; }
+        .view-all { font-size: 11px; font-weight: bold; color: var(--th-blue); text-decoration: none; }
     </style>
+    <style id="custom-profile-css"></style>
 </head>
 <body>
 
@@ -52,11 +51,10 @@
         <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
         <a href="#"><i class="fa fa-eye"></i> Browse</a>
         <div class="dropdown">
-            <div class="nav-item" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></div>
+            <button class="nav-item" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></button>
             <div id="drop-submit" class="dropdown-content">
-                <a href="create_character.html"><i class="fa fa-user"></i> Character</a>
-                <a href="create_bulletin.html"><i class="fa fa-newspaper"></i> Bulletin</a>
-                <a href="#"><i class="fa fa-image"></i> Image</a>
+                <a href="create_character.html">Character</a>
+                <a href="create_bulletin.html">Bulletin</a>
             </div>
         </div>
         <a href="#"><i class="fa fa-search"></i> Search</a>
@@ -64,29 +62,17 @@
         <a href="#"><i class="fa fa-newspaper"></i> Blogs</a>
         <a href="#"><i class="fa fa-bullhorn"></i> News</a>
     </div>
-
-    <div class="dropdown">
-        <div class="nav-item" onclick="toggleDrop('drop-user')">
-            <span id="nav-username">militarygrade</span>
-            <div class="nav-pfp" id="nav-pfp-img"></div>
-        </div>
-        <div id="drop-user" class="dropdown-content dropdown-right">
-            <a href="dashboard.html">Profile</a>
-            <a href="messages.html">Inbox</a>
-            <div style="border-top:1px solid #eee;"></div>
-            <a href="#" id="logout-btn">Logout</a>
-        </div>
-    </div>
+    <div class="nav-item" id="nav-user-text" style="color:white;">militarygrade</div>
 </nav>
 
 <div class="wrapper">
     <aside class="sidebar">
         <div class="side-user-header">
-            <div class="side-avatar-box" id="side-pfp"></div>
-            <div class="side-user-name" id="side-user-text">militarygrade</div>
+            <div class="side-avatar" id="side-pfp"></div>
+            <div style="font-weight: bold;" id="side-username">militarygrade</div>
         </div>
         <div class="side-nav">
-            <a href="dashboard.html" class="active"><i class="fa fa-user"></i> Profile</a>
+            <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
             <a href="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
             <a href="characters.html"><i class="fa fa-users"></i> Characters</a>
             <a href="#"><i class="fa fa-link"></i> Links</a>
@@ -100,32 +86,62 @@
             
             <div class="side-label">Interaction</div>
             <a href="profile_comments.html"><i class="fa fa-comments"></i> Comments</a>
-            <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
+            <a href="#"><i class="fa fa-envelope"></i> Inbox</a>
         </div>
     </aside>
 
     <main class="main">
-        <div id="profile-blurb"></div>
+        <div id="profile-raw-html"></div>
 
         <div class="folder-header">
             <span style="font-weight:bold; font-size: 18px;"><i class="fa fa-folder-open"></i> Unsorted</span>
-            <a href="characters.html" style="font-size:11px; font-weight:bold; color:var(--th-blue); text-decoration:none;"><i class="fa fa-eye"></i> View All</a>
+            <a href="#" class="view-all"><i class="fa fa-eye"></i> View All</a>
         </div>
-        <div class="char-grid" id="char-gallery">
-            </div>
+        <div id="character-grid-placeholder" style="padding: 20px 0; color: #999; font-size: 13px;">
+            No characters found.
+        </div>
     </main>
 </div>
 
-<script>
-    function toggleDrop(id) {
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    // UI Logic
+    window.toggleDrop = (id) => {
         document.querySelectorAll('.dropdown-content').forEach(d => { if(d.id !== id) d.classList.remove('show'); });
         document.getElementById(id).classList.toggle('show');
-    }
-    window.onclick = function(e) {
-        if (!e.target.closest('.dropdown')) {
-            document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                
+                // SIDEBAR SYNC
+                document.getElementById('side-username').innerText = data.username || "User";
+                if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+
+                // RAW CODE INJECTION (HTML and CSS from Settings)
+                // This makes your profile custom just like Toyhouse
+                if (data.profileHTML) {
+                    document.getElementById('profile-raw-html').innerHTML = data.profileHTML;
+                }
+                if (data.profileCSS) {
+                    document.getElementById('custom-profile-css').innerHTML = data.profileCSS;
+                }
+            }
         }
-    }
+    });
 </script>
 </body>
 </html>
