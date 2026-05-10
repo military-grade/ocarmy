@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Edit Warnings | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
+    <style>
+        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; }
+        body { background: var(--th-bg); padding: 40px; }
+        .edit-card { background: white; border: 1px solid #ddd; padding: 25px; border-radius: 4px; max-width: 900px; margin: auto; }
+        .warning-toggle { border: 1px solid #4e92ac; background: #56a0ba; color: white; padding: 5px 15px; border-radius: 4px; cursor: pointer; }
+        .btn-update { background: #0088cc; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="edit-card">
+        <h5 class="border-bottom pb-2 mb-3">Mature Content Warning</h5>
+        <h5 class="border-bottom pb-2 mb-3">Content Warning</h5>
+        
+        <div class="d-flex gap-4 mb-4">
+            <button id="toggle-warning" class="warning-toggle" onclick="toggleWarning()">Warning On</button>
+            <div class="small text-muted">
+                This adds a warning page prior to viewing any of this character's pages.
+                <ul>
+                    <li>This will add a single warning page for the session...</li>
+                    <li>Users who have favourited this character will not receive this warning.</li>
+                </ul>
+            </div>
+        </div>
+
+        <textarea id="warning-bio"></textarea>
+        <button class="btn-update" onclick="saveWarnings()">Update Warnings</button>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
+    const charId = new URLSearchParams(window.location.search).get('id');
+    let warningActive = true;
+
+    tinymce.init({ selector: '#warning-bio', height: 300, plugins: 'code link lists', toolbar: 'bold italic underline | bullist numlist | link code' });
+
+    async function load() {
+        const snap = await getDoc(doc(db, "characters", charId));
+        const data = snap.data();
+        warningActive = data.warningActive ?? true;
+        updateToggleUI();
+        setTimeout(() => tinymce.get('warning-bio').setContent(data.warningContent || ""), 1000);
+    }
+
+    window.toggleWarning = () => {
+        warningActive = !warningActive;
+        updateToggleUI();
+    };
+
+    function updateToggleUI() {
+        const btn = document.getElementById('toggle-warning');
+        btn.innerText = warningActive ? "Warning On" : "Warning Off";
+        btn.style.background = warningActive ? "#56a0ba" : "#eee";
+        btn.style.color = warningActive ? "white" : "#333";
+    }
+
+    window.saveWarnings = async () => {
+        await updateDoc(doc(db, "characters", charId), {
+            warningActive: warningActive,
+            warningContent: tinymce.get('warning-bio').getContent()
+        });
+        alert("Warnings Updated!");
+    };
+    load();
+</script>
+</body>
+</html>
