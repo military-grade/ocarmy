@@ -2,146 +2,151 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Character | OCARMY</title>
+    <title>Characters | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; --side-teal: #7cc1d8; }
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
 
-        /* Sidebar & Navigation */
+        /* Left Sidebar */
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-header { background: #427e95; padding: 10px 15px; font-weight: bold; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.1); }
         .side-user-info { padding: 12px 15px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); }
         .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .side-nav a:hover { background: rgba(0,0,0,0.1); }
-        .cp-header { background: var(--side-teal); color: white; padding: 10px 15px; font-weight: bold; font-size: 13px; cursor: pointer; }
-        .cp-subnav { background: #f1f8fb; display: none; }
-        .cp-subnav a { display: block; padding: 8px 20px; color: #4e92ac !important; font-size: 12px; border-bottom: 1px solid #e1eef2; }
-        .cp-active .cp-subnav { display: block; }
+        .side-nav a:hover, .side-nav a.active { background: rgba(0,0,0,0.1); }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
 
         /* Main Content */
-        .main { flex: 1; padding: 25px; border-right: 1px solid #eee; }
-        .char-main-pfp { width: 100px; height: 100px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
+        .main { flex: 1; padding: 25px; }
+        .folder-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Warning Overlay */
-        #warning-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; padding: 50px 20px; overflow-y: auto; }
+        /* Character Grid */
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .char-card { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; text-decoration: none; color: inherit; transition: 0.2s; background: #fff; }
+        .char-card:hover { border-color: var(--th-blue); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .char-thumb { width: 100%; aspect-ratio: 1/1; background: #eee; background-size: cover; background-position: center; }
+        .char-name { padding: 10px; font-weight: bold; font-size: 13px; color: var(--th-blue); text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="warning-overlay">
-    <div style="max-width:800px; margin:auto; text-align:center; border:1px solid #ddd; padding:40px; background:#fff; border-radius:4px;">
-        <h2 style="color:#d9534f;"><i class="fa fa-exclamation-triangle"></i> Character Warning</h2>
-        <hr>
-        <div id="warning-text" style="text-align:left; margin:30px 0; line-height:1.6;"></div>
-        <button class="btn btn-primary px-5" id="proceed-btn" style="background:#4e92ac; border:none;">Proceed to Profile</button>
-    </div>
-</div>
-
-<nav class="navbar"><div class="px-3 fw-bold">OCARMY</div></nav>
+<nav class="navbar"><div class="fw-bold">OCARMY</div></nav>
 
 <div class="wrapper">
     <aside class="sidebar">
-        <div class="side-header"><i class="fa fa-heart"></i> Character</div>
+        <div class="side-header"><i class="fa fa-users"></i> Characters</div>
         <div class="side-user-info">
             <div class="side-avatar" id="side-pfp"></div>
-            <a href="#" id="side-user-link" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
+            <a href="#" id="side-username" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
         </div>
-        <div class="side-nav">
-            <a href="#" class="active"><i class="fa fa-file-alt"></i> Profile</a>
-            <a href="#" id="link-gallery"><i class="fa fa-image"></i> Gallery <span id="count-gallery" class="badge bg-light text-dark float-end">0</span></a>
-            <div id="owner-panel" style="display:none; margin-top:10px;">
-                <div class="cp-header" onclick="this.parentElement.classList.toggle('cp-active')">
-                    <i class="fa fa-wrench"></i> Control Panel <i class="fa fa-caret-down float-end"></i>
-                </div>
-                <div class="cp-subnav">
-                    <a href="#" id="edit-char-link"><i class="fa fa-pencil"></i> Manage Character</a>
-                    <a href="#" id="edit-imgs-link"><i class="fa fa-images"></i> Manage Images</a>
-                    <a href="#" id="edit-warnings-link"><i class="fa fa-exclamation-triangle"></i> Character Warnings</a>
-                </div>
+        <div class="side-nav" id="folder-list">
+            <a href="javascript:void(0)" onclick="loadCharacters('all')" class="active"><i class="fa fa-folder"></i> All Characters</a>
+            <a href="javascript:void(0)" onclick="loadCharacters('unsorted')"><i class="fa fa-folder-open"></i> Unsorted</a>
+            <div class="side-label">Folders</div>
             </div>
-        </div>
     </aside>
 
     <main class="main">
-        <div class="mb-2">
-            <a href="#" id="dynamic-back-btn" class="text-muted small text-decoration-none"><i class="fa fa-arrow-left"></i> Back to Profile</a>
-        </div>
-        
-        <div class="d-flex gap-3 mb-4">
-            <div class="char-main-pfp" id="main-pfp"></div>
-            <div>
-                <h2 class="m-0"><a href="#" id="refresh-link" class="text-dark text-decoration-none"><i class="fa fa-lock"></i> <span id="display-name">...</span></a></h2>
-                <div class="small"><i class="fa fa-user"></i> <a href="#" id="creator-link" style="color:#4e92ac; font-weight:bold; text-decoration:none;">User</a></div>
+        <div class="folder-header">
+            <h3 id="folder-title">All Characters</h3>
+            <div id="owner-tools" style="display:none;">
+                <a href="create_character.html" class="btn btn-sm btn-primary" style="background:var(--th-blue); border:none;"><i class="fa fa-plus"></i> Create</a>
             </div>
         </div>
-        <div id="bio-content"></div>
-        <h5 class="border-bottom pb-2 mt-4">Recent Images</h5>
-        <div class="row g-2" id="gallery-preview"></div>
+        
+        <div class="char-grid" id="character-display">
+            <div class="text-muted">Loading characters...</div>
+        </div>
     </main>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
     const auth = getAuth();
-    const charId = new URLSearchParams(window.location.search).get('id');
 
-    onAuthStateChanged(auth, (user) => {
-        onSnapshot(doc(db, "characters", charId), async (snap) => {
-            if(!snap.exists()) return;
-            const data = snap.data();
+    const urlParams = new URLSearchParams(window.location.search);
+    let targetUserId = urlParams.get('user');
+
+    onAuthStateChanged(auth, async (user) => {
+        // If no user in URL, default to the logged-in user
+        if (!targetUserId && user) targetUserId = user.uid;
+        
+        if (targetUserId) {
+            setupProfile(targetUserId);
+            loadCharacters('all');
+            loadFolders(targetUserId);
             
-            // Warning Logic
-            if (data.warningActive && !sessionStorage.getItem(`warn_${charId}`)) {
-                document.getElementById('warning-overlay').style.display = 'block';
-                document.getElementById('warning-text').innerHTML = data.warningContent || "Warning: Sensitive content.";
-                document.getElementById('proceed-btn').onclick = () => {
-                    sessionStorage.setItem(`warn_${charId}`, 'true');
-                    document.getElementById('warning-overlay').style.display = 'none';
-                };
+            // Show create button only if viewing your own list
+            if (user && user.uid === targetUserId) {
+                document.getElementById('owner-tools').style.display = "block";
             }
-
-            document.getElementById('display-name').innerText = data.name;
-            document.getElementById('refresh-link').href = `character.html?id=${charId}`;
-            document.getElementById('main-pfp').style.backgroundImage = `url('${data.avatar}')`;
-            document.getElementById('bio-content').innerHTML = data.description || "";
-            
-            // Sync Owner Data & Links
-            const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
-            if(ownerSnap.exists()){
-                const oData = ownerSnap.data();
-                
-                // --- THE BACK BUTTON FIX APPLIED HERE ---
-                document.getElementById('dynamic-back-btn').href = `user.html?id=${data.ownerId}`;
-                
-                document.getElementById('side-user-link').innerText = oData.username;
-                document.getElementById('side-user-link').href = `user.html?id=${data.ownerId}`;
-                document.getElementById('creator-link').innerText = oData.username;
-                if(oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
-            }
-
-            const gallery = data.gallery || [];
-            document.getElementById('count-gallery').innerText = gallery.length;
-            document.getElementById('link-gallery').href = `character_gallery.html?id=${charId}`;
-            document.getElementById('gallery-preview').innerHTML = gallery.slice(0,6).map(img => `<div class="col-4"><div style="aspect-ratio:1/1; background:url('${img}') center/cover; border:1px solid #ddd;"></div></div>`).join('');
-
-            // Control Panel Display logic
-            if (user && user.uid === data.ownerId) {
-                document.getElementById('owner-panel').style.display = "block";
-                document.getElementById('edit-char-link').href = `edit_character.html?id=${charId}`;
-                document.getElementById('edit-imgs-link').href = `manage_images.html?id=${charId}`;
-                document.getElementById('edit-warnings-link').href = `edit_warnings.html?id=${charId}`;
-            }
-        });
+        } else {
+            document.getElementById('character-display').innerHTML = "<div class='p-3'>Please log in to view your characters.</div>";
+        }
     });
+
+    async function setupProfile(uid) {
+        const snap = await getDoc(doc(db, "users", uid));
+        if (snap.exists()) {
+            const data = snap.data();
+            document.getElementById('side-username').innerText = data.username;
+            document.getElementById('side-username').href = `user.html?id=${uid}`;
+            if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+        }
+    }
+
+    async function loadFolders(uid) {
+        const q = query(collection(db, "folders"), where("ownerId", "==", uid));
+        const snap = await getDocs(q);
+        const list = document.getElementById('folder-list');
+        snap.forEach(doc => {
+            const folder = doc.data();
+            list.innerHTML += `<a href="javascript:void(0)" onclick="loadCharacters('${doc.id}', '${folder.name}')"><i class="fa fa-folder"></i> ${folder.name}</a>`;
+        });
+    }
+
+    window.loadCharacters = async (folderId, folderName = "All Characters") => {
+        document.getElementById('folder-title').innerText = folderName === "unsorted" ? "Unsorted" : folderName;
+        const grid = document.getElementById('character-display');
+        grid.innerHTML = "<div class='text-muted'>Loading...</div>";
+
+        let q;
+        if (folderId === 'all') {
+            q = query(collection(db, "characters"), where("ownerId", "==", targetUserId));
+        } else if (folderId === 'unsorted') {
+            // This pulls characters where folderId is empty or non-existent
+            q = query(collection(db, "characters"), where("ownerId", "==", targetUserId), where("folderId", "in", ["", null]));
+        } else {
+            q = query(collection(db, "characters"), where("ownerId", "==", targetUserId), where("folderId", "==", folderId));
+        }
+
+        try {
+            const snap = await getDocs(q);
+            grid.innerHTML = snap.empty ? "<div class='text-muted'>No characters found in this folder.</div>" : "";
+            
+            snap.forEach(doc => {
+                const char = doc.data();
+                grid.innerHTML += `
+                    <a href="character.html?id=${doc.id}" class="char-card">
+                        <div class="char-thumb" style="background-image: url('${char.avatar || ''}')"></div>
+                        <div class="char-name">${char.name || 'Unnamed'}</div>
+                    </a>`;
+            });
+        } catch (err) {
+            console.error(err);
+            grid.innerHTML = "<div class='text-danger'>Error loading characters. Check console.</div>";
+        }
+    };
 </script>
 </body>
 </html>
