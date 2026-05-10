@@ -4,35 +4,37 @@
     <meta charset="UTF-8">
     <title>Profile Comments | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
-        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
-        body { margin: 0; font-family: sans-serif; background: var(--th-bg); }
-        .wrapper { max-width: 900px; margin: 30px auto; background: white; border: 1px solid var(--border); padding: 30px; border-radius: 4px; }
-        .header { font-size: 18px; font-weight: bold; color: var(--th-blue); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-        .comment-item { display: flex; gap: 15px; margin-top: 20px; border: 1px solid #eee; padding: 15px; border-radius: 4px; }
-        .user-thumb { width: 60px; height: 60px; background: #eee; border-radius: 4px; }
-        .btn-post { background: var(--th-blue); color: white; border: none; padding: 12px; width: 100%; margin-top: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; }
+        /* ... RE-PASTE ALL CSS FROM DASHBOARD ABOVE ... */
+        .comment-header { font-size: 24px; margin-bottom: 10px; color: #333; }
+        .comment-input-area { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 30px; }
+        .comment-input-area textarea { flex: 1; height: 80px; border: 1px solid #ccc; border-radius: 4px; padding: 10px; }
+        .btn-post { background: #eee; border: 1px solid #ccc; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        
+        .comment-card { display: flex; gap: 15px; border: 1px solid #eee; padding: 15px; margin-top: 10px; border-radius: 4px; }
+        .comm-user-box { width: 60px; text-align: center; }
+        .comm-avatar { width: 60px; height: 60px; background: #eee; border-radius: 4px; }
+        .comm-name { font-weight: bold; color: var(--th-blue); font-size: 12px; margin-top: 5px; }
     </style>
 </head>
 <body>
 <div class="wrapper">
-    <div class="header"><i class="fa fa-user"></i> militarygrade's Profile Comments</div>
-    <textarea id="editor"></textarea>
-    <button class="btn-post">Post Comment</button>
-    
-    <div id="comment-list">
-        <div class="comment-item">
-            <div class="user-thumb"></div>
-            <div>
-                <div style="font-weight:bold; color:var(--th-blue); font-size:13px;">ashxer_rr</div>
-                <div style="font-size:14px; margin-top:5px;">toyhouse</div>
+    <main class="main">
+        <div class="comment-header">militarygrade's Profile Comments</div>
+        <div class="comment-input-area">
+            <textarea placeholder="Write a comment..."></textarea>
+            <button class="btn-post">Post Comment</button>
+        </div>
+        <div id="comments-list">
+            <div class="comment-card">
+                <div class="comm-user-box">
+                    <div class="comm-avatar"></div>
+                    <div class="comm-name">ashxer_rr</div>
+                </div>
+                <div style="font-size:14px; padding-top: 5px;">toyhouse</div>
             </div>
         </div>
-    </div>
+    </main>
 </div>
-<script>
-    tinymce.init({ selector: '#editor', height: 250, menubar: false, toolbar_mode: 'wrap' });
-</script>
 </body>
 </html>
