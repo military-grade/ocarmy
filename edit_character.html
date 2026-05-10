@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Edit Character | OCARMY</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
+</head>
+<body>
+    <div class="wrapper">
+        <main class="main">
+            <h3>Manage Character</h3>
+            <div class="card p-4">
+                <label class="fw-bold">Name</label>
+                <input type="text" id="edit-name" class="form-control mb-3">
+
+                <label class="fw-bold">Profile Content (Bio)</label>
+                <textarea id="edit-bio"></textarea>
+
+                <button class="btn btn-primary mt-4" id="save-edit">Save Changes</button>
+            </div>
+        </main>
+    </div>
+
+<script type="module">
+    // ... (Firebase setup) ...
+    const charId = new URLSearchParams(window.location.search).get('id');
+
+    // Init TinyMCE
+    tinymce.init({ selector: '#edit-bio', height: 400, plugins: 'code link image lists', toolbar: 'undo redo | bold italic | code' });
+
+    // CARRY OVER THE BIO FOR EDITING
+    onSnapshot(doc(db, "characters", charId), (snap) => {
+        const data = snap.data();
+        document.getElementById('edit-name').value = data.name;
+        
+        // Wait for TinyMCE to load, then set the bio
+        setTimeout(() => {
+            tinymce.get('edit-bio').setContent(data.description || "");
+        }, 1000);
+    });
+
+    document.getElementById('save-edit').onclick = async () => {
+        await updateDoc(doc(db, "characters", charId), {
+            name: document.getElementById('edit-name').value,
+            description: tinymce.get('edit-bio').getContent()
+        });
+        window.location.href = `character.html?id=${charId}`;
+    };
+</script>
+</body>
+</html>
