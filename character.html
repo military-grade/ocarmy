@@ -11,7 +11,7 @@
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
 
-        /* Left Sidebar - Exact Toyhouse Replication */
+        /* Left Sidebar */
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-header { background: #427e95; padding: 10px 15px; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(0,0,0,0.1); }
         .side-user-info { padding: 12px 15px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); }
@@ -19,7 +19,7 @@
         .side-folder-header { background: #56a0ba; padding: 8px 15px; font-weight: bold; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .side-oc-link { padding: 10px 15px; display: flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-size: 13px; background: rgba(255,255,255,0.05); }
         
-        .side-nav a { display: block; padding: 8px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.1s; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.1s; }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
         .side-nav a i { width: 18px; text-align: center; margin-right: 5px; opacity: 0.8; }
         .badge-count { background: rgba(255,255,255,0.2); font-size: 10px; padding: 2px 6px; border-radius: 10px; float: right; }
@@ -29,27 +29,26 @@
         /* Control Panel Dropdown */
         .cp-header { background: var(--side-teal); color: white; padding: 10px 15px; font-weight: bold; font-size: 13px; cursor: pointer; }
         .cp-subnav { background: #f1f8fb; display: none; }
-        .cp-subnav a { display: block; padding: 8px 20px; color: #4e92ac; text-decoration: none; font-size: 12px; border-bottom: 1px solid #e1eef2; }
+        .cp-subnav a { display: block; padding: 8px 20px; color: #4e92ac !important; text-decoration: none; font-size: 12px; border-bottom: 1px solid #e1eef2; }
         .cp-subnav a:hover { background: #e6f2f6; }
         .cp-active .cp-subnav { display: block; }
 
-        /* Main Content Area */
+        /* Main Content */
         .main { flex: 1; padding: 25px; border-right: 1px solid #eee; }
         .char-header-row { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 25px; }
         .char-main-pfp { width: 100px; height: 100px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
         .char-name-area h2 { margin: 0; font-size: 26px; font-weight: normal; color: #444; }
-        .char-name-area h2 a { color: #444; text-decoration: none; }
+        .char-name-area h2 a { color: #444; text-decoration: none; display: flex; align-items: center; gap: 10px; }
         
         .section-title { font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin: 30px 0 15px; font-weight: 500; }
-        .bio-render { line-height: 1.6; }
+        .gallery-preview-item { aspect-ratio: 1/1; border: 1px solid #ddd; border-radius: 2px; background-size: cover; background-position: center; }
 
         /* Stats Right Column */
         .stats-col { width: 260px; padding: 25px; background: #fafafa; flex-shrink: 0; font-size: 13px; }
-        .stat-box { margin-bottom: 20px; }
         .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #eee; }
         .stat-label { font-weight: bold; color: #666; }
         
-        .btn-delete-final { color: #d9534f !important; font-weight: bold; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; cursor: pointer; }
+        .btn-delete-final { color: #d9534f !important; font-weight: bold; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; cursor: pointer; text-decoration: none; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -79,16 +78,15 @@
             <a href="#"><i class="fa fa-comments"></i> Comments</a>
             <a href="#"><i class="fa fa-star"></i> Favorite <span class="badge-count">0</span></a>
             <a href="#"><i class="fa fa-check-square"></i> Ownership</a>
-            <a href="#"><i class="fa fa-exclamation-triangle"></i> Report</a>
             
             <div id="owner-panel" style="display:none; margin-top:10px;">
                 <div class="cp-header" onclick="this.parentElement.classList.toggle('cp-active')">
                     <i class="fa fa-wrench"></i> Control Panel <i class="fa fa-caret-down float-end mt-1"></i>
                 </div>
                 <div class="cp-subnav">
-                    <a href="#" id="edit-char-link">Manage Character</a>
-                    <a href="#" id="edit-imgs-link">Manage Images</a>
-                    <a href="#">Manage Literatures</a>
+                    <a href="#" id="edit-char-link"><i class="fa fa-pencil"></i> Manage Character</a>
+                    <a href="#" id="edit-imgs-link"><i class="fa fa-images"></i> Manage Images</a>
+                    <a href="#" id="edit-warnings-link"><i class="fa fa-exclamation-triangle"></i> Character Warnings</a>
                 </div>
                 <div class="btn-delete-final" onclick="confirmDelete()"><i class="fa fa-trash"></i> Delete Character</div>
             </div>
@@ -96,6 +94,10 @@
     </aside>
 
     <main class="main">
+        <div class="mb-2">
+            <a href="dashboard.html" class="text-muted small text-decoration-none"><i class="fa fa-arrow-left"></i> Back to Profile</a>
+        </div>
+
         <div class="char-header-row">
             <div class="char-main-pfp" id="main-pfp"></div>
             <div class="char-name-area">
@@ -107,26 +109,22 @@
         </div>
 
         <div class="section-title">Basic Info</div>
-        <div class="d-flex gap-5">
-            <div><span class="fw-bold me-3">Worth</span> <span id="display-worth">$0.00</span></div>
-        </div>
+        <div class="mb-4"><span class="fw-bold me-3">Worth</span> <span id="display-worth">$0.00</span></div>
 
         <div class="section-title">Profile</div>
-        <div id="bio-content" class="bio-render"></div>
+        <div id="bio-content"></div>
 
         <div class="section-title d-flex justify-content-between align-items-center">
             Recent Images
-            <button class="btn btn-sm btn-outline-secondary" style="font-size:11px;">View More</button>
+            <a href="#" id="view-more-gallery" class="btn btn-sm btn-outline-secondary" style="font-size:11px;">View More</a>
         </div>
         <div class="row g-2" id="gallery-preview"></div>
     </main>
 
     <aside class="stats-col">
-        <div class="stat-box">
-            <div class="stat-row"><span class="stat-label">Created</span><span id="stat-date">-</span></div>
-            <div class="stat-row"><span class="stat-label">Creator</span><span id="stat-creator">-</span></div>
-            <div class="stat-row"><span class="stat-label">Favorites</span><span>0</span></div>
-        </div>
+        <div class="stat-row"><span class="stat-label">Created</span><span id="stat-date">-</span></div>
+        <div class="stat-row"><span class="stat-label">Creator</span><span id="stat-creator">-</span></div>
+        <div class="stat-row"><span class="stat-label">Favorites</span><span>0</span></div>
     </aside>
 </div>
 
@@ -146,19 +144,19 @@
             if (!snap.exists()) return;
             const data = snap.data();
 
-            // Sync Header & Sidebar
+            // Populate Content
             document.getElementById('display-name').innerText = data.name;
             document.getElementById('side-name').innerText = data.name;
             document.getElementById('clickable-name').href = `character.html?id=${charId}`;
+            document.getElementById('side-name-link').href = `character.html?id=${charId}`;
             document.getElementById('main-pfp').style.backgroundImage = `url('${data.avatar}')`;
             document.getElementById('display-worth').innerText = `$${data.worth || "0.00"}`;
             document.getElementById('bio-content').innerHTML = data.description || "<i>No profile description.</i>";
             
-            // Sync Stats
             document.getElementById('stat-creator').innerText = data.designer || "Unknown";
             document.getElementById('stat-date').innerText = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : "-";
 
-            // Sync User/Owner Info
+            // Sync Creator/Owner Data
             const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
             if(ownerSnap.exists()){
                 const oData = ownerSnap.data();
@@ -167,18 +165,21 @@
                 if(oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
             }
 
-            // Gallery Preview
+            // Gallery logic
             const gallery = data.gallery || [];
             document.getElementById('count-gallery').innerText = gallery.length;
+            document.getElementById('link-gallery').href = `character_gallery.html?id=${charId}`;
+            document.getElementById('view-more-gallery').href = `character_gallery.html?id=${charId}`;
             document.getElementById('gallery-preview').innerHTML = gallery.slice(0, 6).map(img => `
-                <div class="col-4"><div style="aspect-ratio:1/1; border:1px solid #ddd; background:url('${img}') center/cover;"></div></div>
+                <div class="col-4"><div class="gallery-preview-item" style="background-image:url('${img}')"></div></div>
             `).join('');
 
-            // Owner Panel Logic
+            // Control Panel Display
             if (user && (user.uid === data.ownerId || !data.ownerId)) {
                 document.getElementById('owner-panel').style.display = "block";
                 document.getElementById('edit-char-link').href = `edit_character.html?id=${charId}`;
                 document.getElementById('edit-imgs-link').href = `manage_images.html?id=${charId}`;
+                document.getElementById('edit-warnings-link').href = `edit_warnings.html?id=${charId}`;
             }
         });
     });
