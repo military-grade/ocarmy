@@ -11,7 +11,6 @@
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .nav-left { display: flex; gap: 15px; align-items: center; height: 100%; }
         .nav-left a, .nav-item { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 5px; }
-        .nav-left a:hover, .nav-item:hover { color: white; }
         
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
         .dropdown-content { display: none; position: absolute; top: 50px; left: 0; background: white; border: 1px solid var(--border); min-width: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1001; }
@@ -19,8 +18,7 @@
         .dropdown-content a { display: block; padding: 10px 15px; color: #333 !important; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; }
         .show { display: block; }
 
-        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-top: none; min-height: calc(100vh - 50px); align-items: stretch; }
-
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); align-items: stretch; }
         .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-user-header { background: #427e95; padding: 10px 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .side-avatar-box { width: 50px; height: 50px; background: #eee; border-radius: 2px; background-size: cover; flex-shrink: 0; }
@@ -29,13 +27,12 @@
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
-
         .main { flex: 1; padding: 30px; background: white; }
+        
         .folder-header { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 10px 15px; border: 1px solid var(--border); border-radius: 4px; margin-top: 30px; }
         .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; padding: 20px 0; }
         .char-card { text-align: center; text-decoration: none; color: inherit; }
         .char-thumb { width: 130px; height: 130px; background: #eee; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; margin-bottom: 5px; }
-        .char-name-tag { font-size: 12px; font-weight: bold; color: var(--th-blue); display: flex; align-items: center; justify-content: center; gap: 5px; }
     </style>
     <style id="user-custom-css"></style>
 </head>
@@ -48,14 +45,11 @@
         <div class="dropdown">
             <div class="nav-item" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></div>
             <div id="drop-submit" class="dropdown-content">
-                <a href="create_character.html"><i class="fa fa-user"></i> Character</a>
-                <a href="create_folder.html"><i class="fa fa-folder"></i> Folder</a>
-                <a href="create_bulletin.html"><i class="fa fa-newspaper"></i> Bulletin</a>
+                <a href="create_character.html">Character</a>
+                <a href="create_folder.html">Folder</a>
             </div>
         </div>
         <a href="#"><i class="fa fa-search"></i> Search</a>
-        <a href="#"><i class="fa fa-info-circle"></i> Info</a>
-        <a href="#"><i class="fa fa-newspaper"></i> Blogs</a>
     </div>
     <div class="dropdown">
         <div class="nav-item" onclick="toggleDrop('drop-user')">
@@ -64,7 +58,6 @@
         </div>
         <div id="drop-user" class="dropdown-content dropdown-right">
             <a href="dashboard.html">Profile</a>
-            <a href="settings.html">Settings</a>
             <a href="#" id="logout-btn">Logout</a>
         </div>
     </div>
@@ -77,21 +70,17 @@
             <div class="side-user-name" id="side-user-text">User</div>
         </div>
         <div class="side-nav">
-            <a href="dashboard.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-user"></i> Profile</a>
-            <a href="#"><i class="fa fa-comment"></i> Bulletins</a>
+            <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
             <a href="#"><i class="fa fa-users"></i> Characters</a>
             <div class="side-label">Portfolio</div>
             <a href="#"><i class="fa fa-paint-brush"></i> Designs</a>
             <a href="#"><i class="fa fa-image"></i> Art</a>
-            <div class="side-label">Interaction</div>
-            <a href="#"><i class="fa fa-comments"></i> Comments</a>
-            <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
         </div>
     </aside>
     <main class="main">
         <div id="profile-blurb"></div>
         <div class="folder-header"><span style="font-weight:bold;"><i class="fa fa-folder-open"></i> Unsorted</span></div>
-        <div class="char-grid" id="character-gallery"></div>
+        <div class="char-grid" id="char-list"></div>
     </main>
 </div>
 
@@ -124,15 +113,14 @@
                 document.getElementById('profile-blurb').innerHTML = data.profileHTML || "";
             }
             const q = query(collection(db, "characters"), where("ownerId", "==", user.uid));
-            const querySnapshot = await getDocs(q);
-            const gallery = document.getElementById('character-gallery');
-            querySnapshot.forEach((doc) => {
-                const char = doc.data();
-                gallery.innerHTML += `<a href="character.html?id=${doc.id}" class="char-card"><div class="char-thumb" style="background-image: url('${char.avatar || ''}')"></div><div class="char-name-tag">${char.name}</div></a>`;
+            const snap = await getDocs(q);
+            const list = document.getElementById('char-list');
+            snap.forEach(d => {
+                const c = d.data();
+                list.innerHTML += `<a href="character.html?id=${d.id}" class="char-card"><div class="char-thumb" style="background-image:url('${c.avatar}')"></div><div style="font-size:12px; font-weight:bold; color:#4e92ac;">${c.name}</div></a>`;
             });
         }
     });
-    document.getElementById('logout-btn').onclick = () => signOut(auth);
 </script>
 </body>
 </html>
