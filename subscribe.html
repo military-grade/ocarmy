@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Subscribe | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; --th-green: #7eb671; }
+        body { font-family: sans-serif; background: var(--th-bg); padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .header-pfp { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-weight: bold; color: var(--th-blue); justify-content: center; }
+        .header-pfp img { width: 30px; height: 30px; border-radius: 2px; }
+
+        .sub-info { font-size: 14px; margin-bottom: 20px; color: #444; }
+
+        .sub-card { background: #f9f9f9; border: 1px solid var(--border); border-radius: 4px; padding: 20px; }
+        .sub-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
+        .sub-option { background: white; border: 1px solid var(--border); padding: 15px; display: flex; align-items: center; gap: 10px; border-radius: 4px; }
+        
+        .btn-submit-sub { background: var(--th-green); color: white; border: none; width: 100%; padding: 12px; font-weight: bold; border-radius: 4px; margin-top: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-pfp">
+        <img id="target-pfp" src="https://via.placeholder.com/30">
+        <span id="target-username">User</span>
+    </div>
+    
+    <div class="sub-info">Subscribing to a user notifies you whenever the user submits a character, bulletin or image. This can be undone at any time.</div>
+
+    <div class="sub-card">
+        <div style="font-weight: bold;">Subscribe</div>
+        <div class="sub-grid">
+            <div class="sub-option"><input type="checkbox" checked> Characters</div>
+            <div class="sub-option"><input type="checkbox" checked> Images</div>
+            <div class="sub-option"><input type="checkbox" checked> Bulletins</div>
+            <div class="sub-option"><input type="checkbox" checked> Literatures</div>
+        </div>
+    </div>
+    
+    <button class="btn-submit-sub" onclick="alert('Subscribed!')">Subscribe</button>
+</div>
+</body>
+</html>
