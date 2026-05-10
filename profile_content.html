@@ -5,19 +5,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
-        :root { --th-blue: #008eb0; --th-teal: #5bc0de; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
+        :root { --th-blue: #008eb0; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; display: flex; }
 
         /* Sidebar: White & Blue */
-        .sidebar { width: 240px; background: #fff; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; }
+        .sidebar { width: 250px; background: #fff; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; }
         .side-header { padding: 15px; background: var(--th-blue); color: white; display: flex; align-items: center; gap: 10px; font-weight: bold; }
         .nav-link { display: block; padding: 12px 20px; color: #555; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; }
+        .nav-link:hover { background: #f9f9f9; }
         .nav-link.active { background: #f0f0f0; border-left: 4px solid var(--th-blue); font-weight: bold; color: #333; }
 
+        /* Main Area */
         .main { flex-grow: 1; padding: 30px; max-width: 1100px; margin: 0 auto; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-wysiwyg { background: #333; color: white; border: none; padding: 6px 15px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+
+        /* Editor Wrapper */
+        .editor-wrapper { border: 1px solid #ccc; border-radius: 4px; background: white; margin-bottom: 25px; }
+
+        /* Profile Block Cards */
         .card { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 20px; margin-top: 20px; }
+        .card-header { font-size: 12px; font-weight: bold; color: #666; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; text-transform: uppercase; }
         
-        .btn-save { background: var(--th-blue); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 20px; }
+        select { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; background: #f9f9f9; }
+        .btn-save { background: var(--th-blue); color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; cursor: pointer; font-weight: bold; font-size: 15px; margin-top: 20px; }
+        .btn-save:hover { background: #007a99; }
     </style>
 </head>
 <body>
@@ -29,45 +41,59 @@
     </div>
     <a href="dashboard.html" class="nav-link"><i class="fa fa-arrow-left"></i> Back to Profile</a>
     <a href="settings.html" class="nav-link">Account Settings</a>
-    <a href="#" class="nav-link active">Profile Content</a>
+    <a href="profile_content.html" class="nav-link active">Profile Content</a>
 </div>
 
 <div class="main">
-    <h2 style="color: #444;">Edit Profile Content</h2>
+    <div class="header-flex">
+        <h2 style="margin:0; color: #444;">Edit Profile Content</h2>
+        <button class="btn-wysiwyg" onclick="toggleEditor()">Disable WYSIWYG</button>
+    </div>
 
-    <div style="border: 1px solid #ccc; border-radius: 4px; overflow: hidden;">
-        <textarea id="editor-body">
-            hello! I am the owner of ocarmy.
-        </textarea>
+    <div class="editor-wrapper">
+        <textarea id="editor-body">Type your profile bio here...</textarea>
     </div>
 
     <div class="card">
-        <div style="font-size: 12px; font-weight: bold; color: #666; margin-bottom: 15px; text-transform: uppercase;">Profile Page Blocks</div>
-        <select id="block-recent" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
+        <div class="card-header">Profile Page Blocks</div>
+        <select id="block-recent">
             <option value="all">Display recent characters and designs</option>
             <option value="none">Hide</option>
         </select>
     </div>
 
-    <button class="btn-save" onclick="saveChanges()">Save Changes</button>
+    <button class="btn-save" onclick="saveProfile()">Save Changes</button>
 </div>
 
 <script>
     tinymce.init({
         selector: '#editor-body',
         height: 500,
-        plugins: 'lists link image charmap emoticons table code fullscreen hr',
-        // All 27 functions requested
+        plugins: 'lists link image charmap emoticons table code fullscreen',
+        // This specific string sets the exact order of buttons
         toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | subscript superscript | forecolor backcolor | emoticons charmap | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote hr | link image table | removeformat | code fullscreen',
+        toolbar_mode: 'wrap', // CRITICAL FIX: This forces the toolbar to wrap to multiple lines instead of using the "..." dropdown
         menubar: false,
-        content_style: 'body { font-family:Arial; font-size:14px; text-align:center; white-space: pre-wrap; }',
-        branding: false
+        branding: false,
+        // Ensures spacing acts like a normal text document
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px; text-align:center; } p { margin: 16px 0; }'
     });
+
+    function toggleEditor() {
+        const btn = document.querySelector('.btn-wysiwyg');
+        if (tinymce.get('editor-body').isHidden()) {
+            tinymce.get('editor-body').show();
+            btn.innerText = "Disable WYSIWYG";
+        } else {
+            tinymce.get('editor-body').hide();
+            btn.innerText = "Enable WYSIWYG";
+        }
+    }
 </script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
@@ -83,29 +109,50 @@
     const db = getFirestore(app);
     const auth = getAuth();
 
+    // Load saved data into the editor
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (userDoc.exists()) {
                 const data = userDoc.data();
-                document.getElementById('side-user').innerText = data.username;
+                document.getElementById('side-user').innerText = data.username || "User";
                 if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
                 
+                // Set the editor content safely
                 tinymce.get('editor-body').on('init', () => {
-                    if(data.profileHTML) tinymce.get('editor-body').setContent(data.profileHTML);
+                    if(data.profileHTML) {
+                        tinymce.get('editor-body').setContent(data.profileHTML);
+                    }
                 });
             }
+        } else {
+            window.location.href = "index.html"; // Boot out if not logged in
         }
     });
 
-    window.saveChanges = async () => {
+    // The robust save function
+    window.saveProfile = async () => {
         const user = auth.currentUser;
-        const content = tinymce.get('editor-body').getContent();
-        await updateDoc(doc(db, "users", user.uid), {
-            profileHTML: content,
-            blockRecent: document.getElementById('block-recent').value
-        });
-        alert("Profile saved!");
+        if (!user) {
+            alert("You are not logged in!");
+            return;
+        }
+
+        try {
+            // Force TinyMCE to update the underlying textarea, then grab the HTML content
+            tinymce.triggerSave();
+            const content = tinymce.get('editor-body').getContent();
+            
+            // updateDoc (with merge: true just in case the document is fresh)
+            await setDoc(doc(db, "users", user.uid), {
+                profileHTML: content,
+                blockRecent: document.getElementById('block-recent').value
+            }, { merge: true });
+            
+            alert("Profile content saved successfully!");
+        } catch (error) {
+            alert("Error saving: " + error.message);
+        }
     };
 </script>
 </body>
