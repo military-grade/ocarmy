@@ -5,15 +5,33 @@
     <title>Designs | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* ... CSS carried from dashboard.html ... */
-        .page-header { font-size: 20px; font-weight: bold; color: var(--th-blue); border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: sans-serif; background: var(--th-bg); }
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
+        .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .main { flex: 1; padding: 30px; }
+        .page-header { font-size: 18px; font-weight: bold; color: var(--th-blue); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .char-card { text-align: center; text-decoration: none; color: inherit; }
+        .char-thumb { width: 140px; height: 140px; background: #eee; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; margin-bottom: 5px; }
+        .char-name-badge { background: var(--th-blue); color: white; padding: 4px 8px; font-size: 11px; font-weight: bold; border-radius: 4px; display: inline-block; }
     </style>
 </head>
 <body>
+<div class="wrapper">
+    <aside class="sidebar">
+        <div style="padding:15px; background:rgba(0,0,0,0.1); font-weight:bold;">militarygrade</div>
+        <div class="side-nav">
+            <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
+            <a href="designs.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-paint-brush"></i> Designs</a>
+        </div>
+    </aside>
     <main class="main">
-        <div class="page-header"><i class="fa fa-user"></i> <span id="user-header">User</span>'s Designs</div>
+        <div class="page-header"><i class="fa fa-user"></i> militarygrade's Designs</div>
         <div class="char-grid" id="design-list">
             </div>
     </main>
+</div>
 </body>
 </html>
