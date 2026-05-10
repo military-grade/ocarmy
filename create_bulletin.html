@@ -2,56 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Bulletin | OCARMY</title>
+    <title>New Bulletin | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
-        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; }
-        body { font-family: sans-serif; background: var(--th-bg); padding: 20px; }
-        .card { background: white; border: 1px solid var(--border); border-radius: 4px; max-width: 900px; margin: 0 auto 20px; }
-        .card-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); }
-        .card-body { padding: 20px; }
-        .toggle-btn { background: #eee; border: 1px solid #ccc; padding: 8px 15px; cursor: pointer; border-radius: 4px; margin-bottom: 15px; display: inline-block; font-size: 13px; font-weight: bold; }
-        .active-toggle { background: var(--th-blue); color: white; border-color: var(--th-blue); }
-        #poll-options { display: none; margin-top: 15px; border: 1px solid #eee; padding: 15px; background: #fff; }
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: sans-serif; background: var(--th-bg); }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; }
+        .wrapper { max-width: 900px; margin: 30px auto; background: white; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+        .header { background: #f9f9f9; padding: 15px; font-weight: bold; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .body { padding: 25px; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-poll { background: #eee; border: 1px solid #ccc; padding: 8px 15px; cursor: pointer; font-weight: bold; margin-bottom: 20px; display: inline-block; }
+        .active-poll { background: var(--th-blue); color: white; border-color: var(--th-blue); }
+        .btn-post { background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-weight: bold; font-size: 16px; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="card-header">New Bulletin</div>
-        <div class="card-body">
-            <div class="toggle-btn" id="ooc-toggle" onclick="this.classList.toggle('active-toggle')">OOC Update</div>
-            
-            <input type="text" placeholder="Subject" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px;">
-            
-            <textarea id="bulletin-editor"></textarea>
 
-            <div class="toggle-btn" onclick="togglePoll()" id="poll-btn">Add Poll</div>
-            <div id="poll-options">
-                <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Question</label>
-                <input type="text" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ccc; border-radius:4px;">
-                <button style="width:100%; padding:8px; border:1px dashed #ccc; background:none; cursor:pointer; color:#666;">+ Add Option</button>
-            </div>
+<nav class="navbar"><div style="font-weight:bold;">OCARMY</div></nav>
 
-            <button style="background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-weight: bold; margin-top:20px; border-radius:4px; font-size:16px;">Post Bulletin</button>
+<div class="wrapper">
+    <div class="header">New Bulletin</div>
+    <div class="body">
+        <label style="font-size:12px; font-weight:bold; color:#666; text-transform:uppercase;">Subject</label>
+        <input type="text" id="b-subject" placeholder="Enter bulletin title...">
+
+        <textarea id="editor"></textarea>
+
+        <div class="btn-poll" id="poll-btn" onclick="togglePoll()"><i class="fa fa-chart-bar"></i> Add Poll</div>
+        
+        <div id="poll-section" style="display:none; border:1px solid #eee; padding:20px; margin-bottom:20px;">
+            <label style="font-size:11px; font-weight:bold;">Poll Question</label>
+            <input type="text" placeholder="What is your question?">
+            <button style="width:100%; padding:10px; border:1px dashed #ccc; background:none; cursor:pointer;">+ Add Option</button>
         </div>
+
+        <button class="btn-post" onclick="submitBulletin()">Post Bulletin</button>
     </div>
-    <script>
-        tinymce.init({
-            selector: '#bulletin-editor',
-            height: 350,
-            menubar: false,
-            toolbar_mode: 'wrap',
-            plugins: 'link image code lists emoticons charmap table fullscreen',
-            toolbar: 'undo redo | bold italic underline | emoticons charmap | alignleft aligncenter alignright | numlist bullist | link image table | code fullscreen',
-            branding: false
-        });
-        function togglePoll() {
-            const p = document.getElementById('poll-options');
-            const btn = document.getElementById('poll-btn');
-            const isOpen = p.style.display === 'block';
-            p.style.display = isOpen ? 'none' : 'block';
-            btn.classList.toggle('active-toggle', !isOpen);
-        }
-    </script>
+</div>
+
+<script>
+    tinymce.init({
+        selector: '#editor',
+        height: 350,
+        menubar: false,
+        toolbar_mode: 'wrap',
+        plugins: 'link emoticons code lists',
+        toolbar: 'undo redo | bold italic underline | emoticons link | bullist numlist | code',
+        branding: false
+    });
+
+    function togglePoll() {
+        const sec = document.getElementById('poll-section');
+        const btn = document.getElementById('poll-btn');
+        const isHidden = sec.style.display === 'none';
+        sec.style.display = isHidden ? 'block' : 'none';
+        btn.classList.toggle('active-poll', isHidden);
+    }
+
+    async function submitBulletin() {
+        alert("Bulletin Posted!");
+        window.location.href = "dashboard.html";
+    }
+</script>
 </body>
 </html>
