@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Folder | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
+    <style>
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; display: flex; flex-direction: column; }
+
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .wrapper { display: flex; max-width: 1200px; margin: 0 auto; width: 100%; min-height: 100vh; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+
+        /* Sidebar */
+        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .side-header { background: rgba(0,0,0,0.1); padding: 15px; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .side-nav a:hover { background: rgba(0,0,0,0.1); }
+
+        /* Main Content */
+        .main { flex: 1; padding: 30px; }
+        .card { background: white; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 25px; }
+        .card-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .card-body { padding: 20px; }
+
+        label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; background: #fff; }
+        
+        .grid-row { display: grid; grid-template-columns: 1fr 1; gap: 20px; }
+        .btn-wysiwyg { background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; float: right; }
+        .btn-submit { background: var(--th-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div style="font-weight: bold;">OCARMY</div>
+    <a href="dashboard.html" style="color:white; text-decoration:none; font-size:13px;">Cancel</a>
+</nav>
+
+<div class="wrapper">
+    <aside class="sidebar">
+        <div class="side-header"><i class="fa fa-plus"></i> Submit</div>
+        <div class="side-nav">
+            <a href="create_character.html"><i class="fa fa-user"></i> Character</a>
+            <a href="create_folder.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-folder"></i> Folder</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <h2 style="margin-top:0;">Create Folder</h2>
+
+        <div class="card">
+            <div class="card-header">General Settings</div>
+            <div class="card-body">
+                <label>Thumbnail (Optional Image URL)</label>
+                <input type="text" id="folder-thumb" placeholder="Paste image link...">
+
+                <div class="grid-row" style="grid-template-columns: 2fr 1fr 1fr;">
+                    <div>
+                        <label>Folder Name</label>
+                        <input type="text" id="folder-name" required>
+                    </div>
+                    <div>
+                        <label>Parent Folder</label>
+                        <select id="parent-folder">
+                            <option value="none">None (Top Level)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Folder Privacy</label>
+                        <select id="folder-privacy">
+                            <option value="public">Public</option>
+                            <option value="protected">Protected</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label>Folder Sort</label>
+                <select id="folder-sort">
+                    <option value="default">Default</option>
+                    <option value="name">Name</option>
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                </select>
+
+                <label>Folder Description</label>
+                <div style="margin-bottom: 10px;">
+                    <button class="btn-wysiwyg" onclick="toggleWYSIWYG()">Disable WYSIWYG</button>
+                    <div style="clear:both;"></div>
+                </div>
+                <textarea id="folder-desc"></textarea>
+            </div>
+        </div>
+
+        <button class="btn-submit" onclick="saveFolder()">Create Folder</button>
+    </main>
+</div>
+
+<script>
+    tinymce.init({
+        selector: '#folder-desc',
+        height: 300,
+        menubar: false,
+        toolbar_mode: 'wrap',
+        plugins: 'link image code lists table emoticons charmap fullscreen',
+        toolbar: 'undo redo | bold italic underline | forecolor backcolor | emoticons charmap | bullist numlist | link image table | code fullscreen',
+        branding: false
+    });
+
+    function toggleWYSIWYG() {
+        const ed = tinymce.get('folder-desc');
+        ed.isHidden() ? ed.show() : ed.hide();
+    }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", 
+        authDomain: "ocarmy-db.firebaseapp.com", 
+        projectId: "ocarmy-db",
+        appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    // Load existing folders for the parent folder dropdown
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) return;
+        const q = query(collection(db, "folders"), where("ownerId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        const select = document.getElementById('parent-folder');
+        querySnapshot.forEach((doc) => {
+            const opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.text = doc.data().name;
+            select.add(opt);
+        });
+    });
+
+    window.saveFolder = async () => {
+        const user = auth.currentUser;
+        if (!user) return alert("Please log in.");
+
+        tinymce.triggerSave();
+        
+        const folderData = {
+            ownerId: user.uid,
+            name: document.getElementById('folder-name').value,
+            thumbnail: document.getElementById('folder-thumb').value,
+            parent: document.getElementById('parent-folder').value,
+            privacy: document.getElementById('folder-privacy').value,
+            sort: document.getElementById('folder-sort').value,
+            description: tinymce.get('folder-desc').getContent(),
+            createdAt: serverTimestamp()
+        };
+
+        if (!folderData.name) return alert("Folder name is required.");
+
+        try {
+            await addDoc(collection(db, "folders"), folderData);
+            alert("Folder Created!");
+            window.location.href = "dashboard.html";
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    };
+</script>
+</body>
+</html>
