@@ -13,23 +13,29 @@
         /* Sidebar */
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .side-nav a:hover { background: rgba(0,0,0,0.1); }
         
         .main { flex: 1; padding: 30px; border-left: 1px solid var(--border); }
         .char-header { display: flex; gap: 25px; margin-bottom: 30px; align-items: flex-start; }
-        .char-img { width: 120px; height: 120px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
+        .char-img { width: 120px; height: 120px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; border: 1px solid #eee; }
         
         /* Stats Box */
         .stats-box { width: 280px; border: 1px solid var(--border); border-radius: 4px; background: #fdfdfd; padding: 15px; font-size: 13px; }
         .stats-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
         .stats-label { color: #666; font-weight: bold; }
 
-        /* Comment System (Screenshot 64 Style) */
+        /* Gallery Grid */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
+        .gallery-item { position: relative; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; aspect-ratio: 1 / 1; background-size: cover; background-position: center; }
+        .edit-overlay { position: absolute; top: 5px; right: 5px; background: rgba(255,255,255,0.8); padding: 5px; border-radius: 3px; font-size: 12px; color: #333; display: none; }
+        .gallery-item:hover .edit-overlay { display: block; }
+
+        /* Comment System */
         .comment-header { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: bold; color: var(--th-blue); margin-top: 40px; margin-bottom: 15px; }
         .comment-box-outer { border: 1px solid var(--border); border-radius: 4px; padding: 15px; background: #fff; margin-bottom: 20px; }
         .comment-list-item { border: 1px solid var(--border); padding: 15px; margin-bottom: 10px; border-radius: 4px; }
         .reply-btn { font-size: 11px; color: var(--th-blue); cursor: pointer; text-decoration: underline; margin-top: 5px; display: inline-block; }
 
-        .btn-fav { color: white; background: rgba(0,0,0,0.1); }
         .fav-active { color: #ffc107 !important; }
     </style>
 </head>
@@ -43,6 +49,7 @@
             <a href="#"><i class="fa fa-folder"></i> Unsorted</a>
             <div style="font-size:10px; padding:15px 15px 5px; text-transform:uppercase; opacity:0.7;">Character</div>
             <a href="#"><i class="fa fa-image"></i> Gallery</a>
+            <a id="manage-images-link" style="color: #d9f3ff;">Manage Images <i class="fa fa-caret-right" style="float:right;"></i></a>
             <a href="#" id="fav-button"><i class="fa fa-star" id="fav-icon"></i> Favorite</a>
             <a href="#"><i class="fa fa-comments"></i> Comments</a>
         </div>
@@ -53,19 +60,22 @@
             <div class="char-img" id="char-avatar-display"></div>
             <div style="flex:1;">
                 <h1 style="margin:0; font-size: 28px;"><i class="fa fa-lock" id="privacy-lock"></i> <span id="char-name-display">Name</span></h1>
-                <a id="creator-link" style="color:var(--th-blue); font-weight:bold; text-decoration:none;">fourteendays</a>
+                <a id="creator-link" style="color:var(--th-blue); font-weight:bold; text-decoration:none;">Username</a>
             </div>
             <div class="stats-box">
                 <div class="stats-row"><span class="stats-label">Created</span> <span id="stat-created">---</span></div>
-                <div class="stats-row"><span class="stats-label">Creator</span> <a id="stat-creator-link" style="color:var(--th-blue); text-decoration:none;">fourteendays</a></div>
+                <div class="stats-row"><span class="stats-label">Creator</span> <a id="stat-creator-link" style="color:var(--th-blue); text-decoration:none;">Username</a></div>
                 <div class="stats-row"><span class="stats-label">Favorites</span> <span id="stat-favs">0</span></div>
             </div>
         </div>
 
         <div id="char-description-display" style="min-height: 100px;"></div>
 
+        <h3 style="margin-top:40px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Gallery</h3>
+        <div class="gallery-grid" id="image-gallery"></div>
+
         <div class="comment-header">
-            <i class="fa fa-lock" style="font-size: 14px;"></i> <span id="comment-title-name">Character</span>'s Comments
+            <i class="fa fa-comments"></i> <span id="comment-title-name">Character</span>'s Comments
         </div>
 
         <div class="comment-box-outer">
@@ -73,8 +83,7 @@
             <button onclick="postComment()" style="background:var(--th-blue); color:white; border:none; padding:8px 20px; margin-top:10px; border-radius:4px; cursor:pointer; font-weight:bold; width:100%;">Post Comment</button>
         </div>
 
-        <div id="real-comment-list">
-            </div>
+        <div id="real-comment-list"></div>
     </main>
 </div>
 
@@ -91,7 +100,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const charId = urlParams.get('id');
 
-    // Initialize TinyMCE for comments
     tinymce.init({
         selector: '#comment-editor',
         height: 200,
@@ -105,58 +113,77 @@
     onAuthStateChanged(auth, async (user) => {
         if (!charId) return;
         const charRef = doc(db, "characters", charId);
-        const charSnap = await getDoc(charRef);
+        
+        onSnapshot(charRef, (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                document.getElementById('char-name-display').innerText = data.name;
+                document.getElementById('comment-title-name').innerText = data.name;
+                document.getElementById('char-description-display').innerHTML = data.description;
+                if(data.avatar) document.getElementById('char-avatar-display').style.backgroundImage = `url('${data.avatar}')`;
+                
+                const creatorName = data.ownerName;
+                const ownerId = data.ownerId;
+                
+                // Remove @ symbol and set links
+                const profileURL = `profile.html?id=${ownerId}`;
+                document.getElementById('creator-link').innerText = creatorName;
+                document.getElementById('creator-link').href = profileURL;
+                document.getElementById('stat-creator-link').innerText = creatorName;
+                document.getElementById('stat-creator-link').href = profileURL;
+                document.getElementById('owner-link').href = profileURL;
+                document.getElementById('side-owner-name').innerText = creatorName;
+                document.getElementById('manage-images-link').href = `edit_gallery.html?id=${charId}`;
 
-        if (charSnap.exists()) {
-            const data = charSnap.data();
-            
-            // Fill Content
-            document.getElementById('char-name-display').innerText = data.name;
-            document.getElementById('comment-title-name').innerText = data.name;
-            document.getElementById('char-description-display').innerHTML = data.description;
-            if(data.avatar) document.getElementById('char-avatar-display').style.backgroundImage = `url('${data.avatar}')`;
-            
-            // Creator Links & Profile Logic
-            const creatorName = data.ownerName;
-            const ownerId = data.ownerId;
-            document.getElementById('creator-link').innerText = creatorName;
-            document.getElementById('creator-link').href = `profile.html?id=${ownerId}`;
-            document.getElementById('stat-creator-link').innerText = creatorName;
-            document.getElementById('stat-creator-link').href = `profile.html?id=${ownerId}`;
-            document.getElementById('owner-link').href = `profile.html?id=${ownerId}`;
-            document.getElementById('side-owner-name').innerText = creatorName;
+                document.getElementById('stat-favs').innerText = data.favCount || 0;
+                if(data.createdAt) document.getElementById('stat-created').innerText = new Date(data.createdAt.toDate()).toLocaleDateString();
 
-            // Stats
-            document.getElementById('stat-favs').innerText = data.favCount || 0;
-            if(data.createdAt) document.getElementById('stat-created').innerText = new Date(data.createdAt.toDate()).toLocaleDateString();
+                const favIcon = document.getElementById('fav-icon');
+                let isFaved = data.favoritedBy?.includes(user?.uid);
+                if(isFaved) favIcon.classList.add('fav-active');
 
-            // Favorite Logic
-            const favBtn = document.getElementById('fav-button');
-            const favIcon = document.getElementById('fav-icon');
-            let isFaved = data.favoritedBy?.includes(user.uid);
-            if(isFaved) favIcon.classList.add('fav-active');
-
-            favBtn.onclick = async () => {
-                if(isFaved) {
-                    await updateDoc(charRef, { favoritedBy: arrayRemove(user.uid), favCount: increment(-1) });
-                    favIcon.classList.remove('fav-active');
-                } else {
-                    await updateDoc(charRef, { favoritedBy: arrayUnion(user.uid), favCount: increment(1) });
-                    favIcon.classList.add('fav-active');
-                }
-                location.reload();
-            };
-
-            // Load Comments
-            loadComments(charId);
-        }
+                document.getElementById('fav-button').onclick = async (e) => {
+                    e.preventDefault();
+                    if(!user) return alert("Log in to favorite!");
+                    if(isFaved) {
+                        await updateDoc(charRef, { favoritedBy: arrayRemove(user.uid), favCount: increment(-1) });
+                    } else {
+                        await updateDoc(charRef, { favoritedBy: arrayUnion(user.uid), favCount: increment(1) });
+                        // Trigger Notification
+                        await addDoc(collection(db, "notifications"), {
+                            to: ownerId,
+                            from: user.uid,
+                            type: "favorite",
+                            charName: data.name,
+                            timestamp: serverTimestamp()
+                        });
+                    }
+                };
+            }
+        });
+        loadComments(charId);
+        loadGallery(charId);
     });
+
+    function loadGallery(id) {
+        const q = query(collection(db, "images"), where("characterId", "==", id), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const gallery = document.getElementById('image-gallery');
+            gallery.innerHTML = "";
+            snapshot.forEach(doc => {
+                const img = doc.data();
+                gallery.innerHTML += `<div class="gallery-item" style="background-image: url('${img.url}')">
+                    <a href="edit_gallery.html?id=${id}" class="edit-overlay"><i class="fa fa-pencil"></i></a>
+                </div>`;
+            });
+        });
+    }
 
     function loadComments(id) {
         const q = query(collection(db, "comments"), where("characterId", "==", id), orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const list = document.getElementById('real-comment-list');
-            list.innerHTML = "";
+            list.innerHTML = snapshot.empty ? '<p style="color:#999; font-size:13px;">No comments yet.</p>' : "";
             snapshot.forEach(doc => {
                 const c = doc.data();
                 list.innerHTML += `
@@ -164,8 +191,7 @@
                         <div style="font-size:12px; margin-bottom:5px;"><strong>${c.userName}</strong> • ${new Date(c.timestamp?.toDate()).toLocaleString()}</div>
                         <div style="font-size:13px;">${c.text}</div>
                         <span class="reply-btn" onclick="setReply('${c.userName}')">Reply</span>
-                    </div>
-                `;
+                    </div>`;
             });
         });
     }
@@ -174,7 +200,6 @@
         const text = tinymce.get('comment-editor').getContent();
         if(!text) return;
         const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
-        
         await addDoc(collection(db, "comments"), {
             characterId: charId,
             userId: auth.currentUser.uid,
@@ -187,6 +212,7 @@
 
     window.setReply = (name) => {
         tinymce.get('comment-editor').execCommand('mceInsertContent', false, `<strong>@${name}</strong> `);
+        window.scrollTo(0, document.getElementById('comment-editor').offsetTop - 100);
     };
 </script>
 </body>
