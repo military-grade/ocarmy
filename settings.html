@@ -4,50 +4,71 @@
     <title>Settings | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --th-blue: #008eb0; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; display: flex; }
+        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); display: flex; min-height: 100vh; }
 
-        .sidebar { width: 250px; background: white; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; padding: 20px; box-sizing: border-box; }
-        .side-header { font-weight: bold; color: var(--th-blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .back-link { display: block; margin-bottom: 20px; color: blue; text-decoration: underline; font-weight: bold; font-size: 15px; }
+        /* Sidebar - Toyhouse Style */
+        .sidebar { width: 220px; background: var(--th-blue); color: white; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 15px; background: rgba(0,0,0,0.1); font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .side-avatar { width: 30px; height: 30px; background: #eee; background-size: cover; border-radius: 2px; }
+        
+        .back-link { display: block; padding: 12px 15px; color: white; text-decoration: none; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.8; }
+        .side-nav a { display: block; padding: 8px 15px; color: white; text-decoration: none; font-size: 13px; }
+        .side-nav a:hover, .side-nav a.active { background: rgba(0,0,0,0.1); }
 
-        .main { flex-grow: 1; padding: 40px; max-width: 1000px; margin: 0 auto; }
-        .card { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 25px; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; margin-top: 5px; box-sizing: border-box; }
-        .btn-teal { background: var(--th-blue); color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; }
+        /* Main Area */
+        .main { flex: 1; padding: 30px; }
+        .card { background: white; border: 1px solid #ddd; border-radius: 4px; padding: 25px; margin-bottom: 20px; }
+        .card-title { font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; color: #444; text-transform: uppercase; font-size: 12px; }
+        
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #666; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; margin-bottom: 15px; box-sizing: border-box; }
+        .btn-update { background: #7cc1d8; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="side-header">
-        <div id="side-pfp" style="width:30px; height:30px; background:#eee; background-size:cover;"></div>
-        <span id="sidebar-user">User</span>
+    <div class="sidebar-header">
+        <div class="side-avatar" id="side-pfp"></div>
+        <span id="side-username">User</span>
     </div>
-    <a href="dashboard.html" class="back-link">← Back to Profile</a>
-    <div style="border-top: 1px solid #eee; padding-top: 10px;">
-        <a href="settings.html" style="display:block; padding:10px 0; color:var(--th-blue); font-weight:bold; text-decoration:none;">Account Settings</a>
-        <a href="profile_content.html" style="display:block; padding:10px 0; color:#555; text-decoration:none;">Profile Content</a>
+    <a href="dashboard.html" class="back-link"><i class="fa fa-arrow-left"></i> Back to Profile</a>
+    
+    <div class="side-nav">
+        <div class="side-label">General Settings</div>
+        <a href="settings.html" class="active">Account Settings</a>
+        
+        <div class="side-label">Profile Settings</div>
+        <a href="profile_content.html">Profile Content</a>
+        <a href="#">Profile CSS</a>
+        
+        <div class="side-label">Management</div>
+        <a href="#">Folders</a>
+        <a href="#">Characters</a>
     </div>
 </div>
 
 <div class="main">
-    <h2 style="margin-top:0;">Account Settings</h2>
+    <h2 style="margin-top: 0; color: #444;">Account Settings</h2>
     
-    <div style="display:flex; gap:20px;">
-        <div style="flex:2;">
+    <div style="display:flex; gap:20px; flex-wrap: wrap;">
+        <div style="flex: 2;">
             <div class="card">
+                <div class="card-title">User Details</div>
                 <label>Username</label>
                 <input type="text" id="username-field" readonly>
-                <label style="display:block; margin-top:15px;">Email</label>
+                <label>Email Address</label>
                 <input type="text" id="email-field" readonly>
             </div>
         </div>
-        <div style="flex:1;">
-            <div class="card" style="text-align:center;">
-                <div id="large-pfp" style="width:120px; height:120px; background:#eee; border-radius:4px; margin:0 auto 15px; background-size:cover;"></div>
-                <input type="text" id="pfp-url" placeholder="New Image URL...">
-                <button class="btn-teal" onclick="saveAvatar()">Update Avatar</button>
+        <div style="flex: 1;">
+            <div class="card" style="text-align: center;">
+                <div class="card-title">Avatar</div>
+                <div id="large-pfp" style="width:120px; height:120px; background:#eee; margin: 0 auto 15px; background-size: cover; border-radius: 3px;"></div>
+                <input type="text" id="pfp-url" placeholder="Avatar URL..." style="background: white;">
+                <button class="btn-update" onclick="saveAvatar()">Update Avatar</button>
             </div>
         </div>
     </div>
@@ -62,6 +83,7 @@
     apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
     authDomain: "ocarmy-db.firebaseapp.com",
     projectId: "ocarmy-db",
+    storageBucket: "ocarmy-db.firebasestorage.app",
     appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
   };
 
@@ -70,24 +92,23 @@
   const db = getFirestore(app);
 
   onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const data = userDoc.data();
-        document.getElementById('sidebar-user').innerText = data.username || "User";
-        document.getElementById('username-field').value = data.username || "";
-        document.getElementById('email-field').value = user.email;
-        if (data.pfp) {
-          document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
-          document.getElementById('large-pfp').style.backgroundImage = `url('${data.pfp}')`;
-        }
+    if (!user) window.location.href = "index.html";
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      document.getElementById('side-username').innerText = data.username || "User";
+      document.getElementById('username-field').value = data.username || "";
+      document.getElementById('email-field').value = user.email;
+      if (data.pfp) {
+        document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+        document.getElementById('large-pfp').style.backgroundImage = `url('${data.pfp}')`;
+        document.getElementById('pfp-url').value = data.pfp;
       }
     }
   });
 
   window.saveAvatar = async () => {
-    const user = auth.currentUser;
-    await updateDoc(doc(db, "users", user.uid), {
+    await updateDoc(doc(db, "users", auth.currentUser.uid), {
       pfp: document.getElementById('pfp-url').value
     });
     alert("Avatar updated!");
