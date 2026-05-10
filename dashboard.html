@@ -1,132 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OCARMY | Dashboard</title>
+    <title>Dashboard | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style id="custom-css-holder">
-        :root { --th-blue: #008eb0; --th-dark: #212529; --th-border: #dcdcdc; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #fff; color: #333; }
-        
-        /* Navbar Fix */
-        .navbar { background: var(--th-dark); color: white; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; position: sticky; top: 0; z-index: 1000; }
-        .nav-left, .nav-right { display: flex; align-items: center; gap: 15px; }
-        .nav-link { color: #aaa; text-decoration: none; font-size: 13px; display: flex; align-items: center; gap: 5px; position: relative; height: 50px; cursor: pointer; }
-        .nav-link:hover { color: white; }
-
-        /* Submit Dropdown */
-        .dropdown { display: none; position: absolute; top: 50px; left: 0; background: #333; min-width: 160px; border: 1px solid #444; border-top: none; }
-        .nav-link:hover .dropdown { display: block; }
-        .drop-item { display: block; padding: 10px 15px; color: #ccc; text-decoration: none; border-bottom: 1px solid #444; }
-        .drop-item:hover { background: #444; color: white; }
-
-        /* Top Right User Menu */
-        .user-dropdown { display: none; position: absolute; top: 50px; right: 0; background: #fff; min-width: 160px; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .nav-right .nav-link:hover .user-dropdown { display: block; }
-        .user-drop-item { display: block; padding: 10px 15px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; }
-        .user-drop-item:hover { background: #eee; }
-
-        .container { display: flex; min-height: calc(100vh - 50px); }
+    <style>
+        :root { --th-blue: #008eb0; --th-bg: #f7f7f7; --th-border: #dcdcdc; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; display: flex; }
 
         /* Sidebar */
-        .sidebar { width: 180px; background: var(--th-blue); color: white; min-height: 100vh; }
-        .sidebar-header { background: rgba(0,0,0,0.1); padding: 10px; font-weight: bold; font-size: 13px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .avatar { width: 40px; height: 40px; background: #eee; border-radius: 2px; margin-right: 10px; background-size: cover; border: 1px solid rgba(0,0,0,0.2); }
-        .side-nav-link { display: block; padding: 8px 15px; color: #e0f4f9; text-decoration: none; font-size: 12px; }
-        .side-nav-link:hover { background: rgba(255,255,255,0.1); color: white; }
-        .side-label { padding: 10px 15px 5px; font-size: 10px; font-weight: bold; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+        .sidebar { width: 250px; background: white; min-height: 100vh; border-right: 1px solid var(--th-border); position: sticky; top: 0; padding: 20px; box-sizing: border-box; }
+        .side-header { font-weight: bold; color: var(--th-blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .side-nav a { display: block; padding: 10px 0; color: #555; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee; }
+        .side-nav a:hover { color: var(--th-blue); }
 
-        /* Main Content */
-        .main-content { flex-grow: 1; padding: 20px 40px; background: #fdfdfd; }
-        .profile-blurb { text-align: center; margin-bottom: 30px; font-size: 14px; padding: 20px; color: #555; border: 1px dashed #ddd; border-radius: 4px; }
-        .profile-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        /* Main Profile Area */
+        .main { flex-grow: 1; padding: 40px; max-width: 1000px; margin: 0 auto; }
+        .profile-header { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 30px; text-align: center; margin-bottom: 20px; }
+        .avatar-main { width: 150px; height: 150px; background: #eee; border-radius: 4px; margin: 0 auto 15px; background-size: cover; border: 1px solid #ddd; }
         
-        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .char-card { background: white; border: 1px solid var(--th-border); border-radius: 4px; overflow: hidden; }
-        .char-card img { width: 100%; height: 140px; object-fit: cover; }
-        .char-info { background: var(--th-blue); color: white; padding: 8px; text-align: center; font-size: 11px; font-weight: bold; }
-        .char-stats { background: rgba(0,0,0,0.05); font-size: 10px; padding: 5px; color: #777; display: flex; justify-content: center; gap: 10px; }
-        .card-title { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2rem; color: #444; }
+        /* THE CONTENT AREA */
+        .profile-content { background: white; border: 1px solid var(--th-border); border-radius: 4px; padding: 30px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="nav-left">
-        <a href="index.html" style="font-weight:bold; color:white; text-decoration:none; margin-right:15px; letter-spacing:1px;">OCARMY</a>
-        <a href="dashboard.html" class="nav-link"><i class="fa fa-home"></i> Profile</a>
-        <a href="info.html" class="nav-link"><i class="fa fa-info-circle"></i> Info</a>
-        <div class="nav-link">
-            <i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i>
-            <div class="dropdown">
-                <a href="submit_character.html" class="drop-item"><i class="fa fa-user"></i> Character</a>
-                <a href="#" class="drop-item"><i class="fa fa-newspaper"></i> Bulletin</a>
-                <a href="#" class="drop-item"><i class="fa fa-image"></i> Image</a>
-                <a href="#" class="drop-item"><i class="fa fa-book"></i> Literature</a>
-                <a href="#" class="drop-item"><i class="fa fa-globe"></i> World</a>
-            </div>
-        </div>
+<div class="sidebar">
+    <div class="side-header">
+        <div id="side-pfp" style="width:30px; height:30px; background:#eee; background-size:cover;"></div>
+        <span id="display-username">Loading...</span>
     </div>
-    <div class="nav-right">
-        <div class="nav-link">
-            <div id="nav-pfp-circle" style="width:30px; height:30px; background:#eee; border-radius:50%; background-size:cover;"></div>
-            <span id="nav-username-top">User</span> <i class="fa fa-caret-down"></i>
-            <div class="user-dropdown">
-                <a href="dashboard.html" class="user-drop-item">Profile</a>
-                <a href="settings.html" class="user-drop-item">Settings</a>
-                <a href="notifications.html" class="user-drop-item">Inbox</a>
-                <a href="#" id="logout-top" class="user-drop-item" style="color: #c9302c;">Logout</a>
-            </div>
-        </div>
+    <div class="side-nav">
+        <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
+        <a href="settings.html"><i class="fa fa-cog"></i> Settings</a>
+        <a href="profile_content.html"><i class="fa fa-edit"></i> Edit Profile</a>
     </div>
-</nav>
+</div>
 
-<div class="container">
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <div class="avatar" id="sidebar-avatar"></div>
-            <div>
-                <span id="sidebar-username">User</span>
-                <span id="owner-crown"></span>
-            </div>
-        </div>
-        <div class="side-nav">
-            <a href="#" class="side-nav-link"><i class="fa fa-newspaper"></i> Bulletins</a>
-            <a href="#" class="side-nav-link"><i class="fa fa-users"></i> Characters</a>
-            <a href="#" class="side-nav-link"><i class="fa fa-link"></i> Links</a>
-            <a href="#" class="side-nav-link"><i class="fa fa-earth-americas"></i> Worlds</a>
-            <a href="#" class="side-nav-link"><i class="fa fa-star"></i> Favorites</a>
-            <div class="side-label">Portfolio</div>
-            <a href="#" class="side-nav-link"><i class="fa fa-palette"></i> Designs</a>
-            <a href="#" class="side-nav-link"><i class="fa fa-paint-brush"></i> Art</a>
-            <div class="side-label">Account</div>
-            <a href="settings.html" class="side-nav-link"><i class="fa fa-cog"></i> Settings</a>
-            <a href="#" id="logout-btn" class="side-nav-link"><i class="fa fa-sign-out-alt"></i> Logout</a>
-        </div>
+<div class="main">
+    <div class="profile-header">
+        <div class="avatar-main" id="main-pfp"></div>
+        <h1 id="profile-name">User</h1>
     </div>
-    <div class="main-content">
-        <div class="profile-blurb" id="profile-blurb"><i>Welcome to my profile!</i></div>
-        <div class="profile-grid">
-            <div class="characters-col">
-                <h3 class="card-title">Recent Characters</h3>
-                <div class="char-grid" id="main-char-grid"></div>
-            </div>
-            <div class="comments-col"><h3 class="card-title">Latest Comments</h3><p style="color:#999; font-size:13px;">No comments found.</p></div>
-        </div>
+
+    <div class="profile-content" id="profile-display">
+        <p style="color: #999;">Loading your profile content...</p>
     </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
     authDomain: "ocarmy-db.firebaseapp.com",
     projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.appspot.com",
-    messagingSenderId: "848883355194",
-    appId: "1:848883355194:web:51254de3c4992d7750af03"
+    storageBucket: "ocarmy-db.firebasestorage.app",
+    appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -134,37 +65,23 @@
   const db = getFirestore(app);
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user) { window.location.href = "index.html"; } 
-    else {
-      const userRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userRef);
+    if (user) {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
       if (userDoc.exists()) {
         const data = userDoc.data();
-        document.getElementById('sidebar-username').innerText = data.username;
-        document.getElementById('nav-username-top').innerText = data.username;
+        document.getElementById('display-username').innerText = data.username || "User";
+        document.getElementById('profile-name').innerText = data.username || "User";
+        
         if (data.pfp) {
-            document.getElementById('sidebar-avatar').style.backgroundImage = `url('${data.pfp}')`;
-            document.getElementById('nav-pfp-circle').style.backgroundImage = `url('${data.pfp}')`;
+          document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+          document.getElementById('main-pfp').style.backgroundImage = `url('${data.pfp}')`;
         }
-        if (data.blurb) document.getElementById('profile-blurb').innerHTML = data.blurb;
-        if (data.username.toLowerCase() === "military grade") {
-            document.getElementById('owner-crown').innerHTML = '<i class="fa fa-crown" style="color:#f1c40f; margin-left:5px;"></i>';
-        }
-        if (data.customCode) {
-            const styleElement = document.createElement('div');
-            styleElement.innerHTML = data.customCode;
-            document.head.appendChild(styleElement);
-        }
+        
+        // This pulls the text saved in profile_content.html
+        document.getElementById('profile-display').innerHTML = data.profileHTML || "<p>No profile content yet.</p>";
       }
-      document.getElementById('logout-btn').onclick = document.getElementById('logout-top').onclick = () => signOut(auth);
-      onSnapshot(query(collection(db, "characters"), orderBy("timestamp", "desc")), (snap) => {
-        const grid = document.getElementById('main-char-grid');
-        grid.innerHTML = '';
-        snap.forEach(doc => {
-          const char = doc.data();
-          grid.innerHTML += `<div class="char-card"><img src="${char.image}"><div class="char-info">${char.name}</div></div>`;
-        });
-      });
+    } else {
+      window.location.href = "index.html";
     }
   });
 </script>
