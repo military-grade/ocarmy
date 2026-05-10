@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: sans-serif; background: var(--th-bg); padding: 20px; }
+        .container { max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-radius: 4px; padding: 25px; }
+        .search-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 25px; }
+        .mode-btn { background: var(--th-blue); color: white; border: none; padding: 10px; border-radius: 4px; opacity: 0.6; font-weight: bold; cursor: pointer; }
+        .mode-btn.active { opacity: 1; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 style="margin-bottom: 20px;">Search</h2>
+    <div class="search-modes">
+        <button class="mode-btn active" id="m-user" onclick="setMode('user')"><i class="fa fa-check"></i> Profile Search</button>
+        <button class="mode-btn" id="m-oc" onclick="setMode('oc')"><i class="fa fa-check"></i> Original Characters</button>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label style="font-weight:bold; font-size:12px;">NAME</label>
+            <input type="text" id="query" placeholder="Enter name..." onkeyup="doSearch()">
+        </div>
+        <div class="col-md-6">
+            <label style="font-weight:bold; font-size:12px;">TAGS</label>
+            <input type="text" placeholder="Enter tags...">
+        </div>
+    </div>
+    <div id="results" style="margin-top: 30px;"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
+    let mode = 'user';
+
+    window.setMode = (m) => {
+        mode = m;
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`m-${m}`).classList.add('active');
+    };
+
+    window.doSearch = async () => {
+        const val = document.getElementById('query').value.toLowerCase();
+        if (val.length < 2) return;
+        const snap = await getDocs(collection(db, mode === 'user' ? "users" : "characters"));
+        const results = document.getElementById('results');
+        results.innerHTML = "";
+        snap.forEach(doc => {
+            const d = doc.data();
+            const name = (mode === 'user' ? d.username : d.name) || "";
+            if (name.toLowerCase().includes(val)) {
+                results.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">
+                    <a href="${mode === 'user' ? 'dashboard.html?user=' + doc.id : 'character.html?id=' + doc.id}" 
+                       style="color:#4e92ac; font-weight:bold; text-decoration:none;">${name}</a>
+                </div>`;
+            }
+        });
+    };
+</script>
+</body>
+</html>
