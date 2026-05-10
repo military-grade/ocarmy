@@ -18,19 +18,16 @@
         .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
         .side-folder-header { background: #56a0ba; padding: 8px 15px; font-weight: bold; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .side-oc-link { padding: 10px 15px; display: flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-size: 13px; background: rgba(255,255,255,0.05); }
-        
-        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.1s; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
         .side-nav a i { width: 18px; text-align: center; margin-right: 5px; opacity: 0.8; }
         .badge-count { background: rgba(255,255,255,0.2); font-size: 10px; padding: 2px 6px; border-radius: 10px; float: right; }
-
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; letter-spacing: 0.5px; }
         
         /* Control Panel Dropdown */
         .cp-header { background: var(--side-teal); color: white; padding: 10px 15px; font-weight: bold; font-size: 13px; cursor: pointer; }
         .cp-subnav { background: #f1f8fb; display: none; }
         .cp-subnav a { display: block; padding: 8px 20px; color: #4e92ac !important; text-decoration: none; font-size: 12px; border-bottom: 1px solid #e1eef2; }
-        .cp-subnav a:hover { background: #e6f2f6; }
         .cp-active .cp-subnav { display: block; }
 
         /* Main Content */
@@ -39,46 +36,38 @@
         .char-main-pfp { width: 100px; height: 100px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
         .char-name-area h2 { margin: 0; font-size: 26px; font-weight: normal; color: #444; }
         .char-name-area h2 a { color: #444; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        
         .section-title { font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin: 30px 0 15px; font-weight: 500; }
-        .gallery-preview-item { aspect-ratio: 1/1; border: 1px solid #ddd; border-radius: 2px; background-size: cover; background-position: center; }
 
-        /* Stats Right Column */
+        /* Stats Column */
         .stats-col { width: 260px; padding: 25px; background: #fafafa; flex-shrink: 0; font-size: 13px; }
         .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #eee; }
         .stat-label { font-weight: bold; color: #666; }
-        
         .btn-delete-final { color: #d9534f !important; font-weight: bold; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; cursor: pointer; text-decoration: none; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="px-3 fw-bold">OCARMY</div>
-</nav>
+<nav class="navbar"><div class="px-3 fw-bold">OCARMY</div></nav>
 
 <div class="wrapper">
     <aside class="sidebar">
         <div class="side-header"><i class="fa fa-heart"></i> Character</div>
         <div class="side-user-info">
             <div class="side-avatar" id="side-pfp"></div>
-            <a href="#" id="side-username" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
+            <a href="#" id="side-user-link" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
         </div>
         <div class="side-folder-header" id="side-folder"><i class="fa fa-folder-open"></i> Unsorted</div>
         <a href="#" class="side-oc-link" id="side-name-link"><i class="fa fa-id-card"></i> <span id="side-name">OC</span></a>
-
         <div class="side-nav">
             <a href="#" class="active"><i class="fa fa-file-alt"></i> Profile</a>
             <a href="#" id="link-gallery"><i class="fa fa-image"></i> Gallery <span class="badge-count" id="count-gallery">0</span></a>
             <a href="#"><i class="fa fa-book"></i> Library</a>
             <a href="#"><i class="fa fa-globe"></i> Worlds</a>
             <a href="#"><i class="fa fa-link"></i> Links</a>
-            
             <div class="side-label">Interaction</div>
             <a href="#"><i class="fa fa-comments"></i> Comments</a>
             <a href="#"><i class="fa fa-star"></i> Favorite <span class="badge-count">0</span></a>
             <a href="#"><i class="fa fa-check-square"></i> Ownership</a>
-            
             <div id="owner-panel" style="display:none; margin-top:10px;">
                 <div class="cp-header" onclick="this.parentElement.classList.toggle('cp-active')">
                     <i class="fa fa-wrench"></i> Control Panel <i class="fa fa-caret-down float-end mt-1"></i>
@@ -97,7 +86,6 @@
         <div class="mb-2">
             <a href="dashboard.html" class="text-muted small text-decoration-none"><i class="fa fa-arrow-left"></i> Back to Profile</a>
         </div>
-
         <div class="char-header-row">
             <div class="char-main-pfp" id="main-pfp"></div>
             <div class="char-name-area">
@@ -107,16 +95,12 @@
                 </div>
             </div>
         </div>
-
         <div class="section-title">Basic Info</div>
         <div class="mb-4"><span class="fw-bold me-3">Worth</span> <span id="display-worth">$0.00</span></div>
-
         <div class="section-title">Profile</div>
         <div id="bio-content"></div>
-
         <div class="section-title d-flex justify-content-between align-items-center">
-            Recent Images
-            <a href="#" id="view-more-gallery" class="btn btn-sm btn-outline-secondary" style="font-size:11px;">View More</a>
+            Recent Images <a href="#" id="view-more-gallery" class="btn btn-sm btn-outline-secondary" style="font-size:11px;">View More</a>
         </div>
         <div class="row g-2" id="gallery-preview"></div>
     </main>
@@ -133,9 +117,7 @@
     import { getFirestore, doc, onSnapshot, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
     const charId = new URLSearchParams(window.location.search).get('id');
 
@@ -143,8 +125,6 @@
         onSnapshot(doc(db, "characters", charId), async (snap) => {
             if (!snap.exists()) return;
             const data = snap.data();
-
-            // Populate Content
             document.getElementById('display-name').innerText = data.name;
             document.getElementById('side-name').innerText = data.name;
             document.getElementById('clickable-name').href = `character.html?id=${charId}`;
@@ -152,30 +132,27 @@
             document.getElementById('main-pfp').style.backgroundImage = `url('${data.avatar}')`;
             document.getElementById('display-worth').innerText = `$${data.worth || "0.00"}`;
             document.getElementById('bio-content').innerHTML = data.description || "<i>No profile description.</i>";
-            
             document.getElementById('stat-creator').innerText = data.designer || "Unknown";
             document.getElementById('stat-date').innerText = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : "-";
 
-            // Sync Creator/Owner Data
             const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
             if(ownerSnap.exists()){
                 const oData = ownerSnap.data();
-                document.getElementById('side-username').innerText = oData.username;
+                document.getElementById('side-user-link').innerText = oData.username;
+                document.getElementById('side-user-link').href = `user.html?id=${data.ownerId}`;
                 document.getElementById('creator-link').innerText = oData.username;
                 if(oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
             }
 
-            // Gallery logic
             const gallery = data.gallery || [];
             document.getElementById('count-gallery').innerText = gallery.length;
             document.getElementById('link-gallery').href = `character_gallery.html?id=${charId}`;
             document.getElementById('view-more-gallery').href = `character_gallery.html?id=${charId}`;
             document.getElementById('gallery-preview').innerHTML = gallery.slice(0, 6).map(img => `
-                <div class="col-4"><div class="gallery-preview-item" style="background-image:url('${img}')"></div></div>
+                <div class="col-4"><div style="aspect-ratio:1/1; border:1px solid #ddd; background:url('${img}') center/cover;"></div></div>
             `).join('');
 
-            // Control Panel Display
-            if (user && (user.uid === data.ownerId || !data.ownerId)) {
+            if (user && user.uid === data.ownerId) {
                 document.getElementById('owner-panel').style.display = "block";
                 document.getElementById('edit-char-link').href = `edit_character.html?id=${charId}`;
                 document.getElementById('edit-imgs-link').href = `manage_images.html?id=${charId}`;
@@ -185,7 +162,7 @@
     });
 
     window.confirmDelete = async () => {
-        if (confirm("Are you sure you want to delete this character? This cannot be undone.")) {
+        if (confirm("Delete this character forever?")) {
             await deleteDoc(doc(db, "characters", charId));
             window.location.href = "characters.html";
         }
