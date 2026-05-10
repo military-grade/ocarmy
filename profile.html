@@ -9,12 +9,12 @@
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
 
-        /* Full Navbar (Screenshot 1.24.10 & 1.35.15) */
+        /* Navbar - Full Restore (Screenshot 1.24.10) */
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 2000; }
         .nav-left { display: flex; gap: 5px; align-items: center; height: 100%; }
         .nav-left a, .nav-item-btn { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
-        .nav-left a:hover, .nav-item-btn:hover { color: white; background: rgba(255,255,255,0.1); }
         
+        /* Notif Bar (Screenshot 1.35.15) */
         .notif-bar { display: flex; align-items: center; gap: 2px; margin-right: 10px; }
         .notif-item { padding: 4px 8px; font-size: 11px; border-radius: 3px; color: white; display: flex; align-items: center; gap: 5px; background: #337ab7; text-decoration: none; }
         .notif-world { background: #f0ad4e; }
@@ -24,7 +24,7 @@
         .dropdown-content a { display: block; padding: 8px 20px; color: #333 !important; text-decoration: none; font-size: 13px; width: 100%; text-align: left; }
         .show { display: block !important; }
 
-        /* Sidebar (Screenshot 1.57.28) */
+        /* Sidebar - Screenshot 1.57.28 */
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); align-items: stretch; }
         .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -57,9 +57,9 @@
     </div>
 
     <div style="display: flex; align-items: center;">
-        <div class="notif-bar" id="nav-notifs">
+        <div class="notif-bar">
             <a href="#" class="notif-item notif-world"><i class="fa fa-globe"></i> 0</a>
-            <a href="#" class="notif-item"><i class="fa fa-user"></i> 0</a>
+            <a href="notifications.html" class="notif-item"><i class="fa fa-user"></i> <span id="count-alerts">0</span></a>
             <a href="#" class="notif-item"><i class="fa fa-star"></i> 0</a>
             <a href="messages.html" class="notif-item"><i class="fa fa-envelope"></i> 0</a>
         </div>
@@ -85,21 +85,21 @@
             <div class="side-avatar" id="side-pfp"></div>
             <div style="font-weight: bold;" id="side-user-text">User</div>
         </div>
-        <div class="side-nav">
-            <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
-            <a href="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
-            <a href="characters.html"><i class="fa fa-users"></i> Characters</a>
-            <a href="#"><i class="fa fa-link"></i> Links</a>
-            <a href="#"><i class="fa fa-globe"></i> Worlds</a>
-            <a href="#"><i class="fa fa-star"></i> Favorites</a>
+        <div class="side-nav" id="sidebar-links">
+            <a href="dashboard.html" data-base="profile.html"><i class="fa fa-user"></i> Profile</a>
+            <a href="bulletins.html" data-base="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
+            <a href="characters.html" data-base="characters.html"><i class="fa fa-users"></i> Characters</a>
+            <a href="#" data-base="#"><i class="fa fa-link"></i> Links</a>
+            <a href="#" data-base="#"><i class="fa fa-globe"></i> Worlds</a>
+            <a href="#" data-base="#"><i class="fa fa-star"></i> Favorites</a>
             <div class="side-label">Portfolio</div>
-            <a href="designs.html"><i class="fa fa-paint-brush"></i> Designs</a>
-            <a href="art.html"><i class="fa fa-image"></i> Art</a>
-            <a href="#"><i class="fa fa-book"></i> Library</a>
+            <a href="designs.html" data-base="designs.html"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a href="art.html" data-base="art.html"><i class="fa fa-image"></i> Art</a>
+            <a href="#" data-base="#"><i class="fa fa-book"></i> Library</a>
             <div class="side-label">Interaction</div>
-            <a href="profile_comments.html"><i class="fa fa-comments"></i> Comments</a>
-            <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
-            <a href="subscribe.html" style="color:white; font-weight:bold; background:rgba(255,255,255,0.1);"><i class="fa fa-plus"></i> Subscribe</a>
+            <a href="profile_comments.html" data-base="profile_comments.html"><i class="fa fa-comments"></i> Comments</a>
+            <a href="messages.html" data-base="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
+            <a href="subscribe.html" data-base="subscribe.html" style="color:white; font-weight:bold; background:rgba(255,255,255,0.1);"><i class="fa fa-plus"></i> Subscribe</a>
         </div>
     </aside>
 
@@ -107,7 +107,7 @@
         <div id="profile-raw-render"></div>
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 40px;">
             <span style="font-weight:bold; font-size: 18px;"><i class="fa fa-folder-open"></i> Unsorted</span>
-            <a href="#" style="font-size:11px; font-weight:bold; color:var(--th-blue); text-decoration:none;"><i class="fa fa-eye"></i> View All</a>
+            <a href="#" id="view-all-link" style="font-size:11px; font-weight:bold; color:var(--th-blue); text-decoration:none;"><i class="fa fa-eye"></i> View All</a>
         </div>
         <div id="char-grid" style="padding: 20px 0; color: #999; font-size: 13px;">No characters found.</div>
     </main>
@@ -132,7 +132,19 @@
         const urlParams = new URLSearchParams(window.location.search);
         const profileId = urlParams.get('user');
 
+        // THE MAGIC PART: Rewrite sidebar links to include the current user ID
         if (profileId) {
+            const links = document.querySelectorAll('#sidebar-links a');
+            links.forEach(link => {
+                const base = link.getAttribute('data-base');
+                if(base !== "#" && base !== "dashboard.html") {
+                    link.href = `${base}?user=${profileId}`;
+                } else if (base === "dashboard.html") {
+                    link.href = `profile.html?user=${profileId}`;
+                }
+            });
+            document.getElementById('view-all-link').href = `characters.html?user=${profileId}`;
+
             onSnapshot(doc(db, "users", profileId), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
@@ -145,6 +157,7 @@
             });
         }
         
+        // Keep the Navbar synced to the actual Logged In User
         if (authUser) {
              onSnapshot(doc(db, "users", authUser.uid), (snap) => {
                 const data = snap.data();
