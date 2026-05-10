@@ -2,94 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Character Profile | OCARMY</title>
+    <title>Characters | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
-
-        /* Sidebar */
-        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
-        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        body { margin: 0; font-family: sans-serif; background: var(--th-bg); }
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; align-items: stretch; }
+        
+        /* FULL SIDEBAR - REMAINS CONSTANT */
+        .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .side-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
+
+        .main { flex: 1; padding: 30px; }
+        .folder-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
         
-        .main { flex: 1; padding: 30px; border-left: 1px solid var(--border); }
-        .char-header { display: flex; gap: 25px; margin-bottom: 30px; align-items: flex-start; }
-        .char-img { width: 120px; height: 120px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; border: 1px solid #eee; }
-        
-        /* Stats Box */
-        .stats-box { width: 280px; border: 1px solid var(--border); border-radius: 4px; background: #fdfdfd; padding: 15px; font-size: 13px; }
-        .stats-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
-        .stats-label { color: #666; font-weight: bold; }
-
-        /* Gallery Grid */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
-        .gallery-item { position: relative; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; aspect-ratio: 1 / 1; background-size: cover; background-position: center; }
-        .edit-overlay { position: absolute; top: 5px; right: 5px; background: rgba(255,255,255,0.8); padding: 5px; border-radius: 3px; font-size: 12px; color: #333; display: none; }
-        .gallery-item:hover .edit-overlay { display: block; }
-
-        /* Comment System */
-        .comment-header { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: bold; color: var(--th-blue); margin-top: 40px; margin-bottom: 15px; }
-        .comment-box-outer { border: 1px solid var(--border); border-radius: 4px; padding: 15px; background: #fff; margin-bottom: 20px; }
-        .comment-list-item { border: 1px solid var(--border); padding: 15px; margin-bottom: 10px; border-radius: 4px; }
-        .reply-btn { font-size: 11px; color: var(--th-blue); cursor: pointer; text-decoration: underline; margin-top: 5px; display: inline-block; }
-
-        .fav-active { color: #ffc107 !important; }
+        /* GRID LOGIC */
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .char-card { text-align: center; text-decoration: none; color: inherit; }
+        .char-thumb { width: 140px; height: 140px; background: #eee; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; margin-bottom: 5px; }
+        .char-name-badge { background: var(--th-blue); color: white; padding: 4px 8px; font-size: 11px; font-weight: bold; border-radius: 4px; display: inline-block; max-width: 100%; }
     </style>
 </head>
 <body>
-
 <div class="wrapper">
     <aside class="sidebar">
-        <div style="padding:15px; background:rgba(0,0,0,0.1); font-weight:bold;"><i class="fa fa-user"></i> Character</div>
+        <div class="side-header"><div id="side-pfp" style="width:40px; height:40px; background:#eee; border-radius:2px; background-size:cover;"></div><b id="side-username">militarygrade</b></div>
         <div class="side-nav">
-            <a id="owner-link"><i class="fa fa-arrow-left"></i> <span id="side-owner-name">Owner</span></a>
-            <a href="#"><i class="fa fa-folder"></i> Unsorted</a>
-            <div style="font-size:10px; padding:15px 15px 5px; text-transform:uppercase; opacity:0.7;">Character</div>
-            <a href="#"><i class="fa fa-image"></i> Gallery</a>
-            <a id="manage-images-link" style="color: #d9f3ff;">Manage Images <i class="fa fa-caret-right" style="float:right;"></i></a>
-            <a href="#" id="fav-button"><i class="fa fa-star" id="fav-icon"></i> Favorite</a>
-            <a href="#"><i class="fa fa-comments"></i> Comments</a>
+            <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
+            <a href="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
+            <a href="characters.html" style="background:rgba(0,0,0,0.2);"><i class="fa fa-users"></i> Characters</a>
+            <a href="#"><i class="fa fa-link"></i> Links</a>
+            <a href="#"><i class="fa fa-globe"></i> Worlds</a>
+            <a href="#"><i class="fa fa-star"></i> Favorites</a>
+            <div class="side-label">Portfolio</div>
+            <a href="designs.html"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a href="art.html"><i class="fa fa-image"></i> Art</a>
+            <a href="#"><i class="fa fa-book"></i> Library</a>
+            <div class="side-label">Interaction</div>
+            <a href="profile_comments.html"><i class="fa fa-comments"></i> Comments</a>
+            <a href="#"><i class="fa fa-envelope"></i> Inbox</a>
         </div>
     </aside>
-
     <main class="main">
-        <div class="char-header">
-            <div class="char-img" id="char-avatar-display"></div>
-            <div style="flex:1;">
-                <h1 style="margin:0; font-size: 28px;"><i class="fa fa-lock" id="privacy-lock"></i> <span id="char-name-display">Name</span></h1>
-                <a id="creator-link" style="color:var(--th-blue); font-weight:bold; text-decoration:none;">Username</a>
-            </div>
-            <div class="stats-box">
-                <div class="stats-row"><span class="stats-label">Created</span> <span id="stat-created">---</span></div>
-                <div class="stats-row"><span class="stats-label">Creator</span> <a id="stat-creator-link" style="color:var(--th-blue); text-decoration:none;">Username</a></div>
-                <div class="stats-row"><span class="stats-label">Favorites</span> <span id="stat-favs">0</span></div>
-            </div>
+        <div class="folder-header">
+            <span style="font-size:18px; font-weight:bold;"><i class="fa fa-folder-open"></i> Unsorted</span>
+            <button style="font-size:11px; cursor:pointer;">View All</button>
         </div>
-
-        <div id="char-description-display" style="min-height: 100px;"></div>
-
-        <h3 style="margin-top:40px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Gallery</h3>
-        <div class="gallery-grid" id="image-gallery"></div>
-
-        <div class="comment-header">
-            <i class="fa fa-comments"></i> <span id="comment-title-name">Character</span>'s Comments
-        </div>
-
-        <div class="comment-box-outer">
-            <textarea id="comment-editor"></textarea>
-            <button onclick="postComment()" style="background:var(--th-blue); color:white; border:none; padding:8px 20px; margin-top:10px; border-radius:4px; cursor:pointer; font-weight:bold; width:100%;">Post Comment</button>
-        </div>
-
-        <div id="real-comment-list"></div>
+        <div class="char-grid" id="char-list"></div>
     </main>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, query, where, onSnapshot, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
@@ -97,123 +65,20 @@
     const db = getFirestore(app);
     const auth = getAuth();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const charId = urlParams.get('id');
-
-    tinymce.init({
-        selector: '#comment-editor',
-        height: 200,
-        menubar: false,
-        toolbar_mode: 'wrap',
-        plugins: 'link emoticons code lists',
-        toolbar: 'bold italic underline | emoticons link | bullist numlist | code',
-        branding: false
-    });
-
     onAuthStateChanged(auth, async (user) => {
-        if (!charId) return;
-        const charRef = doc(db, "characters", charId);
-        
-        onSnapshot(charRef, (snap) => {
-            if (snap.exists()) {
-                const data = snap.data();
-                document.getElementById('char-name-display').innerText = data.name;
-                document.getElementById('comment-title-name').innerText = data.name;
-                document.getElementById('char-description-display').innerHTML = data.description;
-                if(data.avatar) document.getElementById('char-avatar-display').style.backgroundImage = `url('${data.avatar}')`;
-                
-                const creatorName = data.ownerName;
-                const ownerId = data.ownerId;
-                
-                // Remove @ symbol and set links
-                const profileURL = `profile.html?id=${ownerId}`;
-                document.getElementById('creator-link').innerText = creatorName;
-                document.getElementById('creator-link').href = profileURL;
-                document.getElementById('stat-creator-link').innerText = creatorName;
-                document.getElementById('stat-creator-link').href = profileURL;
-                document.getElementById('owner-link').href = profileURL;
-                document.getElementById('side-owner-name').innerText = creatorName;
-                document.getElementById('manage-images-link').href = `edit_gallery.html?id=${charId}`;
-
-                document.getElementById('stat-favs').innerText = data.favCount || 0;
-                if(data.createdAt) document.getElementById('stat-created').innerText = new Date(data.createdAt.toDate()).toLocaleDateString();
-
-                const favIcon = document.getElementById('fav-icon');
-                let isFaved = data.favoritedBy?.includes(user?.uid);
-                if(isFaved) favIcon.classList.add('fav-active');
-
-                document.getElementById('fav-button').onclick = async (e) => {
-                    e.preventDefault();
-                    if(!user) return alert("Log in to favorite!");
-                    if(isFaved) {
-                        await updateDoc(charRef, { favoritedBy: arrayRemove(user.uid), favCount: increment(-1) });
-                    } else {
-                        await updateDoc(charRef, { favoritedBy: arrayUnion(user.uid), favCount: increment(1) });
-                        // Trigger Notification
-                        await addDoc(collection(db, "notifications"), {
-                            to: ownerId,
-                            from: user.uid,
-                            type: "favorite",
-                            charName: data.name,
-                            timestamp: serverTimestamp()
-                        });
-                    }
-                };
-            }
+        if (!user) return;
+        const q = query(collection(db, "characters"), where("ownerId", "==", user.uid));
+        const snap = await getDocs(q);
+        const list = document.getElementById('char-list');
+        snap.forEach(d => {
+            const c = d.data();
+            list.innerHTML += `
+                <a href="character.html?id=${d.id}" class="char-card">
+                    <div class="char-thumb" style="background-image:url('${c.avatar}')"></div>
+                    <div class="char-name-badge">${c.name}</div>
+                </a>`;
         });
-        loadComments(charId);
-        loadGallery(charId);
     });
-
-    function loadGallery(id) {
-        const q = query(collection(db, "images"), where("characterId", "==", id), orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const gallery = document.getElementById('image-gallery');
-            gallery.innerHTML = "";
-            snapshot.forEach(doc => {
-                const img = doc.data();
-                gallery.innerHTML += `<div class="gallery-item" style="background-image: url('${img.url}')">
-                    <a href="edit_gallery.html?id=${id}" class="edit-overlay"><i class="fa fa-pencil"></i></a>
-                </div>`;
-            });
-        });
-    }
-
-    function loadComments(id) {
-        const q = query(collection(db, "comments"), where("characterId", "==", id), orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const list = document.getElementById('real-comment-list');
-            list.innerHTML = snapshot.empty ? '<p style="color:#999; font-size:13px;">No comments yet.</p>' : "";
-            snapshot.forEach(doc => {
-                const c = doc.data();
-                list.innerHTML += `
-                    <div class="comment-list-item">
-                        <div style="font-size:12px; margin-bottom:5px;"><strong>${c.userName}</strong> • ${new Date(c.timestamp?.toDate()).toLocaleString()}</div>
-                        <div style="font-size:13px;">${c.text}</div>
-                        <span class="reply-btn" onclick="setReply('${c.userName}')">Reply</span>
-                    </div>`;
-            });
-        });
-    }
-
-    window.postComment = async () => {
-        const text = tinymce.get('comment-editor').getContent();
-        if(!text) return;
-        const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
-        await addDoc(collection(db, "comments"), {
-            characterId: charId,
-            userId: auth.currentUser.uid,
-            userName: userDoc.data().username,
-            text: text,
-            timestamp: serverTimestamp()
-        });
-        tinymce.get('comment-editor').setContent("");
-    };
-
-    window.setReply = (name) => {
-        tinymce.get('comment-editor').execCommand('mceInsertContent', false, `<strong>@${name}</strong> `);
-        window.scrollTo(0, document.getElementById('comment-editor').offsetTop - 100);
-    };
 </script>
 </body>
 </html>
