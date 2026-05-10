@@ -2,52 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Character | OCARMY</title>
+    <title>Character Profile | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; --side-teal: #7cc1d8; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
 
-        /* Left Sidebar */
+        /* Left Sidebar - Toyhouse Styling */
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
-        .side-header { background: #427e95; padding: 10px 15px; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .side-header { background: #427e95; padding: 10px 15px; font-weight: bold; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.1); }
         .side-user-info { padding: 12px 15px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); }
         .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
-        .side-folder-header { background: #56a0ba; padding: 8px 15px; font-weight: bold; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .side-oc-link { padding: 10px 15px; display: flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-size: 13px; background: rgba(255,255,255,0.05); }
-        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
-        .side-nav a i { width: 18px; text-align: center; margin-right: 5px; opacity: 0.8; }
         .badge-count { background: rgba(255,255,255,0.2); font-size: 10px; padding: 2px 6px; border-radius: 10px; float: right; }
-        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; letter-spacing: 0.5px; }
-        
+
         /* Control Panel Dropdown */
         .cp-header { background: var(--side-teal); color: white; padding: 10px 15px; font-weight: bold; font-size: 13px; cursor: pointer; }
         .cp-subnav { background: #f1f8fb; display: none; }
-        .cp-subnav a { display: block; padding: 8px 20px; color: #4e92ac !important; text-decoration: none; font-size: 12px; border-bottom: 1px solid #e1eef2; }
+        .cp-subnav a { display: block; padding: 8px 20px; color: #4e92ac !important; font-size: 12px; border-bottom: 1px solid #e1eef2; text-decoration: none; }
         .cp-active .cp-subnav { display: block; }
 
         /* Main Content */
         .main { flex: 1; padding: 25px; border-right: 1px solid #eee; }
-        .char-header-row { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 25px; }
-        .char-main-pfp { width: 100px; height: 100px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
-        .char-name-area h2 { margin: 0; font-size: 26px; font-weight: normal; color: #444; }
-        .char-name-area h2 a { color: #444; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .char-main-thumb { width: 100px; height: 100px; border: 1px solid var(--border); border-radius: 4px; background-size: cover; background-position: center; }
         .section-title { font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin: 30px 0 15px; font-weight: 500; }
 
         /* Stats Column */
         .stats-col { width: 260px; padding: 25px; background: #fafafa; flex-shrink: 0; font-size: 13px; }
         .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #eee; }
         .stat-label { font-weight: bold; color: #666; }
-        .btn-delete-final { color: #d9534f !important; font-weight: bold; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; cursor: pointer; text-decoration: none; font-size: 13px; }
+
+        /* Warning Overlay */
+        #warning-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; padding: 50px 20px; overflow-y: auto; text-align: center; }
     </style>
 </head>
 <body>
 
-<nav class="navbar"><div class="px-3 fw-bold">OCARMY</div></nav>
+<div id="warning-overlay">
+    <div style="max-width:800px; margin:auto; border:1px solid #ddd; padding:40px; background:#fff; border-radius:4px;">
+        <h2 style="color:#d9534f;"><i class="fa fa-exclamation-triangle"></i> Character Warning</h2>
+        <hr>
+        <div id="warning-text" style="text-align:left; margin:30px 0;"></div>
+        <button class="btn btn-primary px-5" id="proceed-btn" style="background:#4e92ac; border:none;">Proceed to Profile</button>
+    </div>
+</div>
+
+<nav class="navbar"><div class="fw-bold px-2">OCARMY</div></nav>
 
 <div class="wrapper">
     <aside class="sidebar">
@@ -56,18 +60,14 @@
             <div class="side-avatar" id="side-pfp"></div>
             <a href="#" id="side-user-link" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
         </div>
-        <div class="side-folder-header" id="side-folder"><i class="fa fa-folder-open"></i> Unsorted</div>
-        <a href="#" class="side-oc-link" id="side-name-link"><i class="fa fa-id-card"></i> <span id="side-name">OC</span></a>
         <div class="side-nav">
             <a href="#" class="active"><i class="fa fa-file-alt"></i> Profile</a>
-            <a href="#" id="link-gallery"><i class="fa fa-image"></i> Gallery <span class="badge-count" id="count-gallery">0</span></a>
-            <a href="#"><i class="fa fa-book"></i> Library</a>
-            <a href="#"><i class="fa fa-globe"></i> Worlds</a>
-            <a href="#"><i class="fa fa-link"></i> Links</a>
-            <div class="side-label">Interaction</div>
-            <a href="#"><i class="fa fa-comments"></i> Comments</a>
-            <a href="#"><i class="fa fa-star"></i> Favorite <span class="badge-count">0</span></a>
-            <a href="#"><i class="fa fa-check-square"></i> Ownership</a>
+            <a href="#" id="link-gallery"><i class="fa fa-image"></i> Gallery <span id="count-gallery" class="badge-count">0</span></a>
+            
+            <div class="p-2">
+                <button class="btn btn-sm btn-outline-light w-100" id="fav-btn" onclick="toggleFavorite()"><i class="fa-regular fa-heart"></i> Favorite</button>
+            </div>
+
             <div id="owner-panel" style="display:none; margin-top:10px;">
                 <div class="cp-header" onclick="this.parentElement.classList.toggle('cp-active')">
                     <i class="fa fa-wrench"></i> Control Panel <i class="fa fa-caret-down float-end mt-1"></i>
@@ -77,28 +77,29 @@
                     <a href="#" id="edit-imgs-link"><i class="fa fa-images"></i> Manage Images</a>
                     <a href="#" id="edit-warnings-link"><i class="fa fa-exclamation-triangle"></i> Character Warnings</a>
                 </div>
-                <div class="btn-delete-final" onclick="confirmDelete()"><i class="fa fa-trash"></i> Delete Character</div>
+                <div class="p-2 text-center">
+                    <button class="btn btn-sm btn-link text-danger fw-bold text-decoration-none" onclick="confirmDelete()">Delete Character</button>
+                </div>
             </div>
         </div>
     </aside>
 
     <main class="main">
         <div class="mb-2">
-            <a href="dashboard.html" class="text-muted small text-decoration-none"><i class="fa fa-arrow-left"></i> Back to Profile</a>
+            <a href="#" id="dynamic-back-btn" class="text-muted small text-decoration-none"><i class="fa fa-arrow-left"></i> Back to Profile</a>
         </div>
-        <div class="char-header-row">
-            <div class="char-main-pfp" id="main-pfp"></div>
-            <div class="char-name-area">
-                <h2><a href="#" id="clickable-name"><i class="fa fa-lock"></i> <span id="display-name">Loading...</span></a></h2>
-                <div style="font-size: 14px;">
-                    <i class="fa fa-user"></i> <a href="#" id="creator-link" style="color:var(--th-blue); text-decoration:none; font-weight:bold;">User</a>
-                </div>
+
+        <div class="d-flex gap-3 mb-4">
+            <div class="char-main-thumb" id="main-thumb"></div>
+            <div>
+                <h2 class="m-0"><a href="#" id="clickable-name" class="text-dark text-decoration-none"><i class="fa fa-lock"></i> <span id="display-name">Loading...</span></a></h2>
+                <div class="small"><i class="fa fa-user"></i> <a href="#" id="creator-link" style="color:var(--th-blue); text-decoration:none; font-weight:bold;">User</a></div>
             </div>
         </div>
-        <div class="section-title">Basic Info</div>
-        <div class="mb-4"><span class="fw-bold me-3">Worth</span> <span id="display-worth">$0.00</span></div>
+
         <div class="section-title">Profile</div>
         <div id="bio-content"></div>
+
         <div class="section-title d-flex justify-content-between align-items-center">
             Recent Images <a href="#" id="view-more-gallery" class="btn btn-sm btn-outline-secondary" style="font-size:11px;">View More</a>
         </div>
@@ -108,61 +109,108 @@
     <aside class="stats-col">
         <div class="stat-row"><span class="stat-label">Created</span><span id="stat-date">-</span></div>
         <div class="stat-row"><span class="stat-label">Creator</span><span id="stat-creator">-</span></div>
-        <div class="stat-row"><span class="stat-label">Favorites</span><span>0</span></div>
+        <div class="stat-row"><span class="stat-label">Favorites</span><span id="stat-favs">0</span></div>
     </aside>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, getDoc, updateDoc, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const db = getFirestore(initializeApp(firebaseConfig));
     const auth = getAuth();
     const charId = new URLSearchParams(window.location.search).get('id');
 
-    onAuthStateChanged(auth, async (user) => {
+    // Load Public Data First
+    if (charId) {
         onSnapshot(doc(db, "characters", charId), async (snap) => {
-            if (!snap.exists()) return;
+            if (!snap.exists()) {
+                document.querySelector('.main').innerHTML = "<h3>Character not found.</h3>";
+                return;
+            }
             const data = snap.data();
+
+            // Populate UI
             document.getElementById('display-name').innerText = data.name;
-            document.getElementById('side-name').innerText = data.name;
-            document.getElementById('clickable-name').href = `character.html?id=${charId}`;
-            document.getElementById('side-name-link').href = `character.html?id=${charId}`;
-            document.getElementById('main-pfp').style.backgroundImage = `url('${data.avatar}')`;
-            document.getElementById('display-worth').innerText = `$${data.worth || "0.00"}`;
+            document.getElementById('main-thumb').style.backgroundImage = `url('${data.avatar || ''}')`;
             document.getElementById('bio-content').innerHTML = data.description || "<i>No profile description.</i>";
             document.getElementById('stat-creator').innerText = data.designer || "Unknown";
+            document.getElementById('stat-favs').innerText = (data.subscribers || []).length;
             document.getElementById('stat-date').innerText = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : "-";
-
+            
+            // Sidebar User Data
             const ownerSnap = await getDoc(doc(db, "users", data.ownerId));
             if(ownerSnap.exists()){
                 const oData = ownerSnap.data();
                 document.getElementById('side-user-link').innerText = oData.username;
                 document.getElementById('side-user-link').href = `user.html?id=${data.ownerId}`;
                 document.getElementById('creator-link').innerText = oData.username;
+                document.getElementById('creator-link').href = `user.html?id=${data.ownerId}`;
+                document.getElementById('dynamic-back-btn').href = `user.html?id=${data.ownerId}`;
                 if(oData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${oData.pfp}')`;
             }
 
+            // Gallery Preview
             const gallery = data.gallery || [];
             document.getElementById('count-gallery').innerText = gallery.length;
             document.getElementById('link-gallery').href = `character_gallery.html?id=${charId}`;
             document.getElementById('view-more-gallery').href = `character_gallery.html?id=${charId}`;
             document.getElementById('gallery-preview').innerHTML = gallery.slice(0, 6).map(img => `
-                <div class="col-4"><div style="aspect-ratio:1/1; border:1px solid #ddd; background:url('${img}') center/cover;"></div></div>
+                <div class="col-4 mb-2"><div style="aspect-ratio:1/1; background:url('${img}') center/cover; border:1px solid #ddd; border-radius:4px;"></div></div>
             `).join('');
 
-            if (user && user.uid === data.ownerId) {
-                document.getElementById('owner-panel').style.display = "block";
-                document.getElementById('edit-char-link').href = `edit_character.html?id=${charId}`;
-                document.getElementById('edit-imgs-link').href = `manage_images.html?id=${charId}`;
-                document.getElementById('edit-warnings-link').href = `edit_warnings.html?id=${charId}`;
+            // Auth/Ownership Check
+            onAuthStateChanged(auth, (user) => {
+                const ownerPanel = document.getElementById('owner-panel');
+                const favBtn = document.getElementById('fav-btn');
+
+                if (user) {
+                    if (user.uid === data.ownerId) {
+                        ownerPanel.style.display = "block";
+                        document.getElementById('edit-char-link').href = `edit_character.html?id=${charId}`;
+                        document.getElementById('edit-imgs-link').href = `manage_images.html?id=${charId}`;
+                        document.getElementById('edit-warnings-link').href = `edit_warnings.html?id=${charId}`;
+                    } else {
+                        ownerPanel.style.display = "none";
+                    }
+
+                    if ((data.subscribers || []).includes(user.uid)) {
+                        favBtn.innerHTML = '<i class="fa fa-heart text-danger"></i> Unfavorite';
+                    } else {
+                        favBtn.innerHTML = '<i class="fa-regular fa-heart"></i> Favorite';
+                    }
+                }
+            });
+
+            // Warning Logic
+            if (data.warningActive && !sessionStorage.getItem(`warn_${charId}`)) {
+                document.getElementById('warning-overlay').style.display = 'block';
+                document.getElementById('warning-text').innerHTML = data.warningContent || "Sensitive Content Advisory.";
+                document.getElementById('proceed-btn').onclick = () => {
+                    sessionStorage.setItem(`warn_${charId}`, 'true');
+                    document.getElementById('warning-overlay').style.display = 'none';
+                };
             }
         });
-    });
+    }
+
+    window.toggleFavorite = async () => {
+        const user = auth.currentUser;
+        if (!user) return alert("Log in to favorite!");
+        const charRef = doc(db, "characters", charId);
+        const charSnap = await getDoc(charRef);
+        const subs = charSnap.data().subscribers || [];
+        if (subs.includes(user.uid)) {
+            await updateDoc(charRef, { subscribers: arrayRemove(user.uid) });
+        } else {
+            await updateDoc(charRef, { subscribers: arrayUnion(user.uid) });
+        }
+    };
 
     window.confirmDelete = async () => {
-        if (confirm("Delete this character forever?")) {
+        if (confirm("Permanently delete character?")) {
             await deleteDoc(doc(db, "characters", charId));
             window.location.href = "characters.html";
         }
