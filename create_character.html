@@ -9,15 +9,14 @@
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: 100vh; }
+        .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
         
-        /* Sidebar Restored */
+        /* Sidebar */
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
         .side-user-info { padding: 12px 15px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); }
         .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
         .side-nav a { display: block; padding: 12px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .side-nav a:hover { background: rgba(0,0,0,0.1); }
-        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
 
         .main { flex: 1; padding: 30px; border-right: 1px solid #eee; }
         .th-section { border: 1px solid var(--border); border-radius: 4px; margin-bottom: 25px; }
@@ -30,7 +29,8 @@
 
         /* Tag system */
         .tag-pill { background: var(--th-blue); color: white; padding: 2px 10px; border-radius: 20px; font-size: 12px; margin: 2px; display: inline-flex; align-items: center; gap: 5px; }
-        .tag-remove { cursor: pointer; }
+        .invalid-user { color: #d9534f; font-size: 11px; font-weight: bold; margin-top: 5px; display: none; }
+        .valid-user { color: #5cb85c; font-size: 11px; font-weight: bold; margin-top: 5px; display: none; }
     </style>
 </head>
 <body>
@@ -41,18 +41,16 @@
             <a href="dashboard.html" id="side-username" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
         </div>
         <div class="side-nav">
-            <a href="dashboard.html"><i class="fa fa-arrow-left"></i> Back to Dashboard</a>
-            <div class="side-label">Submit</div>
+            <a href="dashboard.html"><i class="fa fa-arrow-left"></i> Back</a>
             <a href="create_character.html" style="background: rgba(255,255,255,0.1);"><i class="fa fa-plus"></i> Character</a>
-            <a href="create_folder.html"><i class="fa fa-folder"></i> Folder</a>
         </div>
     </aside>
 
     <main class="main">
-        <h2 class="mb-4"><i class="fa fa-plus-circle"></i> Create Character</h2>
+        <h2 class="mb-4">Create Character</h2>
 
         <div class="th-section">
-            <div class="th-section-header">Upload Avatar</div>
+            <div class="th-section-header">Upload & Crop Avatar</div>
             <div class="th-section-body d-flex gap-4">
                 <div id="cropper-wrap" onmousedown="startDrag(event)">
                     <img id="avatar-img" src="">
@@ -61,9 +59,6 @@
                     <input type="file" id="char-file" class="form-control mb-3" accept="image/*" onchange="previewAvatar(event)">
                     <label class="form-label fw-bold small">Zoom</label>
                     <input type="range" id="zoom-slider" class="form-range" min="100" max="500" value="100" oninput="applyZoom()">
-                    <p class="small text-muted mt-2">Drag the image inside the box to crop.</p>
-                    <label class="form-label fw-bold small mt-2">Reference Sheet (Optional)</label>
-                    <input type="file" id="ref-file" class="form-control" accept="image/*">
                 </div>
             </div>
         </div>
@@ -73,20 +68,16 @@
             <div class="th-section-body row g-3">
                 <div class="col-md-6">
                     <label class="form-label fw-bold small">Name</label>
-                    <input type="text" id="char-name" class="form-control" required>
+                    <input type="text" id="char-name" class="form-control">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label fw-bold small">Folder</label>
-                    <select id="char-folder" class="form-select"><option value="">Unsorted</option></select>
-                </div>
-                <div class="col-md-12">
-                    <label class="form-label fw-bold small">Tags (Press Enter to add)</label>
-                    <div id="tag-container" class="mb-2"></div>
-                    <input type="text" id="tag-input" class="form-control" placeholder="feline, warrior, etc...">
-                </div>
-                <div class="col-md-12">
                     <label class="form-label fw-bold small">Worth ($)</label>
                     <input type="number" id="char-worth" class="form-control" value="0.00">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label fw-bold small">Tags (Press Enter)</label>
+                    <div id="tag-container" class="mb-2"></div>
+                    <input type="text" id="tag-input" class="form-control">
                 </div>
             </div>
         </div>
@@ -95,16 +86,19 @@
             <div class="th-section-header">Designer Credit</div>
             <div class="th-section-body">
                 <div class="btn-group w-100 mb-3">
-                    <button class="btn btn-outline-secondary active btn-credit" id="btn-self" onclick="setCredit('self')">I am the creator</button>
-                    <button class="btn btn-outline-secondary btn-credit" id="btn-onsite" onclick="setCredit('onsite')">On-Site Creator</button>
-                    <button class="btn btn-outline-secondary btn-credit" id="btn-offsite" onclick="setCredit('offsite')">Off-Site Creator</button>
+                    <button class="btn btn-outline-secondary active" id="btn-self" onclick="setCredit('self')">Me</button>
+                    <button class="btn btn-outline-secondary" id="btn-onsite" onclick="setCredit('onsite')">On-Site</button>
                 </div>
-                <input type="text" id="credit-input" class="form-control" style="display:none;" placeholder="Username or Link...">
+                <div id="onsite-input-div" style="display:none;">
+                    <input type="text" id="designer-name" class="form-control" placeholder="Enter username..." onkeyup="validateUser()">
+                    <div id="user-error" class="invalid-user">User not found!</div>
+                    <div id="user-success" class="valid-user">User found! They will be notified.</div>
+                </div>
             </div>
         </div>
 
         <div class="th-section">
-            <div class="th-section-header">Profile Content</div>
+            <div class="th-section-header">Description</div>
             <div class="th-section-body">
                 <textarea id="char-desc"></textarea>
             </div>
@@ -114,6 +108,8 @@
     </main>
 </div>
 
+<canvas id="crop-canvas" width="220" height="220" style="display:none;"></canvas>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -122,31 +118,27 @@
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
 
-    tinymce.init({ selector: '#char-desc', height: 400, menubar: true, plugins: 'code link image lists table', toolbar: 'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link image code' });
+    tinymce.init({ selector: '#char-desc', height: 300, menubar: false, plugins: 'code link lists', toolbar: 'bold italic underline | bullist numlist | link code' });
 
-    let currentTags = [], creditMode = 'self', isDragging = false, startX, startY, imgX = 0, imgY = 0;
+    let currentTags = [], creditMode = 'self', isDragging = false, startX, startY, imgX = 0, imgY = 0, recipientId = null;
 
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) return;
-        const uSnap = await getDoc(doc(db, "users", user.uid));
-        if(uSnap.exists()) {
-            document.getElementById('side-username').innerText = uSnap.data().username;
-            if(uSnap.data().pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${uSnap.data().pfp}')`;
+    // --- SIDEBAR PFP ---
+    onAuthStateChanged(auth, async (u) => {
+        if(!u) return;
+        const snap = await getDoc(doc(db, "users", u.uid));
+        if(snap.exists()) {
+            document.getElementById('side-username').innerText = snap.data().username;
+            document.getElementById('side-pfp').style.backgroundImage = `url('${snap.data().pfp}')`;
         }
-        // Load Folders
-        const q = query(collection(db, "folders"), where("ownerId", "==", user.uid));
-        const fSnap = await getDocs(q);
-        fSnap.forEach(d => { document.getElementById('char-folder').innerHTML += `<option value="${d.id}">${d.data().name}</option>`; });
     });
 
+    // --- CROPPER LOGIC ---
     window.previewAvatar = (e) => {
         const reader = new FileReader();
         reader.onload = () => { document.getElementById('avatar-img').src = reader.result; };
         reader.readAsDataURL(e.target.files[0]);
     };
-
     window.applyZoom = () => { document.getElementById('avatar-img').style.width = document.getElementById('zoom-slider').value + "%"; };
-
     window.startDrag = (e) => { isDragging = true; startX = e.clientX - imgX; startY = e.clientY - imgY; };
     window.onmousemove = (e) => {
         if (!isDragging) return;
@@ -155,48 +147,94 @@
     };
     window.onmouseup = () => { isDragging = false; };
 
+    // --- TAG LOGIC (FIXED) ---
     document.getElementById('tag-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && e.target.value.trim()) {
+        if (e.key === 'Enter') {
             e.preventDefault();
-            const tag = e.target.value.trim();
-            if (!currentTags.includes(tag)) { currentTags.push(tag); renderTags(); }
+            const val = e.target.value.trim();
+            if(val && !currentTags.includes(val)) {
+                currentTags.push(val);
+                renderTags();
+            }
             e.target.value = '';
         }
     });
-
     function renderTags() {
-        document.getElementById('tag-container').innerHTML = currentTags.map(t => `<span class="tag-pill">${t} <i class="fa fa-times ms-1" onclick="removeTag('${t}')"></i></span>`).join('');
+        document.getElementById('tag-container').innerHTML = currentTags.map(t => `<span class="tag-pill">${t} <i class="fa fa-times" style="cursor:pointer" onclick="removeTag('${t}')"></i></span>`).join('');
     }
-    window.removeTag = (t) => { currentTags = currentTags.filter(tag => tag !== t); renderTags(); };
+    window.removeTag = (t) => { currentTags = currentTags.filter(x => x !== t); renderTags(); };
 
+    // --- CREDIT VALIDATION ---
     window.setCredit = (m) => {
         creditMode = m;
-        document.querySelectorAll('.btn-credit').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-'+m).classList.add('active');
-        document.getElementById('credit-input').style.display = m === 'self' ? 'none' : 'block';
+        document.getElementById('btn-self').classList.toggle('active', m === 'self');
+        document.getElementById('btn-onsite').classList.toggle('active', m === 'onsite');
+        document.getElementById('onsite-input-div').style.display = m === 'onsite' ? 'block' : 'none';
     };
 
+    window.validateUser = async () => {
+        const val = document.getElementById('designer-name').value.trim().toLowerCase();
+        const err = document.getElementById('user-error');
+        const succ = document.getElementById('user-success');
+        recipientId = null;
+
+        if(!val) { err.style.display = succ.style.display = "none"; return; }
+        
+        const q = query(collection(db, "users"));
+        const snap = await getDocs(q);
+        const found = snap.docs.find(d => d.data().username.toLowerCase() === val);
+        
+        if(found) {
+            recipientId = found.id;
+            err.style.display = "none"; succ.style.display = "block";
+        } else {
+            err.style.display = "block"; succ.style.display = "none";
+        }
+    };
+
+    // --- SUBMIT WITH CROP & NOTIFICATION ---
     document.getElementById('submit-btn').onclick = async () => {
         const user = auth.currentUser;
-        if (!user) return;
-        tinymce.triggerSave();
+        if(!user) return;
         const btn = document.getElementById('submit-btn');
-        btn.disabled = true; btn.innerText = "Creating...";
+        btn.disabled = true; btn.innerText = "Processing...";
+
+        // Process Crop
+        const canvas = document.getElementById('crop-canvas');
+        const ctx = canvas.getContext('2d');
+        const img = document.getElementById('avatar-img');
+        const zoom = document.getElementById('zoom-slider').value / 100;
+        
+        // This calculates the exact portion of the image inside the 220px box
+        ctx.drawImage(img, imgX, imgY, img.naturalWidth * zoom, img.naturalHeight * zoom);
+        const finalAvatar = canvas.toDataURL("image/jpeg", 0.8);
 
         try {
-            const docRef = await addDoc(collection(db, "characters"), {
+            const charRef = await addDoc(collection(db, "characters"), {
                 ownerId: user.uid,
                 name: document.getElementById('char-name').value,
-                folderId: document.getElementById('char-folder').value,
-                avatar: document.getElementById('avatar-img').src,
+                avatar: finalAvatar,
                 tags: currentTags,
                 worth: document.getElementById('char-worth').value,
-                designer: creditMode === 'self' ? user.displayName : document.getElementById('credit-input').value,
+                designer: creditMode === 'self' ? user.displayName : document.getElementById('designer-name').value,
                 description: tinymce.get('char-desc').getContent(),
-                createdAt: serverTimestamp(),
-                gallery: [], subscribers: []
+                createdAt: serverTimestamp()
             });
-            window.location.href = `character.html?id=${docRef.id}`;
+
+            // SEND CREDIT NOTIFICATION (If onsite)
+            if(creditMode === 'onsite' && recipientId) {
+                await addDoc(collection(db, "notifications"), {
+                    toUserId: recipientId,
+                    fromUsername: user.displayName || "A User",
+                    type: "credit",
+                    characterId: charRef.id,
+                    characterName: document.getElementById('char-name').value,
+                    status: "unread",
+                    createdAt: serverTimestamp()
+                });
+            }
+
+            window.location.href = `character.html?id=${charRef.id}`;
         } catch (e) { alert(e.message); btn.disabled = false; }
     };
 </script>
