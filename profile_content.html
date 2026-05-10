@@ -61,12 +61,31 @@
 <script>
     tinymce.init({
         selector: '#profile-editor',
-        height: 350,
+        height: 450,
         menubar: false,
-        plugins: 'link image code lists emoticons table',
-        toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image emoticons | code',
+        toolbar_mode: 'wrap', // This forces all 27 icons to stack instead of hiding in a menu
+        plugins: 'link image code lists table emoticons charmap fullscreen',
+        // The massive toolbar array with everything you requested:
+        toolbar: 'undo redo removeformat | bold italic underline strikethrough subscript superscript | fontfamily fontsize forecolor backcolor | charmap emoticons spoiler | blocks | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote hr | link image table | code fullscreen',
+        
+        setup: function(editor) {
+            // Custom Spoiler Button Logic
+            editor.ui.registry.addButton('spoiler', {
+                text: 'Spoiler',
+                tooltip: 'Wrap highlighted text in a spoiler',
+                onAction: function () {
+                    const selectedText = editor.selection.getContent() || 'Hidden content';
+                    editor.insertContent(
+                        `<details style="border: 1px solid #ccc; padding: 10px; border-radius: 4px; margin: 10px 0; background: #f9f9f9;">
+                            <summary style="font-weight: bold; cursor: pointer; color: #4e92ac;">Spoiler (Click to view)</summary>
+                            <div style="margin-top: 10px;">${selectedText}</div>
+                        </details>`
+                    );
+                }
+            });
+        },
         branding: false,
-        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px; text-align:center; }'
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px; text-align:left; }'
     });
 
     function toggleWYSIWYG() {
