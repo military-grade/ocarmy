@@ -6,23 +6,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        :root { --th-green: #a4c28e; --th-bg: #f7f7f7; --border: #ddd; }
-        body { background: var(--th-bg); font-family: sans-serif; padding: 50px 20px; }
+        :root { --th-blue: #4e92ac; --th-green: #97ba83; --th-bg: #f7f7f7; --border: #ddd; }
+        body { background: var(--th-bg); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 50px 20px; }
         .sub-container { max-width: 600px; margin: auto; background: white; border: 1px solid var(--border); padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .sub-header { text-align: center; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; color: #4e92ac; font-size: 24px; font-weight: bold; }
+        .sub-header { text-align: center; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; color: var(--th-blue); font-size: 24px; font-weight: bold; }
         .check-card { border: 1px solid var(--border); padding: 15px; border-radius: 6px; text-align: center; background: #fafafa; }
-        .btn-subscribe { background: var(--th-green); color: white; border: none; width: 100%; padding: 15px; font-weight: bold; border-radius: 6px; margin-top: 25px; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-subscribe:hover { background: #8fb178; }
+        .btn-subscribe { background: var(--th-green); color: white; border: none; width: 100%; padding: 15px; font-weight: bold; border-radius: 6px; margin-top: 25px; text-transform: uppercase; }
+        .btn-subscribe:disabled { background: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-<div class="sub-container">
+<div class="sub-container" id="main-content">
     <div class="sub-header">
-        <i class="fa fa-user-plus"></i> Subscribe to <span id="target-username">...</span>
+        <i class="fa fa-user-plus"></i> Subscribe to <span id="target-username">Loading...</span>
     </div>
-    <p class="text-center text-muted small mb-4">Choose which updates you want to receive. You can change these at any time.</p>
-
+    
     <div class="row g-3">
         <div class="col-6"><div class="check-card"><input type="checkbox" id="sub-chars" checked class="form-check-input mb-2"><br><strong>Characters</strong></div></div>
         <div class="col-6"><div class="check-card"><input type="checkbox" id="sub-imgs" checked class="form-check-input mb-2"><br><strong>Images</strong></div></div>
@@ -30,7 +29,7 @@
         <div class="col-6"><div class="check-card"><input type="checkbox" id="sub-ads" checked class="form-check-input mb-2"><br><strong>Ads</strong></div></div>
     </div>
 
-    <button class="btn-subscribe" id="sub-btn">SUBSCRIBE</button>
+    <button class="btn-subscribe" id="sub-btn" disabled>Waiting for User...</button>
 </div>
 
 <script type="module">
@@ -38,25 +37,49 @@
     import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
+    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
     const auth = getAuth();
-    const targetUid = new URLSearchParams(window.location.search).get('id');
+
+    // 1. Get the ID from the URL properly
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetUid = urlParams.get('id');
 
     onAuthStateChanged(auth, async (user) => {
-        if (!user || !targetUid) return;
-        if (user.uid === targetUid) {
-            document.querySelector('.sub-container').innerHTML = "<div class='alert alert-warning'>You cannot subscribe to yourself!</div>";
+        if (!user) {
+            alert("Please log in to subscribe!");
             return;
         }
 
-        const targetSnap = await getDoc(doc(db, "users", targetUid));
-        if (targetSnap.exists()) {
-            document.getElementById('target-username').innerText = targetSnap.data().username;
+        if (!targetUid) {
+            document.getElementById('main-content').innerHTML = "<h3>No user specified to subscribe to.</h3>";
+            return;
         }
 
+        if (user.uid === targetUid) {
+            document.getElementById('main-content').innerHTML = "<div class='alert alert-warning'>You cannot subscribe to yourself!</div>";
+            return;
+        }
+
+        // 2. Load Target User Name
+        const targetRef = doc(db, "users", targetUid);
+        const targetSnap = await getDoc(targetRef);
+        
+        if (targetSnap.exists()) {
+            document.getElementById('target-username').innerText = targetSnap.data().username;
+            const subBtn = document.getElementById('sub-btn');
+            subBtn.disabled = false;
+            subBtn.innerText = "SUBSCRIBE";
+        } else {
+            document.getElementById('target-username').innerText = "Unknown User";
+        }
+
+        // 3. The Actual Logic
         document.getElementById('sub-btn').onclick = async () => {
             const btn = document.getElementById('sub-btn');
-            btn.disabled = true; btn.innerText = "SUBSCRIBING...";
+            btn.disabled = true;
+            btn.innerText = "PROCESSING...";
 
             const prefs = {
                 characters: document.getElementById('sub-chars').checked,
@@ -66,14 +89,15 @@
             };
 
             try {
-                // 1. Save Sub Relation
+                // Save the subscriber relationship
                 await setDoc(doc(db, "users", targetUid, "subscribers", user.uid), {
                     fromUsername: user.displayName || "A user",
+                    fromUid: user.uid,
                     prefs: prefs,
                     timestamp: serverTimestamp()
                 });
 
-                // 2. TRIGGER NOTIFICATION
+                // Send the notification
                 await addDoc(collection(db, "notifications"), {
                     toUserId: targetUid,
                     fromUsername: user.displayName || "A user",
@@ -83,9 +107,15 @@
                     createdAt: serverTimestamp()
                 });
 
-                alert("Subscription Successful!");
+                alert("Successfully subscribed!");
                 window.location.href = `profile.html?user=${targetUid}`;
-            } catch (e) { alert(e.message); btn.disabled = false; }
+
+            } catch (error) {
+                console.error("Subscription failed:", error);
+                alert("Subscription failed. Check console for errors.");
+                btn.disabled = false;
+                btn.innerText = "SUBSCRIBE";
+            }
         };
     });
 </script>
