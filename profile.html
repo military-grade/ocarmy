@@ -9,33 +9,28 @@
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
 
-        /* Navbar - Full Restore (Screenshot 1.24.10) */
+        /* Navbar */
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 2000; }
         .nav-left { display: flex; gap: 5px; align-items: center; height: 100%; }
         .nav-left a, .nav-item-btn { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
+        .nav-left a:hover, .nav-item-btn:hover { color: white; background: rgba(255,255,255,0.1); }
         
-        /* Notif Bar (Screenshot 1.35.15) */
-        .notif-bar { display: flex; align-items: center; gap: 2px; margin-right: 10px; }
-        .notif-item { padding: 4px 8px; font-size: 11px; border-radius: 3px; color: white; display: flex; align-items: center; gap: 5px; background: #337ab7; text-decoration: none; }
-        .notif-world { background: #f0ad4e; }
-
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
         .dropdown-content { display: none; position: absolute; top: 50px; background: white; border: 1px solid var(--border); min-width: 160px; box-shadow: 0 6px 12px rgba(0,0,0,.175); z-index: 3000; padding: 5px 0; border-radius: 0 0 4px 4px; }
         .dropdown-content a { display: block; padding: 8px 20px; color: #333 !important; text-decoration: none; font-size: 13px; width: 100%; text-align: left; }
         .show { display: block !important; }
 
-        /* Sidebar - Screenshot 1.57.28 */
-        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); align-items: stretch; }
-        .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
+        /* Sidebar & Layout */
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
+        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .side-avatar { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; }
-        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .side-avatar { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
 
+        .creator-crown { color: #ffd700; margin-left: 5px; }
         .main { flex: 1; padding: 30px; background: white; }
-        #profile-raw-render { width: 100%; min-height: 100px; }
     </style>
-    <style id="custom-profile-css"></style>
 </head>
 <body>
 
@@ -45,37 +40,13 @@
         <a href="browse.html"><i class="fa fa-eye"></i> Browse</a>
         <div class="dropdown">
             <button class="nav-item-btn" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></button>
-            <div id="drop-submit" class="dropdown-content" style="left:0;">
-                <a href="create_character.html"><i class="fa fa-user"></i> Character</a>
-                <a href="create_bulletin.html"><i class="fa fa-newspaper"></i> Bulletin</a>
-            </div>
+            <div id="drop-submit" class="dropdown-content"><a href="create_character.html">Character</a><a href="create_folder.html">Folder</a></div>
         </div>
         <a href="search.html"><i class="fa fa-search"></i> Search</a>
-        <a href="#"><i class="fa fa-info-circle"></i> Info</a>
-        <a href="#"><i class="fa fa-newspaper"></i> Blogs</a>
-        <a href="#"><i class="fa fa-bullhorn"></i> News</a>
     </div>
-
-    <div style="display: flex; align-items: center;">
-        <div class="notif-bar">
-            <a href="#" class="notif-item notif-world"><i class="fa fa-globe"></i> 0</a>
-            <a href="notifications.html" class="notif-item"><i class="fa fa-user"></i> <span id="count-alerts">0</span></a>
-            <a href="#" class="notif-item"><i class="fa fa-star"></i> 0</a>
-            <a href="messages.html" class="notif-item"><i class="fa fa-envelope"></i> 0</a>
-        </div>
-        <div class="dropdown">
-            <button class="nav-item-btn" onclick="toggleDrop('drop-user')">
-                <span id="nav-username">User</span>
-                <div id="nav-avatar" style="width:30px; height:30px; background:#eee; border-radius:2px; background-size:cover; margin-left:8px;"></div>
-                <i class="fa fa-caret-down" style="margin-left:5px; font-size:10px;"></i>
-            </button>
-            <div id="drop-user" class="dropdown-content" style="right:0;">
-                <a href="dashboard.html">Profile</a>
-                <a href="settings.html">Settings</a>
-                <div style="border-top:1px solid #eee; margin: 5px 0;"></div>
-                <a href="#" id="logout-btn">Logout</a>
-            </div>
-        </div>
+    <div class="dropdown">
+        <button class="nav-item-btn" onclick="toggleDrop('drop-user')"><span id="nav-username">User</span> <i class="fa fa-caret-down"></i></button>
+        <div id="drop-user" class="dropdown-content" style="right:0;"><a href="dashboard.html">Profile</a><a href="settings.html">Settings</a><a href="#" id="logout-btn">Logout</a></div>
     </div>
 </nav>
 
@@ -83,88 +54,100 @@
     <aside class="sidebar">
         <div class="side-user-header">
             <div class="side-avatar" id="side-pfp"></div>
-            <div style="font-weight: bold;" id="side-user-text">User</div>
+            <div>
+                <div id="side-name-container" style="font-weight: bold; display:flex; align-items:center;">
+                    <span id="side-username">Loading...</span>
+                </div>
+                <div style="font-size: 11px; opacity: 0.8;" id="side-sub-count">0 subscribers</div>
+            </div>
         </div>
-        <div class="side-nav" id="sidebar-links">
-            <a href="dashboard.html" data-base="profile.html"><i class="fa fa-user"></i> Profile</a>
-            <a href="bulletins.html" data-base="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
-            <a href="characters.html" data-base="characters.html"><i class="fa fa-users"></i> Characters</a>
-            <a href="#" data-base="#"><i class="fa fa-link"></i> Links</a>
-            <a href="#" data-base="#"><i class="fa fa-globe"></i> Worlds</a>
-            <a href="#" data-base="#"><i class="fa fa-star"></i> Favorites</a>
+        <div class="side-nav">
+            <a id="link-profile"><i class="fa fa-user"></i> Profile</a>
+            <a id="link-bulletins"><i class="fa fa-comment"></i> Bulletins</a>
+            <a id="link-characters"><i class="fa fa-users"></i> Characters</a>
+            <a href="#"><i class="fa fa-link"></i> Links</a>
+            <a href="#"><i class="fa fa-globe"></i> Worlds</a>
+            
             <div class="side-label">Portfolio</div>
-            <a href="designs.html" data-base="designs.html"><i class="fa fa-paint-brush"></i> Designs</a>
-            <a href="art.html" data-base="art.html"><i class="fa fa-image"></i> Art</a>
-            <a href="#" data-base="#"><i class="fa fa-book"></i> Library</a>
+            <a href="#"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a href="#"><i class="fa fa-image"></i> Art</a>
+            
             <div class="side-label">Interaction</div>
-            <a href="profile_comments.html" data-base="profile_comments.html"><i class="fa fa-comments"></i> Comments</a>
-            <a href="messages.html" data-base="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
-            <a href="subscribe.html" data-base="subscribe.html" style="color:white; font-weight:bold; background:rgba(255,255,255,0.1);"><i class="fa fa-plus"></i> Subscribe</a>
+            <a id="link-comments"><i class="fa fa-comments"></i> Comments</a>
+            
+            <div id="visitor-controls" style="display: none;">
+                <a id="link-subscribe" style="font-weight: bold; background: rgba(255,255,255,0.1);"><i class="fa fa-plus"></i> Subscribe</a>
+                <a id="link-message"><i class="fa fa-envelope"></i> Message</a>
+            </div>
+            
+            <div id="owner-controls" style="display: none;">
+                <a href="notifications.html"><i class="fa fa-bell"></i> Notifications</a>
+                <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
+            </div>
         </div>
     </aside>
 
     <main class="main">
-        <div id="profile-raw-render"></div>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 40px;">
-            <span style="font-weight:bold; font-size: 18px;"><i class="fa fa-folder-open"></i> Unsorted</span>
-            <a href="#" id="view-all-link" style="font-size:11px; font-weight:bold; color:var(--th-blue); text-decoration:none;"><i class="fa fa-eye"></i> View All</a>
-        </div>
-        <div id="char-grid" style="padding: 20px 0; color: #999; font-size: 13px;">No characters found.</div>
+        <div id="profile-content">Loading profile...</div>
     </main>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
+
+    // Get Target User from URL (e.g. profile.html?id=USER_ID)
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetUid = urlParams.get('id');
 
     window.toggleDrop = (id) => {
         document.querySelectorAll('.dropdown-content').forEach(d => { if(d.id !== id) d.classList.remove('show'); });
         document.getElementById(id).classList.toggle('show');
     };
 
-    onAuthStateChanged(auth, (authUser) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const profileId = urlParams.get('user');
+    onAuthStateChanged(auth, (currentUser) => {
+        if (!targetUid) return;
 
-        // THE MAGIC PART: Rewrite sidebar links to include the current user ID
-        if (profileId) {
-            const links = document.querySelectorAll('#sidebar-links a');
-            links.forEach(link => {
-                const base = link.getAttribute('data-base');
-                if(base !== "#" && base !== "dashboard.html") {
-                    link.href = `${base}?user=${profileId}`;
-                } else if (base === "dashboard.html") {
-                    link.href = `profile.html?user=${profileId}`;
-                }
-            });
-            document.getElementById('view-all-link').href = `characters.html?user=${profileId}`;
-
-            onSnapshot(doc(db, "users", profileId), (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    document.getElementById('side-user-text').innerText = data.username || "User";
-                    if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
-                    const rawContent = data.profileHTML || "Welcome!";
-                    document.getElementById('profile-raw-render').innerHTML = rawContent.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
-                    document.getElementById('custom-profile-css').innerHTML = data.profileCSS || "";
-                }
-            });
-        }
+        // Determine if we are looking at our own profile
+        const isOwner = currentUser && currentUser.uid === targetUid;
         
-        // Keep the Navbar synced to the actual Logged In User
-        if (authUser) {
-             onSnapshot(doc(db, "users", authUser.uid), (snap) => {
-                const data = snap.data();
-                document.getElementById('nav-username').innerText = data.username || "User";
-                if (data.pfp) document.getElementById('nav-avatar').style.backgroundImage = `url('${data.pfp}')`;
-             });
+        if (isOwner) {
+            document.getElementById('owner-controls').style.display = 'block';
+        } else {
+            document.getElementById('visitor-controls').style.display = 'block';
+            document.getElementById('link-subscribe').href = `subscribe.html?id=${targetUid}`;
+            document.getElementById('link-message').href = `message_user.html?id=${targetUid}`;
         }
+
+        // Set sidebar links correctly
+        document.getElementById('link-profile').href = `profile.html?id=${targetUid}`;
+        document.getElementById('link-bulletins').href = `bulletins.html?id=${targetUid}`;
+        document.getElementById('link-characters').href = `characters.html?id=${targetUid}`;
+        document.getElementById('link-comments').href = `profile_comments.html?id=${targetUid}`;
+
+        // Fetch Target Profile Data
+        onSnapshot(doc(db, "users", targetUid), async (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                document.getElementById('side-username').innerText = data.username || "User";
+                if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+
+                // 👑 Creator Crown Logic
+                if (data.username?.toLowerCase() === 'militarygrade' && !document.querySelector('.creator-crown')) {
+                    document.getElementById('side-name-container').innerHTML += ` <i class="fa fa-crown creator-crown" title="OCARMY Creator"></i>`;
+                }
+
+                // 👥 Subscriber Count
+                const subSnap = await getDocs(collection(db, "users", targetUid, "subscribers"));
+                document.getElementById('side-sub-count').innerText = `${subSnap.size} subscribers`;
+
+                document.getElementById('profile-content').innerHTML = data.profileHTML || "No profile content yet.";
+            }
+        });
     });
 </script>
 </body>
