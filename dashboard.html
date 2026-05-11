@@ -79,7 +79,8 @@
                 <i class="fa fa-caret-down" style="margin-left:5px; font-size:10px;"></i>
             </button>
             <div id="drop-user" class="dropdown-content" style="right:0;">
-                <a href="dashboard.html">Profile</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a id="nav-public-profile" href="#">Public Profile</a>
                 <a href="settings.html">Settings</a>
                 <div style="border-top:1px solid #eee; margin: 5px 0;"></div>
                 <a href="#" id="logout-btn">Logout</a>
@@ -100,7 +101,8 @@
             </div>
         </div>
         <div class="side-nav">
-            <a href="dashboard.html"><i class="fa fa-user"></i> Profile</a>
+            <a href="dashboard.html"><i class="fa fa-user"></i> Dashboard</a>
+            <a id="side-public-profile" href="#"><i class="fa fa-eye"></i> View Profile</a>
             <a href="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
             <a href="characters.html"><i class="fa fa-users"></i> Characters</a>
             <a href="#"><i class="fa fa-link"></i> Links</a>
@@ -155,6 +157,11 @@
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            // Update Public Profile links with the new ?user= format
+            const publicUrl = `profile.html?user=${user.uid}`;
+            document.getElementById('nav-public-profile').href = publicUrl;
+            document.getElementById('side-public-profile').href = publicUrl;
+
             onSnapshot(doc(db, "users", user.uid), async (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
