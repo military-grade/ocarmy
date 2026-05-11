@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Notifications | OCARMY</title>
+    <title>Inbox | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
@@ -11,40 +11,37 @@
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
 
-        /* Sidebar */
+        /* Sidebar Styling */
         .sidebar { width: 220px; background: #f4f4f4; border-right: 1px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; }
         .side-header { background: var(--th-blue); color: white; padding: 10px 15px; font-weight: bold; font-size: 14px; }
-        .side-user { padding: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
-        .side-avatar { width: 40px; height: 40px; background: #eee; border-radius: 4px; background-size: cover; background-position: center; }
-        .side-nav a { display: block; padding: 10px 15px; color: var(--th-blue); text-decoration: none; font-size: 13px; border-bottom: 1px solid var(--border); }
+        .side-user { padding: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+        .side-avatar { width: 45px; height: 45px; background: #eee; border-radius: 4px; background-size: cover; background-position: center; border: 1px solid var(--border); }
+        .side-nav a { display: block; padding: 10px 15px; color: var(--th-blue); text-decoration: none; font-size: 13px; border-bottom: 1px solid var(--border); cursor: pointer; }
         .side-nav a:hover { background: #eee; }
         .side-nav a.active { background: #e0e0e0; font-weight: bold; color: #333; border-left: 3px solid var(--th-blue); }
 
-        /* Creator Crown */
-        .creator-crown { color: var(--creator-gold); margin-left: 4px; cursor: help; }
-        .creator-crown:hover::after { content: "OCARMY Creator"; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; white-space: nowrap; z-index: 100; }
+        /* Creator Badge */
+        .creator-crown { color: var(--creator-gold); margin-left: 4px; cursor: help; text-shadow: 0 0 3px rgba(0,0,0,0.1); }
+        .creator-crown:hover::after { content: "OCARMY Creator"; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; white-space: nowrap; z-index: 100; margin-left: 10px; }
 
-        /* Main Area */
-        .main { flex: 1; padding: 20px; }
-        .breadcrumb { background: #f9f9f9; padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; margin-bottom: 20px; }
-        .page-title { font-size: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; }
+        /* Content Area */
+        .main { flex: 1; padding: 25px; }
+        .breadcrumb { background: #f9f9f9; padding: 10px 15px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; margin-bottom: 20px; color: #777; }
+        .page-title { font-size: 22px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
 
-        /* Notif/Transfer Cards */
-        .notif-card { border: 1px solid var(--border); border-radius: 4px; display: flex; padding: 15px; margin-bottom: 15px; background: white; align-items: center; }
-        .transfer-card { border: 1px solid var(--border); border-radius: 4px; display: flex; padding: 15px; margin-bottom: 15px; background: white; }
-        .transfer-img { width: 120px; height: 120px; background: #eee; border-radius: 4px; margin-right: 20px; flex-shrink: 0; background-size: cover; background-position: center; border: 1px solid var(--border); }
-        .transfer-body { flex: 1; }
-        .notif-icon { width: 40px; font-size: 20px; text-align: center; color: var(--th-blue); }
-        .transfer-time { font-size: 11px; color: #777; margin-bottom: 5px; }
-        .char-badge { background: var(--th-blue); color: white; padding: 2px 8px; border-radius: 4px; text-decoration: none; font-size: 12px; }
-        .transfer-reason { border: 1px solid var(--border); border-radius: 4px; padding: 10px; font-size: 12px; margin: 10px 0; background: #fafafa; }
+        /* Notification Card Styling */
+        .notif-item { border: 1px solid var(--border); border-radius: 4px; padding: 15px; margin-bottom: 12px; background: white; display: flex; align-items: center; gap: 15px; }
+        .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .icon-sub { background: #e8f5e9; color: #4caf50; }
+        .icon-fav { background: #ffebee; color: #f44336; }
+        .icon-update { background: #e3f2fd; color: #2196f3; }
+        
+        .empty-state { padding: 40px; text-align: center; color: #999; font-style: italic; }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="fw-bold">OCARMY</div>
-</nav>
+<nav class="navbar"><div class="fw-bold">OCARMY</div></nav>
 
 <div class="wrapper">
     <aside class="sidebar">
@@ -53,145 +50,139 @@
             <div class="side-avatar" id="side-pfp"></div>
             <div>
                 <div style="display:flex; align-items:center;">
-                    <a href="#" id="side-username" style="color:var(--th-blue); text-decoration:none; font-size:13px; font-weight:bold;">User</a>
+                    <a href="dashboard.html" id="side-username" style="color:var(--th-blue); text-decoration:none; font-size:14px; font-weight:bold;">User</a>
                     <span id="side-crown"></span>
                 </div>
-                <div id="side-subs" style="font-size:10px; color:#777;">0 subscribers</div>
+                <div id="side-subs" style="font-size:11px; color:#888;">0 subscribers</div>
             </div>
         </div>
         <div class="side-nav">
-            <a href="javascript:void(0)" onclick="showTab('transfers')" id="tab-transfers" class="active">Character Transfers <span id="trans-count">(0)</span></a>
-            <a href="javascript:void(0)" onclick="showTab('notifs')" id="tab-notifs">Notifications <span id="notif-count">(0)</span></a>
+            <a onclick="showSection('transfers')" id="nav-transfers" class="active">Character Transfers <span id="count-transfers">(0)</span></a>
+            <a onclick="showSection('subscriptions')" id="nav-subscriptions">Subscriptions <span id="count-subscriptions">(0)</span></a>
+            <a onclick="showSection('updates')" id="nav-updates">Character Updates <span id="count-updates">(0)</span></a>
+            <a onclick="showSection('comments')" id="nav-comments">Subscribers & Comments <span id="count-comments">(0)</span></a>
         </div>
     </aside>
 
     <main class="main">
-        <div class="breadcrumb">
-            <span style="color: var(--th-blue);">Account Management</span> / <span id="bread-tab">Transfers</span>
-        </div>
-        
+        <div class="breadcrumb">Account Management / <span id="bread-current">Transfers</span></div>
         <h2 class="page-title" id="page-title">Character Transfers</h2>
-        
-        <div id="section-transfers">
-            <div id="transfer-list"><div class="text-muted">Loading transfers...</div></div>
-        </div>
 
-        <div id="section-notifs" style="display:none;">
-            <div id="notif-list"><div class="text-muted">Loading notifications...</div></div>
+        <div id="notif-display-area">
+            <div class="empty-state">Checking for alerts...</div>
         </div>
     </main>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, onSnapshot, getDoc, doc, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
-    const db = getFirestore(initializeApp(firebaseConfig));
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
-    let currentUser = null;
+
+    let currentSection = 'transfers';
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) return window.location.href = "index.html";
-        currentUser = user;
 
-        // 1. Setup Sidebar & Creator Status
+        // 1. Sidebar Setup (User check for militarygrade)
         const userSnap = await getDoc(doc(db, "users", user.uid));
         if (userSnap.exists()) {
-            const userData = userSnap.data();
-            document.getElementById('side-username').innerText = userData.username;
-            if(userData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${userData.pfp}')`;
+            const data = userSnap.data();
+            document.getElementById('side-username').innerText = data.username;
+            if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
             
-            // Apply Gold Crown for militarygrade
-            if(userData.username.toLowerCase() === "militarygrade") {
+            if (data.username.toLowerCase() === 'militarygrade') {
                 document.getElementById('side-crown').innerHTML = `<i class="fa fa-crown creator-crown"></i>`;
             }
 
-            // Load Subscriber Count
             const subSnap = await getDocs(collection(db, "users", user.uid, "subscribers"));
             document.getElementById('side-subs').innerText = `${subSnap.size} subscribers`;
         }
 
-        // 2. Watch for Transfers (Real-time)
-        const transQ = query(collection(db, "transfers"), where("toUserId", "==", user.uid), where("status", "==", "pending"));
-        onSnapshot(transQ, (snap) => {
-            const list = document.getElementById('transfer-list');
-            document.getElementById('trans-count').innerText = `(${snap.size})`;
-            list.innerHTML = snap.empty ? "<div class='text-muted p-3'>No pending transfers.</div>" : "";
-            
-            snap.forEach(d => {
-                const t = d.data();
-                list.innerHTML += `
-                    <div class="transfer-card">
-                        <div class="transfer-img" style="background-image: url('${t.characterAvatar || ''}')"></div>
-                        <div class="transfer-body">
-                            <div class="transfer-time">${t.createdAt?.toDate().toLocaleString() || 'Recently'}</div>
-                            <div class="transfer-text"><strong>${t.fromUsername}</strong> wants to transfer <a href="character.html?id=${t.characterId}" class="char-badge">${t.characterName}</a> to you.</div>
-                            <div class="transfer-reason">${t.reason || 'No reason provided.'}</div>
-                            <div class="text-end">
-                                <button class="btn btn-sm btn-success me-2" onclick="resolveTransfer('${d.id}', '${t.characterId}', 'accept')">Accept</button>
-                                <button class="btn btn-sm btn-danger" onclick="resolveTransfer('${d.id}', '${t.characterId}', 'decline')">Decline</button>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-        });
-
-        // 3. Watch for Social Notifs (Favs/Subs/Credit)
-        const notifQ = query(collection(db, "notifications"), where("toUserId", "==", user.uid), orderBy("createdAt", "desc"));
-        onSnapshot(notifQ, (snap) => {
-            const list = document.getElementById('notif-list');
-            document.getElementById('notif-count').innerText = `(${snap.size})`;
-            list.innerHTML = snap.empty ? "<div class='text-muted p-3'>No new notifications.</div>" : "";
-            
-            snap.forEach(d => {
-                const n = d.data();
-                let icon = "fa-bell text-secondary";
-                let text = "";
-
-                if(n.type === "subscription") {
-                    icon = "fa-user-plus text-success";
-                    text = `<strong>${n.fromUsername}</strong> subscribed to you!`;
-                } else if(n.type === "favorite") {
-                    icon = "fa-heart text-danger";
-                    text = `<strong>${n.fromUsername}</strong> favorited <a href="character.html?id=${n.characterId}">${n.characterName}</a>`;
-                } else if(n.type === "credit") {
-                    icon = "fa-palette text-primary";
-                    text = `<strong>${n.fromUsername}</strong> credited you for <a href="character.html?id=${n.characterId}">${n.characterName}</a>`;
-                }
-
-                list.innerHTML += `
-                    <div class="notif-card">
-                        <div class="notif-icon"><i class="fa ${icon}"></i></div>
-                        <div>${text}</div>
-                    </div>`;
-            });
-        });
+        // 2. Real-time Notification Listeners
+        loadData(user.uid);
     });
 
-    // Tab Switching Logic
-    window.showTab = (tab) => {
-        document.getElementById('section-transfers').style.display = tab === 'transfers' ? 'block' : 'none';
-        document.getElementById('section-notifs').style.display = tab === 'notifs' ? 'block' : 'none';
-        document.getElementById('tab-transfers').classList.toggle('active', tab === 'transfers');
-        document.getElementById('tab-notifs').classList.toggle('active', tab === 'notifs');
-        document.getElementById('page-title').innerText = tab === 'transfers' ? 'Character Transfers' : 'General Notifications';
-        document.getElementById('bread-tab').innerText = tab === 'transfers' ? 'Transfers' : 'Notifications';
+    function loadData(uid) {
+        // Character Transfers
+        onSnapshot(query(collection(db, "transfers"), where("toUserId", "==", uid), where("status", "==", "pending")), (snap) => {
+            document.getElementById('count-transfers').innerText = `(${snap.size})`;
+            if(currentSection === 'transfers') renderTransfers(snap);
+        });
+
+        // General Notifications (Subscriptions, Favorites, Updates)
+        onSnapshot(query(collection(db, "notifications"), where("toUserId", "==", uid), orderBy("createdAt", "desc")), (snap) => {
+            const counts = { subscriptions: 0, updates: 0, comments: 0 };
+            snap.forEach(doc => {
+                const type = doc.data().type;
+                if(type === 'subscription') counts.subscriptions++;
+                if(type === 'update' || type === 'favorite') counts.updates++;
+                if(type === 'comment') counts.comments++;
+            });
+
+            document.getElementById('count-subscriptions').innerText = `(${counts.subscriptions})`;
+            document.getElementById('count-updates').innerText = `(${counts.updates})`;
+            document.getElementById('count-comments').innerText = `(${counts.comments})`;
+
+            if(currentSection !== 'transfers') renderGeneralNotifs(snap);
+        });
+    }
+
+    window.showSection = (section) => {
+        currentSection = section;
+        const titles = { transfers: 'Character Transfers', subscriptions: 'Subscriptions', updates: 'Character Updates', comments: 'Subscribers & Comments' };
+        document.getElementById('page-title').innerText = titles[section];
+        document.getElementById('bread-current').innerText = titles[section];
+        document.querySelectorAll('.side-nav a').forEach(a => a.classList.remove('active'));
+        document.getElementById(`nav-${section}`).classList.add('active');
+        
+        // Refresh display
+        loadData(auth.currentUser.uid);
     };
 
-    // Transfer Resolution
-    window.resolveTransfer = async (tId, cId, action) => {
-        try {
-            if (action === 'accept') {
-                await updateDoc(doc(db, "characters", cId), { ownerId: currentUser.uid, folderId: "" });
-                await updateDoc(doc(db, "transfers", tId), { status: "accepted" });
-                alert("Character accepted!");
-            } else {
-                await updateDoc(doc(db, "transfers", tId), { status: "declined" });
-            }
-        } catch (e) { console.error(e); }
-    };
+    function renderTransfers(snap) {
+        const area = document.getElementById('notif-display-area');
+        if (snap.empty) { area.innerHTML = `<div class="empty-state">You have no pending transfers.</div>`; return; }
+        
+        area.innerHTML = snap.docs.map(d => {
+            const t = d.data();
+            return `<div class="notif-item">
+                <div style="width:60px; height:60px; background:url('${t.characterAvatar}') center/cover; border-radius:4px;"></div>
+                <div class="flex-grow-1">
+                    <strong>${t.fromUsername}</strong> wants to transfer <strong>${t.characterName}</strong> to you.
+                    <div class="small text-muted mt-1">Reason: ${t.reason || 'None'}</div>
+                </div>
+                <button class="btn btn-sm btn-success">Accept</button>
+            </div>`;
+        }).join('');
+    }
+
+    function renderGeneralNotifs(snap) {
+        const area = document.getElementById('notif-display-area');
+        const filtered = snap.docs.filter(d => {
+            const type = d.data().type;
+            if(currentSection === 'subscriptions') return type === 'subscription';
+            if(currentSection === 'updates') return type === 'update' || type === 'favorite';
+            if(currentSection === 'comments') return type === 'comment';
+            return false;
+        });
+
+        if (filtered.length === 0) { area.innerHTML = `<div class="empty-state">No active notifications here.</div>`; return; }
+
+        area.innerHTML = filtered.map(d => {
+            const n = d.data();
+            let iconClass = n.type === 'subscription' ? 'icon-sub fa-user-plus' : (n.type === 'favorite' ? 'icon-fav fa-heart' : 'icon-update fa-sync');
+            let message = n.type === 'subscription' ? `<strong>${n.fromUsername}</strong> subscribed to you!` : `<strong>${n.fromUsername}</strong> favorited ${n.characterName}`;
+            
+            return `<div class="notif-item">
+                <div class="notif-icon ${iconClass.split(' ')[0]}"><i class="fa ${iconClass.split(' ')[1]}"></i></div>
+                <div>${message}</div>
+            </div>`;
+        }).join('');
+    }
 </script>
 </body>
 </html>
