@@ -6,12 +6,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        :root { --th-blue: #0093b5; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        :root { --th-blue: #0093b5; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; --creator-gold: #ffd700; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
 
-        /* Sidebar matching the image */
+        /* Sidebar */
         .sidebar { width: 220px; background: #f4f4f4; border-right: 1px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; }
         .side-header { background: var(--th-blue); color: white; padding: 10px 15px; font-weight: bold; font-size: 14px; }
         .side-user { padding: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
@@ -20,22 +20,24 @@
         .side-nav a:hover { background: #eee; }
         .side-nav a.active { background: #e0e0e0; font-weight: bold; color: #333; border-left: 3px solid var(--th-blue); }
 
+        /* Creator Crown */
+        .creator-crown { color: var(--creator-gold); margin-left: 4px; cursor: help; }
+        .creator-crown:hover::after { content: "OCARMY Creator"; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; white-space: nowrap; z-index: 100; }
+
         /* Main Area */
         .main { flex: 1; padding: 20px; }
         .breadcrumb { background: #f9f9f9; padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; margin-bottom: 20px; }
         .page-title { font-size: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; }
 
-        /* Transfer Card */
+        /* Notif/Transfer Cards */
+        .notif-card { border: 1px solid var(--border); border-radius: 4px; display: flex; padding: 15px; margin-bottom: 15px; background: white; align-items: center; }
         .transfer-card { border: 1px solid var(--border); border-radius: 4px; display: flex; padding: 15px; margin-bottom: 15px; background: white; }
-        .transfer-img { width: 150px; height: 150px; background: #eee; border-radius: 4px; margin-right: 20px; flex-shrink: 0; background-size: cover; background-position: center; border: 1px solid var(--border); }
+        .transfer-img { width: 120px; height: 120px; background: #eee; border-radius: 4px; margin-right: 20px; flex-shrink: 0; background-size: cover; background-position: center; border: 1px solid var(--border); }
         .transfer-body { flex: 1; }
+        .notif-icon { width: 40px; font-size: 20px; text-align: center; color: var(--th-blue); }
         .transfer-time { font-size: 11px; color: #777; margin-bottom: 5px; }
-        .transfer-text { font-size: 14px; margin-bottom: 10px; }
-        .char-badge { background: var(--th-blue); color: white; padding: 2px 8px; border-radius: 4px; text-decoration: none; font-size: 13px; }
-        .transfer-reason { border: 1px solid var(--border); border-radius: 4px; padding: 15px; font-size: 13px; margin-bottom: 15px; background: #fafafa; min-height: 60px; }
-        
-        .btn-accept { background: #5cb85c; color: white; border: none; }
-        .btn-decline { background: #d9534f; color: white; border: none; }
+        .char-badge { background: var(--th-blue); color: white; padding: 2px 8px; border-radius: 4px; text-decoration: none; font-size: 12px; }
+        .transfer-reason { border: 1px solid var(--border); border-radius: 4px; padding: 10px; font-size: 12px; margin: 10px 0; background: #fafafa; }
     </style>
 </head>
 <body>
@@ -49,34 +51,40 @@
         <div class="side-header">Inbox</div>
         <div class="side-user">
             <div class="side-avatar" id="side-pfp"></div>
-            <a href="#" id="side-username" style="color:var(--th-blue); text-decoration:none; font-size:13px;">User</a>
+            <div>
+                <div style="display:flex; align-items:center;">
+                    <a href="#" id="side-username" style="color:var(--th-blue); text-decoration:none; font-size:13px; font-weight:bold;">User</a>
+                    <span id="side-crown"></span>
+                </div>
+                <div id="side-subs" style="font-size:10px; color:#777;">0 subscribers</div>
+            </div>
         </div>
         <div class="side-nav">
-            <a href="#">Inbox</a>
-            <a href="#">Outbox</a>
-            <a href="#">Message Folders</a>
-            <a href="#" class="active">Character Transfers <span id="notif-count">(0)</span></a>
-            <a href="#">World Requests</a>
-            <a href="#">Notifications</a>
+            <a href="javascript:void(0)" onclick="showTab('transfers')" id="tab-transfers" class="active">Character Transfers <span id="trans-count">(0)</span></a>
+            <a href="javascript:void(0)" onclick="showTab('notifs')" id="tab-notifs">Notifications <span id="notif-count">(0)</span></a>
         </div>
     </aside>
 
     <main class="main">
         <div class="breadcrumb">
-            <span style="color: var(--th-blue);">Account Management</span> / Notifications
+            <span style="color: var(--th-blue);">Account Management</span> / <span id="bread-tab">Transfers</span>
         </div>
         
-        <h2 class="page-title">Transfers</h2>
+        <h2 class="page-title" id="page-title">Character Transfers</h2>
         
-        <div id="transfer-list">
-            <div class="text-muted">Loading notifications...</div>
+        <div id="section-transfers">
+            <div id="transfer-list"><div class="text-muted">Loading transfers...</div></div>
+        </div>
+
+        <div id="section-notifs" style="display:none;">
+            <div id="notif-list"><div class="text-muted">Loading notifications...</div></div>
         </div>
     </main>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
@@ -88,88 +96,101 @@
         if (!user) return window.location.href = "index.html";
         currentUser = user;
 
-        // Set up sidebar profile
+        // 1. Setup Sidebar & Creator Status
         const userSnap = await getDoc(doc(db, "users", user.uid));
         if (userSnap.exists()) {
-            document.getElementById('side-username').innerText = userSnap.data().username;
-            if(userSnap.data().pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${userSnap.data().pfp}')`;
-        }
-
-        loadTransfers();
-    });
-
-    async function loadTransfers() {
-        const list = document.getElementById('transfer-list');
-        list.innerHTML = "";
-
-        // Find transfers where the recipient is the logged in user, and it hasn't been accepted/declined yet
-        const q = query(collection(db, "transfers"), where("toUserId", "==", currentUser.uid), where("status", "==", "pending"));
-        const snap = await getDocs(q);
-
-        document.getElementById('notif-count').innerText = `(${snap.size})`;
-
-        if (snap.empty) {
-            list.innerHTML = "<div class='text-muted p-3'>You have no pending transfers.</div>";
-            return;
-        }
-
-        snap.forEach(d => {
-            const transfer = d.data();
-            const dateStr = transfer.createdAt ? transfer.createdAt.toDate().toLocaleString() : "Just now";
-
-            list.innerHTML += `
-                <div class="transfer-card" id="transfer-${d.id}">
-                    <div class="transfer-img" style="background-image: url('${transfer.characterAvatar || ''}');"></div>
-                    <div class="transfer-body">
-                        <div class="transfer-time">${dateStr}</div>
-                        <div class="transfer-text">
-                            <i class="fa fa-user"></i> <strong>${transfer.fromUsername}</strong> would like to transfer you <a href="character.html?id=${transfer.characterId}" class="char-badge">${transfer.characterName}</a>.
-                        </div>
-                        <div class="transfer-reason">
-                            ${transfer.reason || 'No reason provided.'}
-                        </div>
-                        <div class="text-end">
-                            <button class="btn btn-sm btn-accept" onclick="resolveTransfer('${d.id}', '${transfer.characterId}', 'accept')"><i class="fa fa-check"></i> Accept</button>
-                            <button class="btn btn-sm btn-decline" onclick="resolveTransfer('${d.id}', '${transfer.characterId}', 'decline')"><i class="fa fa-times"></i> Decline</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    // Handle Accepting or Declining
-    window.resolveTransfer = async (transferId, charId, action) => {
-        try {
-            if (action === 'accept') {
-                // 1. Update the character's owner to the new user
-                await updateDoc(doc(db, "characters", charId), {
-                    ownerId: currentUser.uid,
-                    folderId: "" // Resets folder to Unsorted so it doesn't break
-                });
-                
-                // 2. Mark transfer as accepted
-                await updateDoc(doc(db, "transfers", transferId), { status: "accepted" });
-                alert("Character accepted! It is now in your Unsorted folder.");
-                
-            } else {
-                // Just mark as declined
-                await updateDoc(doc(db, "transfers", transferId), { status: "declined" });
-                alert("Transfer declined.");
+            const userData = userSnap.data();
+            document.getElementById('side-username').innerText = userData.username;
+            if(userData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${userData.pfp}')`;
+            
+            // Apply Gold Crown for militarygrade
+            if(userData.username.toLowerCase() === "militarygrade") {
+                document.getElementById('side-crown').innerHTML = `<i class="fa fa-crown creator-crown"></i>`;
             }
 
-            // Remove the card from the screen
-            document.getElementById(`transfer-${transferId}`).remove();
-            
-            // Update the counter
-            let countSpan = document.getElementById('notif-count');
-            let currentCount = parseInt(countSpan.innerText.replace(/\D/g,''));
-            countSpan.innerText = `(${currentCount - 1})`;
-
-        } catch (error) {
-            console.error(error);
-            alert("Error processing request.");
+            // Load Subscriber Count
+            const subSnap = await getDocs(collection(db, "users", user.uid, "subscribers"));
+            document.getElementById('side-subs').innerText = `${subSnap.size} subscribers`;
         }
+
+        // 2. Watch for Transfers (Real-time)
+        const transQ = query(collection(db, "transfers"), where("toUserId", "==", user.uid), where("status", "==", "pending"));
+        onSnapshot(transQ, (snap) => {
+            const list = document.getElementById('transfer-list');
+            document.getElementById('trans-count').innerText = `(${snap.size})`;
+            list.innerHTML = snap.empty ? "<div class='text-muted p-3'>No pending transfers.</div>" : "";
+            
+            snap.forEach(d => {
+                const t = d.data();
+                list.innerHTML += `
+                    <div class="transfer-card">
+                        <div class="transfer-img" style="background-image: url('${t.characterAvatar || ''}')"></div>
+                        <div class="transfer-body">
+                            <div class="transfer-time">${t.createdAt?.toDate().toLocaleString() || 'Recently'}</div>
+                            <div class="transfer-text"><strong>${t.fromUsername}</strong> wants to transfer <a href="character.html?id=${t.characterId}" class="char-badge">${t.characterName}</a> to you.</div>
+                            <div class="transfer-reason">${t.reason || 'No reason provided.'}</div>
+                            <div class="text-end">
+                                <button class="btn btn-sm btn-success me-2" onclick="resolveTransfer('${d.id}', '${t.characterId}', 'accept')">Accept</button>
+                                <button class="btn btn-sm btn-danger" onclick="resolveTransfer('${d.id}', '${t.characterId}', 'decline')">Decline</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        });
+
+        // 3. Watch for Social Notifs (Favs/Subs/Credit)
+        const notifQ = query(collection(db, "notifications"), where("toUserId", "==", user.uid), orderBy("createdAt", "desc"));
+        onSnapshot(notifQ, (snap) => {
+            const list = document.getElementById('notif-list');
+            document.getElementById('notif-count').innerText = `(${snap.size})`;
+            list.innerHTML = snap.empty ? "<div class='text-muted p-3'>No new notifications.</div>" : "";
+            
+            snap.forEach(d => {
+                const n = d.data();
+                let icon = "fa-bell text-secondary";
+                let text = "";
+
+                if(n.type === "subscription") {
+                    icon = "fa-user-plus text-success";
+                    text = `<strong>${n.fromUsername}</strong> subscribed to you!`;
+                } else if(n.type === "favorite") {
+                    icon = "fa-heart text-danger";
+                    text = `<strong>${n.fromUsername}</strong> favorited <a href="character.html?id=${n.characterId}">${n.characterName}</a>`;
+                } else if(n.type === "credit") {
+                    icon = "fa-palette text-primary";
+                    text = `<strong>${n.fromUsername}</strong> credited you for <a href="character.html?id=${n.characterId}">${n.characterName}</a>`;
+                }
+
+                list.innerHTML += `
+                    <div class="notif-card">
+                        <div class="notif-icon"><i class="fa ${icon}"></i></div>
+                        <div>${text}</div>
+                    </div>`;
+            });
+        });
+    });
+
+    // Tab Switching Logic
+    window.showTab = (tab) => {
+        document.getElementById('section-transfers').style.display = tab === 'transfers' ? 'block' : 'none';
+        document.getElementById('section-notifs').style.display = tab === 'notifs' ? 'block' : 'none';
+        document.getElementById('tab-transfers').classList.toggle('active', tab === 'transfers');
+        document.getElementById('tab-notifs').classList.toggle('active', tab === 'notifs');
+        document.getElementById('page-title').innerText = tab === 'transfers' ? 'Character Transfers' : 'General Notifications';
+        document.getElementById('bread-tab').innerText = tab === 'transfers' ? 'Transfers' : 'Notifications';
+    };
+
+    // Transfer Resolution
+    window.resolveTransfer = async (tId, cId, action) => {
+        try {
+            if (action === 'accept') {
+                await updateDoc(doc(db, "characters", cId), { ownerId: currentUser.uid, folderId: "" });
+                await updateDoc(doc(db, "transfers", tId), { status: "accepted" });
+                alert("Character accepted!");
+            } else {
+                await updateDoc(doc(db, "transfers", tId), { status: "declined" });
+            }
+        } catch (e) { console.error(e); }
     };
 </script>
 </body>
