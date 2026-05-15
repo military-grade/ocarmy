@@ -1,49 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login | OCARMY</title>
+    <meta charset="UTF-8">
+    <title>OCARMY | Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background: #2c3e50; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background: white; padding: 40px; border-radius: 4px; width: 350px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        h2 { text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; color: #2c3e50; }
-        input { width: 100%; margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .footer-links { text-align: center; margin-top: 20px; font-size: 13px; color: #777; }
-        .footer-links a { color: #3498db; text-decoration: none; }
+        :root { --th-blue: #3498db; --th-dark: #222; --th-input: #1a1a1a; --border: #444; }
+        body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: #222; color: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        
+        .login-card { background: #333; padding: 40px; border-radius: 8px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); text-align: center; }
+        .mascot-logo { max-width: 220px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); }
+        
+        h2 { margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase; font-size: 1.5rem; }
+        p { color: #888; font-size: 13px; margin-bottom: 30px; }
+
+        .form-group { text-align: left; margin-bottom: 20px; position: relative; }
+        label { display: block; font-size: 11px; text-transform: uppercase; color: #666; margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; }
+        
+        input { width: 100%; padding: 12px; padding-right: 40px; background: var(--th-input); border: 1px solid var(--border); border-radius: 4px; color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--th-blue); box-shadow: 0 0 8px rgba(52, 152, 219, 0.3); }
+
+        .toggle-password { position: absolute; right: 12px; bottom: 12px; color: #666; cursor: pointer; transition: 0.3s; }
+        .toggle-password:hover { color: var(--th-blue); }
+
+        .btn-login { width: 100%; padding: 15px; background: var(--th-blue); border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; margin-top: 10px; }
+        .btn-login:hover { background: #2980b9; transform: translateY(-2px); }
+
+        .options-link { display: block; margin-top: 15px; font-size: 12px; color: var(--th-blue); text-decoration: none; cursor: pointer; }
+        .options-link:hover { text-decoration: underline; }
+        
+        .footer-links { margin-top: 30px; font-size: 13px; border-top: 1px solid var(--border); padding-top: 20px; }
+        .footer-links a { color: #666; text-decoration: none; }
     </style>
 </head>
 <body>
-<div class="login-box">
-    <h2>Login</h2>
-    <input type="email" id="email" placeholder="Email Address">
-    <input type="password" id="password" placeholder="Password">
-    <button id="login-btn">Login</button>
-    <div class="footer-links">
-        <a href="register.html">Register New Account</a>
+
+    <div class="login-card">
+        <img src="Illustration226.jpg" alt="OCARMY Mascot" class="mascot-logo">
+        <h2>Login</h2>
+        <p>Access your characters and archive.</p>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label>Username or Email</label>
+                <input type="text" id="identifier" placeholder="Enter username or email" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+                <i class="fa fa-eye toggle-password" id="eye-icon" onclick="togglePass()"></i>
+            </div>
+
+            <button type="submit" class="btn-login" id="login-btn">Sign In</button>
+            <a class="options-link" onclick="forgotPassword()">Forgot Password?</a>
+        </form>
+
+        <div class="footer-links">
+            <a href="register.html">Need an account? <strong style="color: #3498db;">Register here.</strong></a>
+        </div>
     </div>
-</div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
-    authDomain: "ocarmy-db.firebaseapp.com",
-    projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.appspot.com",
-    messagingSenderId: "848883355194",
-    appId: "1:848883355194:web:51254de3c4992d7750af03"
-  };
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
+        authDomain: "ocarmy-db.firebaseapp.com",
+        projectId: "ocarmy-db"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore();
 
-  document.getElementById('login-btn').onclick = () => {
-    signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
-      .then(() => { window.location.href = "index.html"; })
-      .catch((err) => { alert("Login failed: " + err.message); });
-  };
+    // Show/Hide Password Toggle
+    window.togglePass = () => {
+        const passInput = document.getElementById('password');
+        const eye = document.getElementById('eye-icon');
+        if (passInput.type === "password") {
+            passInput.type = "text";
+            eye.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            passInput.type = "password";
+            eye.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    };
+
+    // Forgot Password Flow
+    window.forgotPassword = async () => {
+        const email = prompt("Enter the email address for your OCARMY account:");
+        if (!email) return;
+
+        try {
+            await sendPasswordResetEmail(auth, email);
+            alert("A reset link has been sent! Check your email and click the link, or copy the 'oobCode' from the URL.");
+            const code = prompt("If you just want to copy-paste the code from the email link, enter it here:");
+            if (code) {
+                window.location.href = `reset_password.html?oobCode=${code}`;
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
+    // Login logic: Handles Username OR Email
+    document.getElementById('login-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('login-btn');
+        btn.innerText = "Signing in...";
+        btn.disabled = true;
+
+        const input = document.getElementById('identifier').value;
+        const password = document.getElementById('password').value;
+        let email = input;
+
+        try {
+            // If the input isn't an email, look up the email by username
+            if (!input.includes('@')) {
+                const q = query(collection(db, "users"), where("username", "==", input));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    email = snap.docs[0].data().email;
+                } else {
+                    throw new Error("Username not found.");
+                }
+            }
+
+            await signInWithEmailAndPassword(auth, email, password);
+            window.location.href = "dashboard.html";
+        } catch (error) {
+            alert(error.message);
+            btn.innerText = "Sign In";
+            btn.disabled = false;
+        }
+    };
 </script>
 </body>
 </html>
