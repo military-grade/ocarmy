@@ -1,1 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Terms of Service | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--th-bg); color: #333; line-height: 1.6; }
 
+        /* Simple Header */
+        .tos-header { background: var(--th-dark); color: white; padding: 40px 20px; text-align: center; border-bottom: 4px solid var(--th-blue); }
+        .tos-header h1 { margin: 0; letter-spacing: 2px; text-transform: uppercase; font-size: 2rem; }
+        
+        .wrapper { max-width: 900px; margin: 40px auto; background: white; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .back-bar { background: #f9f9f9; padding: 15px 25px; border-bottom: 1px solid var(--border); }
+        .btn-back { color: var(--th-blue); text-decoration: none; font-weight: bold; font-size: 14px; transition: 0.3s; }
+        .btn-back:hover { color: #356d82; }
+
+        .tos-content { padding: 40px; }
+        .tos-section { margin-bottom: 40px; }
+        .tos-section h2 { color: var(--th-blue); font-size: 1.5rem; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        .tos-list { list-style: none; padding: 0; }
+        .tos-list li { margin-bottom: 15px; padding-left: 30px; position: relative; }
+        .tos-list li::before { content: "\f00c"; font-family: "Font Awesome 5 Free"; font-weight: 900; position: absolute; left: 0; color: var(--th-blue); }
+        .tos-list li.prohibited::before { content: "\f00d"; color: #d9534f; }
+        
+        .important-note { background: #fff3f3; border-left: 4px solid #d9534f; padding: 20px; margin: 20px 0; border-radius: 4px; font-size: 14px; }
+        
+        .footer-note { text-align: center; padding: 30px; background: #f9f9f9; border-top: 1px solid var(--border); color: #777; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="tos-header">
+        <h1>Terms of Service</h1>
+    </div>
+
+    <div class="wrapper">
+        <div class="back-bar">
+            <a href="dashboard.html" class="btn-back"><i class="fa fa-arrow-left"></i> Return to Dashboard</a>
+        </div>
+
+        <div class="tos-content">
+            
+            <div class="tos-section">
+                <h2><i class="fa fa-globe"></i> General Site Rules</h2>
+                <ul class="tos-list">
+                    <li class="prohibited"><strong>AI Prohibition:</strong> You may NOT use our services or site to train AI. This includes all uploaded characters, art, and images.</li>
+                    <li class="prohibited"><strong>Conduct:</strong> You may NOT use our site to harass, stalk, or endanger others.</li>
+                    <li class="prohibited"><strong>Content Safety:</strong> You may NOT upload hateful art or characters. While we are an archive site, we prioritize the safety of our community.</li>
+                    <li><strong>Age Requirement:</strong> You must be at least 14 years old to join OCARMY.</li>
+                    <li class="prohibited"><strong>Hate Speech:</strong> Do not post hate speech, ship discourse content, political content, racism, LGBT-phobia, or other hateful topics.</li>
+                </ul>
+                <div class="important-note">
+                    <strong>Banning Policy:</strong> If you are banned, we will keep your works and characters uploaded for proper recovery, but we will revoke your permissions for uploading. Your profile will only be visible to you.
+                </div>
+            </div>
+
+            <div class="tos-section">
+                <h2><i class="fa fa-paint-brush"></i> Art & Characters</h2>
+                <ul class="tos-list">
+                    <li>Art may be uploaded provided proper credit is given to the original creator.</li>
+                    <li class="prohibited">You may NOT archive other users' art or characters if they have been banned.</li>
+                    <li class="prohibited"><strong>No AI Content:</strong> You MAY NOT upload AI generated images, or put existing characters into AI generators.</li>
+                    <li class="prohibited"><strong>NSFW/Suggestive Content:</strong> You MAY NOT upload suggestive or NSFW art of underage, feral, or otherwise non-consenting characters (real or fictional).</li>
+                    <li>Kinsonas and inspired characters are allowed with proper credit!</li>
+                </ul>
+            </div>
+
+            <div class="tos-section">
+                <h2><i class="fa fa-shopping-bag"></i> Adoptables</h2>
+                <ul class="tos-list">
+                    <li class="prohibited">You MAY NOT upload adopts you do not own or did not create.</li>
+                    <li>You MAY upload adopts you have owned previously if they are hosted off-site or if the creator does not have an OCARMY account.</li>
+                    <li>Inspired / CBC (Character-Based Character) adopts are permitted with proper credit.</li>
+                    <li class="prohibited">You MAY NOT make adopts based on existing OCs unless given explicit permission by the original creator.</li>
+                </ul>
+            </div>
+
+            <div class="tos-section">
+                <h2><i class="fa fa-dollar-sign"></i> Commissions</h2>
+                <ul class="tos-list">
+                    <li class="prohibited"><strong>Restricted Payment/Services:</strong> You MAY NOT advertise commissions that accept payment through or for: Genshin Impact, Identity V, Honkai Star Rail, Streaming Subscriptions, or Toyhou.se Pro Subscriptions.</li>
+                    <li><strong>Terminology:</strong> You MAY NOT advertise "Free Commissions." These must be titled <strong>Art Requests</strong> (note: this is a formatting rule, not a bannable offense).</li>
+                    <li class="prohibited">You MAY NOT advertise NSFW commissions on the site.</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="footer-note">
+            Stay safe! If you see anyone violating our Terms of Service, please report them to OCARMY staff immediately.
+        </div>
+    </div>
+
+</body>
+</html>
