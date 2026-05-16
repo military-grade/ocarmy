@@ -25,11 +25,8 @@
 
         .btn-login { width: 100%; padding: 15px; background: var(--th-blue); border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; margin-top: 10px; }
         .btn-login:hover { background: #2980b9; transform: translateY(-2px); }
-        .btn-login:disabled { background: #555; cursor: not-allowed; transform: none; }
+        .btn-login:disabled { background: #555 !important; cursor: not-allowed; transform: none; }
 
-        .options-link { display: block; margin-top: 15px; font-size: 12px; color: var(--th-blue); text-decoration: none; cursor: pointer; }
-        .options-link:hover { text-decoration: underline; }
-        
         .footer-links { margin-top: 30px; font-size: 13px; border-top: 1px solid var(--border); padding-top: 20px; }
         .footer-links a { color: #666; text-decoration: none; }
     </style>
@@ -44,17 +41,17 @@
         <form id="login-form">
             <div class="form-group">
                 <label>Username or Email</label>
-                <input type="text" id="identifier" placeholder="Enter username or email" required>
+                <input type="text" id="identifier" placeholder="Enter username or email" required autocomplete="username">
             </div>
 
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="password" placeholder="••••••••" required>
+                <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
                 <i class="fa fa-eye toggle-password" id="eye-icon" onclick="togglePass()"></i>
             </div>
 
             <button type="submit" class="btn-login" id="login-btn">Sign In</button>
-            <a class="options-link" onclick="forgotPassword()">Forgot Password?</a>
+            <a style="display:block; margin-top:15px; color:#3498db; font-size:12px; cursor:pointer;" onclick="forgotPassword()">Forgot Password?</a>
         </form>
 
         <div class="footer-links">
@@ -64,9 +61,10 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // Double check these match your Firebase Console EXACTLY
     const firebaseConfig = {
         apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
         authDomain: "ocarmy-db.firebaseapp.com",
@@ -74,8 +72,13 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const db = getFirestore();
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // If user is already logged in, push them to dashboard immediately
+    onAuthStateChanged(auth, (user) => {
+        if (user) window.location.href = "dashboard.html";
+    });
 
     window.togglePass = () => {
         const passInput = document.getElementById('password');
@@ -91,50 +94,48 @@
 
     window.forgotPassword = async () => {
         const email = prompt("Enter your account email:");
-        if (!email) return;
-        try {
-            await sendPasswordResetEmail(auth, email);
-            alert("Reset link sent! Please check your inbox.");
-        } catch (error) {
-            alert("Error: " + error.message);
+        if (email) {
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("Reset email sent!");
+            } catch (e) { alert(e.message); }
         }
     };
 
     document.getElementById('login-form').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('login-btn');
-        const input = document.getElementById('identifier').value.trim();
+        const identifier = document.getElementById('identifier').value.trim();
         const password = document.getElementById('password').value;
         
         btn.innerText = "Signing in...";
         btn.disabled = true;
 
-        let loginEmail = input;
-
         try {
-            // If the input doesn't look like an email, find the email via Firestore username query
-            if (!input.includes('@')) {
-                const q = query(collection(db, "users"), where("username", "==", input));
+            let email = identifier;
+
+            // 1. Username Lookup Logic
+            if (!identifier.includes('@')) {
+                const q = query(collection(db, "users"), where("username", "==", identifier));
                 const snap = await getDocs(q);
                 
                 if (!snap.empty) {
-                    loginEmail = snap.docs[0].data().email;
+                    email = snap.docs[0].data().email;
                 } else {
-                    // Stop early if username doesn't exist
-                    throw new Error("auth/invalid-credential");
+                    throw new Error("User not found.");
                 }
             }
 
-            // Attempt login with the found (or provided) email
-            await signInWithEmailAndPassword(auth, loginEmail, password);
+            // 2. The Login
+            await signInWithEmailAndPassword(auth, email, password);
+            console.log("Login Success!");
             window.location.href = "dashboard.html";
 
         } catch (error) {
-            console.error("Login error:", error.code);
-            // Generic error message for security and better UX
+            console.error("Login Error:", error.code, error.message);
             alert("Incorrect username or password.");
             
-            // RESET BUTTON so the user can try again
+            // 3. THE FIX: Ensure button always resets on error
             btn.innerText = "Sign In";
             btn.disabled = false;
         }
