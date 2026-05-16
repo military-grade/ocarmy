@@ -136,11 +136,23 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, collection, query, where, getDocs, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
-    const auth = getAuth();
+    // UPDATED CONFIG FROM IMG_7567
+    const firebaseConfig = {
+        apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
+        authDomain: "ocarmy-db.firebaseapp.com",
+        projectId: "ocarmy-db",
+        storageBucket: "ocarmy-db.firebasestorage.app",
+        messagingSenderId: "848883355194",
+        appId: "1:848883355194:web:361e9fe8eb9e01f350af03",
+        measurementId: "G-9G2WV3NXV1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
     window.toggleDrop = (id) => {
         document.querySelectorAll('.dropdown-content').forEach(d => { if(d.id !== id) d.classList.remove('show'); });
@@ -157,22 +169,28 @@
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Update Public Profile links with the new ?user= format
+            // Setup public URLs
             const publicUrl = `profile.html?user=${user.uid}`;
             document.getElementById('nav-public-profile').href = publicUrl;
             document.getElementById('side-public-profile').href = publicUrl;
 
-            onSnapshot(doc(db, "users", user.uid), async (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    document.getElementById('nav-username').innerText = data.username;
-                    document.getElementById('side-username').innerText = data.username;
+            // BULLETPROOF FETCH: Query by email to guarantee we find the right document 
+            // even if the document ID isn't the standard user.uid
+            const userQuery = query(collection(db, "users"), where("email", "==", user.email));
+            
+            onSnapshot(userQuery, async (snap) => {
+                if (!snap.empty) {
+                    const data = snap.docs[0].data();
+                    const actualUserId = snap.docs[0].id; // Get the real document ID
+                    
+                    document.getElementById('nav-username').innerText = data.username || "User";
+                    document.getElementById('side-username').innerText = data.username || "User";
+                    
                     if (data.pfp) {
                         document.getElementById('nav-avatar').style.backgroundImage = `url('${data.pfp}')`;
                         document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
                     }
 
-                    // 👑 Crown logic for militarygrade
                     if (data.username?.toLowerCase() === 'militarygrade') {
                         const container = document.getElementById('side-name-container');
                         if (!container.querySelector('.fa-crown')) {
@@ -180,27 +198,39 @@
                         }
                     }
 
-                    // Subscriber Count
-                    const subSnap = await getDocs(collection(db, "users", user.uid, "subscribers"));
+                    const subSnap = await getDocs(collection(db, "users", actualUserId, "subscribers"));
                     document.getElementById('dash-sub-count').innerText = `${subSnap.size} subscribers`;
 
-                    // Render Profile Content
-                    const rawHTML = data.profileHTML || "Welcome!";
+                    const rawHTML = data.profileHTML || "Welcome to your new dashboard!";
                     document.getElementById('profile-raw-render').innerHTML = rawHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
                     document.getElementById('custom-profile-css').innerHTML = data.profileCSS || "";
+                } else {
+                    console.error("No user profile found for this email address.");
                 }
             });
 
-            // Character Grid Fetch
-            onSnapshot(query(collection(db, "characters"), where("ownerId", "==", user.uid), where("folderId", "==", "")), (snap) => {
+            // Character Fetch: Using the auth UID for ownership
+            const charQuery = query(collection(db, "characters"), where("ownerId", "==", user.uid));
+            onSnapshot(charQuery, (snap) => {
                 const grid = document.getElementById('char-grid');
-                if (snap.empty) { grid.innerHTML = "<div class='text-muted small'>No characters found.</div>"; return; }
-                grid.innerHTML = snap.docs.map(d => `
+                
+                // Filter out characters that are in folders on the client side just in case
+                const unsortedChars = snap.docs.filter(d => !d.data().folderId || d.data().folderId === "");
+                
+                if (unsortedChars.length === 0) { 
+                    grid.innerHTML = "<div class='text-muted small'>No characters found.</div>"; 
+                    return; 
+                }
+                
+                grid.innerHTML = unsortedChars.map(d => `
                     <a href="character.html?id=${d.id}" class="char-card">
-                        <div class="char-thumb" style="background-image: url('${d.data().avatar}')"></div>
-                        <div class="char-name">${d.data().name}</div>
+                        <div class="char-thumb" style="background-image: url('${d.data().avatar || ''}')"></div>
+                        <div class="char-name">${d.data().name || 'Unnamed'}</div>
                     </a>`).join('');
             });
+        } else {
+            // Not logged in, kick them back to login
+            window.location.href = "login.html";
         }
     });
 </script>
