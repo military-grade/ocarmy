@@ -25,6 +25,7 @@
 
         .btn-login { width: 100%; padding: 15px; background: var(--th-blue); border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; margin-top: 10px; }
         .btn-login:hover { background: #2980b9; transform: translateY(-2px); }
+        .btn-login:disabled { background: #555; cursor: not-allowed; transform: none; }
 
         .options-link { display: block; margin-top: 15px; font-size: 12px; color: var(--th-blue); text-decoration: none; cursor: pointer; }
         .options-link:hover { text-decoration: underline; }
@@ -76,7 +77,6 @@
     const auth = getAuth();
     const db = getFirestore();
 
-    // Show/Hide Password Toggle
     window.togglePass = () => {
         const passInput = document.getElementById('password');
         const eye = document.getElementById('eye-icon');
@@ -89,50 +89,52 @@
         }
     };
 
-    // Forgot Password Flow
     window.forgotPassword = async () => {
-        const email = prompt("Enter the email address for your OCARMY account:");
+        const email = prompt("Enter your account email:");
         if (!email) return;
-
         try {
             await sendPasswordResetEmail(auth, email);
-            alert("A reset link has been sent! Check your email and click the link, or copy the 'oobCode' from the URL.");
-            const code = prompt("If you just want to copy-paste the code from the email link, enter it here:");
-            if (code) {
-                window.location.href = `reset_password.html?oobCode=${code}`;
-            }
+            alert("Reset link sent! Please check your inbox.");
         } catch (error) {
-            alert(error.message);
+            alert("Error: " + error.message);
         }
     };
 
-    // Login logic: Handles Username OR Email
     document.getElementById('login-form').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('login-btn');
+        const input = document.getElementById('identifier').value.trim();
+        const password = document.getElementById('password').value;
+        
         btn.innerText = "Signing in...";
         btn.disabled = true;
 
-        const input = document.getElementById('identifier').value;
-        const password = document.getElementById('password').value;
-        let email = input;
+        let loginEmail = input;
 
         try {
-            // If the input isn't an email, look up the email by username
+            // If the input doesn't look like an email, find the email via Firestore username query
             if (!input.includes('@')) {
                 const q = query(collection(db, "users"), where("username", "==", input));
                 const snap = await getDocs(q);
+                
                 if (!snap.empty) {
-                    email = snap.docs[0].data().email;
+                    loginEmail = snap.docs[0].data().email;
                 } else {
-                    throw new Error("Username not found.");
+                    // Stop early if username doesn't exist
+                    throw new Error("auth/invalid-credential");
                 }
             }
 
-            await signInWithEmailAndPassword(auth, email, password);
+            // Attempt login with the found (or provided) email
+            await signInWithEmailAndPassword(auth, loginEmail, password);
             window.location.href = "dashboard.html";
+
         } catch (error) {
-            alert(error.message);
+            console.error("Login error:", error.code);
+            // Generic error message for security and better UX
+            alert("Incorrect username or password.");
+            
+            // RESET BUTTON so the user can try again
             btn.innerText = "Sign In";
             btn.disabled = false;
         }
