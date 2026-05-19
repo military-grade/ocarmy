@@ -8,42 +8,28 @@
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-
-        /* Navbar & Top Right Dropdown */
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 2000; }
         .nav-left { display: flex; gap: 5px; align-items: center; height: 100%; }
         .nav-left a, .nav-item-btn { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
         .nav-left a:hover, .nav-item-btn:hover { color: white; background: rgba(255,255,255,0.1); }
-        
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
         .dropdown-content { display: none; position: absolute; top: 50px; background: white; border: 1px solid var(--border); min-width: 160px; box-shadow: 0 6px 12px rgba(0,0,0,.175); z-index: 3000; padding: 5px 0; border-radius: 0 0 4px 4px; }
         .dropdown-content a { display: block; padding: 8px 20px; color: #333 !important; text-decoration: none; font-size: 13px; width: 100%; text-align: left; }
         .show { display: block !important; }
-
-        /* Notif Bar Badges */
         .notif-bar { display: flex; align-items: center; gap: 2px; margin-right: 10px; }
         .notif-item { padding: 4px 8px; font-size: 11px; border-radius: 3px; color: white; display: flex; align-items: center; gap: 5px; background: #337ab7; text-decoration: none; opacity: 0.6; }
-        .notif-world { background: #f0ad4e; }
-
-        /* Sidebar - Full Portfolio & Interaction */
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .side-avatar { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
-
-        /* Creator Crown */
         .creator-crown { color: #ffd700; margin-left: 5px; text-shadow: 0 0 3px rgba(0,0,0,0.2); }
-
-        /* Character Grid */
         .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; padding: 20px 0; }
         .char-card { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; text-decoration: none; background: #fff; transition: 0.2s; }
         .char-thumb { width: 100%; aspect-ratio: 1/1; background-size: cover; background-position: center; background-color: #eee; }
         .char-name { padding: 8px; font-size: 12px; font-weight: bold; color: var(--th-blue); text-align: center; }
-
         .main { flex: 1; padding: 30px; background: white; }
-        #profile-raw-render { width: 100%; min-height: 100px; }
     </style>
     <style id="custom-profile-css"></style>
 </head>
@@ -66,12 +52,11 @@
 
     <div style="display: flex; align-items: center;">
         <div class="notif-bar">
-            <a href="#" class="notif-item notif-world"><i class="fa fa-globe"></i> <span id="badge-worlds">0</span></a>
+            <a href="#" class="notif-item"><i class="fa fa-globe"></i> <span id="badge-worlds">0</span></a>
             <a href="notifications.html" class="notif-item"><i class="fa fa-user"></i> <span id="badge-social">0</span></a>
             <a href="notifications.html" class="notif-item"><i class="fa fa-star"></i> <span id="badge-favs">0</span></a>
             <a href="notifications.html" class="notif-item"><i class="fa fa-envelope"></i> <span id="badge-inbox">0</span></a>
         </div>
-
         <div class="dropdown">
             <button class="nav-item-btn" onclick="toggleDrop('drop-user')">
                 <span id="nav-username">User</span>
@@ -105,15 +90,9 @@
             <a id="side-public-profile" href="#"><i class="fa fa-eye"></i> View Profile</a>
             <a href="bulletins.html"><i class="fa fa-comment"></i> Bulletins</a>
             <a href="characters.html"><i class="fa fa-users"></i> Characters</a>
-            <a href="#"><i class="fa fa-link"></i> Links</a>
-            <a href="#"><i class="fa fa-globe"></i> Worlds</a>
-            <a href="#"><i class="fa fa-star"></i> Favorites</a>
-            
             <div class="side-label">Portfolio</div>
             <a href="designs.html"><i class="fa fa-paint-brush"></i> Designs</a>
             <a href="art.html"><i class="fa fa-image"></i> Art</a>
-            <a href="#"><i class="fa fa-book"></i> Library</a>
-            
             <div class="side-label">Interaction</div>
             <a href="profile_comments.html"><i class="fa fa-comments"></i> Comments</a>
             <a href="notifications.html"><i class="fa fa-bell"></i> Notifications</a>
@@ -123,7 +102,6 @@
 
     <main class="main">
         <div id="profile-raw-render"></div>
-        
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 40px;">
             <span style="font-weight:bold; font-size: 18px;"><i class="fa fa-folder-open"></i> Unsorted Characters</span>
             <a href="characters.html" style="font-size:11px; font-weight:bold; color:var(--th-blue); text-decoration:none;">View All</a>
@@ -132,14 +110,11 @@
     </main>
 </div>
 
-<script type="module" src="navbar-notifs.js"></script>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, collection, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    // UPDATED CONFIG FROM IMG_7567
     const firebaseConfig = {
         apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
         authDomain: "ocarmy-db.firebaseapp.com",
@@ -159,79 +134,80 @@
         document.getElementById(id).classList.toggle('show');
     };
 
-    window.onclick = (e) => {
-        if (!e.target.closest('.dropdown')) {
-            document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
-        }
-    };
-
     document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href="login.html");
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            // Setup public URLs
-            const publicUrl = `profile.html?user=${user.uid}`;
-            document.getElementById('nav-public-profile').href = publicUrl;
-            document.getElementById('side-public-profile').href = publicUrl;
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
 
-            // BULLETPROOF FETCH: Query by email to guarantee we find the right document 
-            // even if the document ID isn't the standard user.uid
-            const userQuery = query(collection(db, "users"), where("email", "==", user.email));
-            
-            onSnapshot(userQuery, async (snap) => {
-                if (!snap.empty) {
-                    const data = snap.docs[0].data();
-                    const actualUserId = snap.docs[0].id; // Get the real document ID
-                    
-                    document.getElementById('nav-username').innerText = data.username || "User";
-                    document.getElementById('side-username').innerText = data.username || "User";
-                    
-                    if (data.pfp) {
-                        document.getElementById('nav-avatar').style.backgroundImage = `url('${data.pfp}')`;
-                        document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
-                    }
+        console.log("Logged in as:", user.email, "UID:", user.uid);
 
-                    if (data.username?.toLowerCase() === 'militarygrade') {
-                        const container = document.getElementById('side-name-container');
-                        if (!container.querySelector('.fa-crown')) {
-                            container.innerHTML += ` <i class="fa fa-crown creator-crown" title="OCARMY Creator"></i>`;
-                        }
-                    }
+        // 1. Find the User Profile (Searching by Email to be safe)
+        const userQuery = query(collection(db, "users"), where("email", "==", user.email));
+        
+        onSnapshot(userQuery, async (userSnap) => {
+            if (userSnap.empty) {
+                console.error("No database profile found for this email!");
+                return;
+            }
 
-                    const subSnap = await getDocs(collection(db, "users", actualUserId, "subscribers"));
-                    document.getElementById('dash-sub-count').innerText = `${subSnap.size} subscribers`;
+            const userDoc = userSnap.docs[0];
+            const userData = userDoc.data();
+            const dbUserId = userDoc.id; // This is the ID we use for everything else
+            const username = userData.username || "User";
 
-                    const rawHTML = data.profileHTML || "Welcome to your new dashboard!";
-                    document.getElementById('profile-raw-render').innerHTML = rawHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
-                    document.getElementById('custom-profile-css').innerHTML = data.profileCSS || "";
-                } else {
-                    console.error("No user profile found for this email address.");
+            console.log("Found profile for:", username, "Document ID:", dbUserId);
+
+            // Update UI
+            document.getElementById('nav-username').innerText = username;
+            document.getElementById('side-username').innerText = username;
+            document.getElementById('nav-public-profile').href = `profile.html?user=${dbUserId}`;
+            document.getElementById('side-public-profile').href = `profile.html?user=${dbUserId}`;
+
+            if (userData.pfp) {
+                document.getElementById('nav-avatar').style.backgroundImage = `url('${userData.pfp}')`;
+                document.getElementById('side-pfp').style.backgroundImage = `url('${userData.pfp}')`;
+            }
+
+            if (username.toLowerCase() === 'militarygrade') {
+                const container = document.getElementById('side-name-container');
+                if (!container.querySelector('.fa-crown')) {
+                    container.innerHTML += ` <i class="fa fa-crown creator-crown" title="OCARMY Creator"></i>`;
                 }
-            });
+            }
 
-            // Character Fetch: Using the auth UID for ownership
-            const charQuery = query(collection(db, "characters"), where("ownerId", "==", user.uid));
+            const rawHTML = userData.profileHTML || "Welcome!";
+            document.getElementById('profile-raw-render').innerHTML = rawHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+            document.getElementById('custom-profile-css').innerHTML = userData.profileCSS || "";
+
+            // 2. Fetch Subscribers using the found ID
+            const subSnap = await getDocs(collection(db, "users", dbUserId, "subscribers"));
+            document.getElementById('dash-sub-count').innerText = `${subSnap.size} subscribers`;
+
+            // 3. Fetch Characters using both UID and Document ID (Double Check)
+            const charQuery = query(collection(db, "characters"), 
+                where("ownerId", "in", [user.uid, dbUserId, username])
+            );
+
             onSnapshot(charQuery, (snap) => {
                 const grid = document.getElementById('char-grid');
+                console.log("Characters found:", snap.size);
                 
-                // Filter out characters that are in folders on the client side just in case
-                const unsortedChars = snap.docs.filter(d => !d.data().folderId || d.data().folderId === "");
+                const unsorted = snap.docs.filter(d => !d.data().folderId || d.data().folderId === "");
                 
-                if (unsortedChars.length === 0) { 
-                    grid.innerHTML = "<div class='text-muted small'>No characters found.</div>"; 
-                    return; 
+                if (unsorted.length === 0) {
+                    grid.innerHTML = "<div class='text-muted small'>No characters found.</div>";
+                } else {
+                    grid.innerHTML = unsorted.map(d => `
+                        <a href="character.html?id=${d.id}" class="char-card">
+                            <div class="char-thumb" style="background-image: url('${d.data().avatar || ''}')"></div>
+                            <div class="char-name">${d.data().name || 'Unnamed'}</div>
+                        </a>`).join('');
                 }
-                
-                grid.innerHTML = unsortedChars.map(d => `
-                    <a href="character.html?id=${d.id}" class="char-card">
-                        <div class="char-thumb" style="background-image: url('${d.data().avatar || ''}')"></div>
-                        <div class="char-name">${d.data().name || 'Unnamed'}</div>
-                    </a>`).join('');
             });
-        } else {
-            // Not logged in, kick them back to login
-            window.location.href = "login.html";
-        }
+        });
     });
 </script>
 </body>
