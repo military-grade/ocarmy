@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE <!DOCTYPE html>
 <html>
 <head>
     <title>Join OCARMY</title>
@@ -8,6 +8,7 @@
         input { display: block; margin: 15px auto; padding: 12px; width: 280px; border-radius: 4px; border: 1px solid #555; background: #222; color: white; }
         button { background: #008eb0; color: white; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
         button:hover { background: #00a8d1; }
+        button:disabled { background: #444; cursor: not-allowed; }
         #msg { color: #ff6b6b; font-size: 13px; margin-top: 15px; }
     </style>
 </head>
@@ -28,46 +29,68 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k",
     authDomain: "ocarmy-db.firebaseapp.com",
     projectId: "ocarmy-db",
-    storageBucket: "ocarmy-db.appspot.com",
+    storageBucket: "ocarmy-db.firebasestorage.app",
     messagingSenderId: "848883355194",
-    appId: "1:848883355194:web:51254de3c4992d7750af03"
+    appId: "1:848883355194:web:361e9fe8eb9e01f350af03"
   };
 
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
+  const auth = getAuth(app);
   const db = getFirestore(app);
 
   document.getElementById('btn-reg').onclick = async () => {
-    const email = document.getElementById('reg-email').value;
+    const btn = document.getElementById('btn-reg');
+    const email = document.getElementById('reg-email').value.trim();
     const pass = document.getElementById('reg-password').value;
-    const user = document.getElementById('reg-username').value;
+    const username = document.getElementById('reg-username').value.trim();
+    const msg = document.getElementById('msg');
 
-    if(!user || !email || !pass) {
-        document.getElementById('msg').innerText = "Please fill in all fields.";
+    if(!username || !email || !pass) {
+        msg.innerText = "Please fill in all fields.";
         return;
     }
 
+    btn.disabled = true;
+    btn.innerText = "Creating Account...";
+
     try {
+        // 1. Check if username is already taken (Case Insensitive)
+        const q = query(collection(db, "users"), where("username_lower", "==", username.toLowerCase()));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+            throw new Error("That username is already taken!");
+        }
+
+        // 2. Create the user in Firebase Auth
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        // This creates the UNIQUE locker for this specific user ID
+        
+        // 3. Create the document in Firestore with the MISSING EMAIL
         await setDoc(doc(db, "users", cred.user.uid), {
-            username: user,
+            username: username,                // For display (e.g. "SparklePuss")
+            username_lower: username.toLowerCase(), // For login (e.g. "sparklepuss")
+            email: email.toLowerCase(),        // CRITICAL: This fixes the Dashboard!
             pfp: "",
-            customCode: "",
-            blurb: "Welcome to my profile!",
+            profileHTML: "<p>Welcome to my profile!</p>",
+            profileCSS: "",
             alerts: 0,
             faves: 0,
-            subs: 0
+            subs: 0,
+            createdAt: new Date()
         });
+
         window.location.href = "dashboard.html";
+
     } catch (e) { 
-        document.getElementById('msg').innerText = e.message; 
+        msg.innerText = e.message; 
+        btn.disabled = false;
+        btn.innerText = "Register";
     }
   };
 </script>
