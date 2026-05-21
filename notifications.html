@@ -28,7 +28,6 @@
         .main { flex: 1; padding: 25px; }
         .breadcrumb { background: #f9f9f9; padding: 10px 15px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; margin-bottom: 20px; color: #777; }
         
-        /* Updated Page Title to flex for the clear button */
         .page-title-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
         .page-title { font-size: 22px; margin: 0; }
         .btn-clear { background: #eee; color: #555; border: 1px solid #ccc; padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; display: none; }
@@ -98,46 +97,58 @@
 
     let currentSection = 'transfers';
     
-    // Global Arrays to store data so we don't recreate listeners
     let transfersData = [];
     let generalNotifsData = [];
-    let currentUserUid = null;
+    let searchIds = []; // Stores both email-lookup ID and Auth UID
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) return window.location.href = "login.html";
-        currentUserUid = user.uid;
 
-        // 1. Sidebar Setup
-        const userSnap = await getDoc(doc(db, "users", user.uid));
-        if (userSnap.exists()) {
-            const data = userSnap.data();
-            document.getElementById('side-username').innerText = data.username;
-            if(data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+        // 1. Robust Dual-Search Lookup (Matches your dashboard logic)
+        let dbId = user.uid;
+        let userData = null;
+
+        const emailQuery = query(collection(db, "users"), where("email", "==", user.email.toLowerCase()));
+        const emailSnap = await getDocs(emailQuery);
+
+        if (!emailSnap.empty) {
+            dbId = emailSnap.docs[0].id;
+            userData = emailSnap.docs[0].data();
+        } else {
+            const uidDoc = await getDoc(doc(db, "users", user.uid));
+            if (uidDoc.exists()) {
+                userData = uidDoc.data();
+            }
+        }
+
+        // We use both IDs to ensure we catch notifications sent to either one
+        searchIds = [...new Set([user.uid, dbId])];
+
+        // 2. Sidebar Setup
+        if (userData) {
+            document.getElementById('side-username').innerText = userData.username || "User";
+            if(userData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${userData.pfp}')`;
             
-            if (data.username.toLowerCase() === 'militarygrade') {
+            if ((userData.username || "").toLowerCase() === 'militarygrade') {
                 document.getElementById('side-crown').innerHTML = `<i class="fa fa-crown creator-crown"></i>`;
             }
 
-            const subSnap = await getDocs(collection(db, "users", user.uid, "subscribers"));
+            const subSnap = await getDocs(collection(db, "users", dbId, "subscribers"));
             document.getElementById('side-subs').innerText = `${subSnap.size} subscribers`;
         }
 
-        // 2. Attach Real-time Listeners EXACTLY ONCE
-        
-        // Listener for Character Transfers
-        const transfersQ = query(collection(db, "transfers"), where("toUserId", "==", user.uid), where("status", "==", "pending"));
+        // 3. Attach Listeners Using Both IDs
+        const transfersQ = query(collection(db, "transfers"), where("toUserId", "in", searchIds), where("status", "==", "pending"));
         onSnapshot(transfersQ, (snap) => {
             transfersData = snap.docs;
             document.getElementById('count-transfers').innerText = `(${snap.size})`;
             if(currentSection === 'transfers') renderDisplay();
         });
 
-        // Listener for General Notifications
-        const notifsQ = query(collection(db, "notifications"), where("toUserId", "==", user.uid), orderBy("createdAt", "desc"));
+        const notifsQ = query(collection(db, "notifications"), where("toUserId", "in", searchIds), orderBy("createdAt", "desc"));
         onSnapshot(notifsQ, (snap) => {
             generalNotifsData = snap.docs;
             
-            // Count ONLY UNREAD for the sidebar brackets
             const counts = { subscriptions: 0, updates: 0, comments: 0 };
             snap.forEach(d => {
                 const data = d.data();
@@ -157,31 +168,22 @@
         });
     });
 
-    // Handle switching tabs
     window.showSection = (section) => {
         currentSection = section;
-        const titles = { 
-            transfers: 'Character Transfers', 
-            subscriptions: 'Subscriptions', 
-            updates: 'Character Updates', 
-            comments: 'Subscribers & Comments' 
-        };
+        const titles = { transfers: 'Character Transfers', subscriptions: 'Subscriptions', updates: 'Character Updates', comments: 'Subscribers & Comments' };
         
         document.getElementById('page-title').innerText = titles[section];
         document.getElementById('bread-current').innerText = titles[section];
         
-        // Update active class
         document.querySelectorAll('.side-nav a').forEach(a => a.classList.remove('active'));
         document.getElementById(`nav-${section}`).classList.add('active');
         
-        // Show or Hide the Clear Button (Transfers don't get 'cleared', they get accepted)
         if(section === 'transfers') document.getElementById('btn-clear').style.display = 'none';
         else document.getElementById('btn-clear').style.display = 'block';
         
         renderDisplay();
     };
 
-    // Central function to render whatever is currently selected
     function renderDisplay() {
         const area = document.getElementById('notif-display-area');
         
@@ -206,7 +208,6 @@
             }).join('');
             
         } else {
-            // Filter general notifications based on the current section
             const filtered = generalNotifsData.filter(d => {
                 const type = d.data().type;
                 if(currentSection === 'subscriptions') return type === 'subscription';
@@ -223,7 +224,6 @@
             area.innerHTML = filtered.map(d => {
                 const n = d.data();
                 const isUnread = n.read === false;
-                
                 let iconClass, message;
                 
                 if (n.type === 'subscription') {
@@ -249,27 +249,23 @@
         }
     }
 
-    // New Function: Clears active notifications for the current section
     window.clearCurrentSection = async () => {
-        if (currentSection === 'transfers' || !currentUserUid) return;
+        if (currentSection === 'transfers' || searchIds.length === 0) return;
 
-        // Find all UNREAD notifications that belong in the CURRENT section
         const unreadDocsToClear = generalNotifsData.filter(d => {
             const data = d.data();
             if (data.read === true) return false;
-            
             if(currentSection === 'subscriptions') return data.type === 'subscription';
             if(currentSection === 'updates') return data.type === 'update' || data.type === 'favorite';
             if(currentSection === 'comments') return data.type === 'comment';
             return false;
         });
 
-        if (unreadDocsToClear.length === 0) return; // Nothing to clear
+        if (unreadDocsToClear.length === 0) return;
 
         const btn = document.getElementById('btn-clear');
         btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Clearing...`;
 
-        // Batch update them to read: true
         const batch = writeBatch(db);
         unreadDocsToClear.forEach(d => {
             batch.update(d.ref, { read: true });
