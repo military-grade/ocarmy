@@ -20,8 +20,29 @@
         .dropdown-content a { display: block; padding: 8px 20px; color: #333 !important; text-decoration: none; font-size: 13px; width: 100%; text-align: left; }
         .show { display: block !important; }
 
-        .notif-bar { display: flex; align-items: center; gap: 2px; margin-right: 10px; }
-        .notif-item { padding: 4px 8px; font-size: 11px; border-radius: 3px; color: white; display: flex; align-items: center; gap: 5px; background: #337ab7; text-decoration: none; opacity: 0.6; }
+        /* Notif Bar Update based on screenshot */
+        .notif-bar { display: flex; align-items: center; gap: 4px; margin-right: 10px; }
+        .notif-item { 
+            padding: 4px 8px; 
+            font-size: 11px; 
+            border-radius: 3px; 
+            color: #ccc; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            background: #3b5998; /* Muted blue */
+            text-decoration: none; 
+            transition: 0.2s;
+        }
+        .notif-item:hover { color: white; }
+        
+        /* Active Notification Highlight (Cyan) */
+        .notif-item.active-alert {
+            background: #00ffff;
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
 
         /* Sidebar & Layout */
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
@@ -62,10 +83,10 @@
 
     <div style="display: flex; align-items: center;">
         <div class="notif-bar">
-            <a href="#" class="notif-item"><i class="fa fa-globe"></i> <span id="badge-worlds">0</span></a>
-            <a href="notifications.html" class="notif-item"><i class="fa fa-user"></i> <span id="badge-social">0</span></a>
-            <a href="notifications.html" class="notif-item"><i class="fa fa-star"></i> <span id="badge-favs">0</span></a>
-            <a href="notifications.html" class="notif-item"><i class="fa fa-envelope"></i> <span id="badge-inbox">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-worlds"><i class="fa fa-globe"></i> <span id="badge-worlds">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-social"><i class="fa fa-user"></i> <span id="badge-social">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-favs"><i class="fa fa-star"></i> <span id="badge-favs">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-inbox"><i class="fa fa-envelope"></i> <span id="badge-inbox">0</span></a>
         </div>
 
         <div class="dropdown">
@@ -152,7 +173,6 @@
 
     document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href="login.html");
 
-    // Helper to update the UI once data is found
     async function renderDashboard(userData, dbId, authUid) {
         const username = userData.username || "User";
         document.getElementById('nav-username').innerText = username;
@@ -172,16 +192,13 @@
             }
         }
 
-        // Subscribers
         const subSnap = await getDocs(collection(db, "users", dbId, "subscribers"));
         document.getElementById('dash-sub-count').innerText = `${subSnap.size} subscribers`;
 
-        // Profile Content
         const rawHTML = userData.profileHTML || "Welcome!";
         document.getElementById('profile-raw-render').innerHTML = rawHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
         document.getElementById('custom-profile-css').innerHTML = userData.profileCSS || "";
 
-        // Characters
         const charQuery = query(collection(db, "characters"), where("ownerId", "in", [authUid, dbId]));
         onSnapshot(charQuery, (snap) => {
             const grid = document.getElementById('char-grid');
@@ -196,6 +213,38 @@
                     </a>`).join('');
             }
         });
+        
+        // Live Notification Listeners for Active Alerts
+        // Check for general notifications (Subscriptions, Favorites, Updates)
+        const notifQuery = query(collection(db, "notifications"), where("toUserId", "==", authUid), where("read", "==", false));
+        onSnapshot(notifQuery, (snap) => {
+            let socialCount = 0;
+            let favsCount = 0;
+            
+            snap.forEach(doc => {
+                const type = doc.data().type;
+                if(type === 'subscription' || type === 'comment') socialCount++;
+                if(type === 'update' || type === 'favorite') favsCount++;
+            });
+            
+            // Update Social Box
+            document.getElementById('badge-social').innerText = socialCount;
+            if(socialCount > 0) document.getElementById('btn-social').classList.add('active-alert');
+            else document.getElementById('btn-social').classList.remove('active-alert');
+            
+            // Update Favs Box
+            document.getElementById('badge-favs').innerText = favsCount;
+            if(favsCount > 0) document.getElementById('btn-favs').classList.add('active-alert');
+            else document.getElementById('btn-favs').classList.remove('active-alert');
+        });
+        
+        // Check for active Character Transfers (Worlds/Globe box)
+        const transferQuery = query(collection(db, "transfers"), where("toUserId", "==", authUid), where("status", "==", "pending"));
+        onSnapshot(transferQuery, (snap) => {
+            document.getElementById('badge-worlds').innerText = snap.size;
+            if(snap.size > 0) document.getElementById('btn-worlds').classList.add('active-alert');
+            else document.getElementById('btn-worlds').classList.remove('active-alert');
+        });
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -203,7 +252,6 @@
 
         console.log("Auth User Email:", user.email);
 
-        // SEARCH 1: Try finding by Email field
         const emailQuery = query(collection(db, "users"), where("email", "==", user.email.toLowerCase()));
         const emailSnap = await getDocs(emailQuery);
 
@@ -211,7 +259,6 @@
             console.log("Success: Found user by email.");
             renderDashboard(emailSnap.docs[0].data(), emailSnap.docs[0].id, user.uid);
         } else {
-            // SEARCH 2: Try finding by Document ID (UID)
             console.log("Email search failed. Trying UID lookup...");
             const uidDoc = await getDoc(doc(db, "users", user.uid));
             
