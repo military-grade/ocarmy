@@ -27,21 +27,31 @@
         /* Content Area */
         .main { flex: 1; padding: 25px; }
         .breadcrumb { background: #f9f9f9; padding: 10px 15px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; margin-bottom: 20px; color: #777; }
-        .page-title { font-size: 22px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
+        
+        /* Updated Page Title to flex for the clear button */
+        .page-title-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
+        .page-title { font-size: 22px; margin: 0; }
+        .btn-clear { background: #eee; color: #555; border: 1px solid #ccc; padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; display: none; }
+        .btn-clear:hover { background: #ddd; }
 
         /* Notification Card Styling */
-        .notif-item { border: 1px solid var(--border); border-radius: 4px; padding: 15px; margin-bottom: 12px; background: white; display: flex; align-items: center; gap: 15px; }
+        .notif-item { border: 1px solid var(--border); border-radius: 4px; padding: 15px; margin-bottom: 12px; background: white; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
+        .notif-item.unread { background: #f0fbff; border-left: 3px solid var(--th-blue); }
         .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        
         .icon-sub { background: #e8f5e9; color: #4caf50; }
         .icon-fav { background: #ffebee; color: #f44336; }
         .icon-update { background: #e3f2fd; color: #2196f3; }
+        .icon-comment { background: #fff3e0; color: #ff9800; }
         
         .empty-state { padding: 40px; text-align: center; color: #999; font-style: italic; }
     </style>
 </head>
 <body>
 
-<nav class="navbar"><div class="fw-bold">OCARMY</div></nav>
+<nav class="navbar">
+    <div class="fw-bold"><a href="dashboard.html" style="color:white; text-decoration:none;">OCARMY</a></div>
+</nav>
 
 <div class="wrapper">
     <aside class="sidebar">
@@ -66,7 +76,11 @@
 
     <main class="main">
         <div class="breadcrumb">Account Management / <span id="bread-current">Transfers</span></div>
-        <h2 class="page-title" id="page-title">Character Transfers</h2>
+        
+        <div class="page-title-container">
+            <h2 class="page-title" id="page-title">Character Transfers</h2>
+            <button class="btn-clear" id="btn-clear" onclick="clearCurrentSection()"><i class="fa fa-check"></i> Mark Section as Read</button>
+        </div>
 
         <div id="notif-display-area">
             <div class="empty-state">Checking for alerts...</div>
@@ -76,18 +90,24 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, query, where, onSnapshot, getDoc, doc, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, onSnapshot, getDoc, doc, getDocs, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
 
     let currentSection = 'transfers';
+    
+    // Global Arrays to store data so we don't recreate listeners
+    let transfersData = [];
+    let generalNotifsData = [];
+    let currentUserUid = null;
 
     onAuthStateChanged(auth, async (user) => {
-        if (!user) return window.location.href = "index.html";
+        if (!user) return window.location.href = "login.html";
+        currentUserUid = user.uid;
 
-        // 1. Sidebar Setup (User check for militarygrade)
+        // 1. Sidebar Setup
         const userSnap = await getDoc(doc(db, "users", user.uid));
         if (userSnap.exists()) {
             const data = userSnap.data();
@@ -102,87 +122,164 @@
             document.getElementById('side-subs').innerText = `${subSnap.size} subscribers`;
         }
 
-        // 2. Real-time Notification Listeners
-        loadData(user.uid);
-    });
-
-    function loadData(uid) {
-        // Character Transfers
-        onSnapshot(query(collection(db, "transfers"), where("toUserId", "==", uid), where("status", "==", "pending")), (snap) => {
+        // 2. Attach Real-time Listeners EXACTLY ONCE
+        
+        // Listener for Character Transfers
+        const transfersQ = query(collection(db, "transfers"), where("toUserId", "==", user.uid), where("status", "==", "pending"));
+        onSnapshot(transfersQ, (snap) => {
+            transfersData = snap.docs;
             document.getElementById('count-transfers').innerText = `(${snap.size})`;
-            if(currentSection === 'transfers') renderTransfers(snap);
+            if(currentSection === 'transfers') renderDisplay();
         });
 
-        // General Notifications (Subscriptions, Favorites, Updates)
-        onSnapshot(query(collection(db, "notifications"), where("toUserId", "==", uid), orderBy("createdAt", "desc")), (snap) => {
+        // Listener for General Notifications
+        const notifsQ = query(collection(db, "notifications"), where("toUserId", "==", user.uid), orderBy("createdAt", "desc"));
+        onSnapshot(notifsQ, (snap) => {
+            generalNotifsData = snap.docs;
+            
+            // Count ONLY UNREAD for the sidebar brackets
             const counts = { subscriptions: 0, updates: 0, comments: 0 };
-            snap.forEach(doc => {
-                const type = doc.data().type;
-                if(type === 'subscription') counts.subscriptions++;
-                if(type === 'update' || type === 'favorite') counts.updates++;
-                if(type === 'comment') counts.comments++;
+            snap.forEach(d => {
+                const data = d.data();
+                if (!data.read) {
+                    const type = data.type;
+                    if(type === 'subscription') counts.subscriptions++;
+                    if(type === 'update' || type === 'favorite') counts.updates++;
+                    if(type === 'comment') counts.comments++;
+                }
             });
 
             document.getElementById('count-subscriptions').innerText = `(${counts.subscriptions})`;
             document.getElementById('count-updates').innerText = `(${counts.updates})`;
             document.getElementById('count-comments').innerText = `(${counts.comments})`;
 
-            if(currentSection !== 'transfers') renderGeneralNotifs(snap);
+            if(currentSection !== 'transfers') renderDisplay();
         });
-    }
+    });
 
+    // Handle switching tabs
     window.showSection = (section) => {
         currentSection = section;
-        const titles = { transfers: 'Character Transfers', subscriptions: 'Subscriptions', updates: 'Character Updates', comments: 'Subscribers & Comments' };
+        const titles = { 
+            transfers: 'Character Transfers', 
+            subscriptions: 'Subscriptions', 
+            updates: 'Character Updates', 
+            comments: 'Subscribers & Comments' 
+        };
+        
         document.getElementById('page-title').innerText = titles[section];
         document.getElementById('bread-current').innerText = titles[section];
+        
+        // Update active class
         document.querySelectorAll('.side-nav a').forEach(a => a.classList.remove('active'));
         document.getElementById(`nav-${section}`).classList.add('active');
         
-        // Refresh display
-        loadData(auth.currentUser.uid);
+        // Show or Hide the Clear Button (Transfers don't get 'cleared', they get accepted)
+        if(section === 'transfers') document.getElementById('btn-clear').style.display = 'none';
+        else document.getElementById('btn-clear').style.display = 'block';
+        
+        renderDisplay();
     };
 
-    function renderTransfers(snap) {
+    // Central function to render whatever is currently selected
+    function renderDisplay() {
         const area = document.getElementById('notif-display-area');
-        if (snap.empty) { area.innerHTML = `<div class="empty-state">You have no pending transfers.</div>`; return; }
         
-        area.innerHTML = snap.docs.map(d => {
-            const t = d.data();
-            return `<div class="notif-item">
-                <div style="width:60px; height:60px; background:url('${t.characterAvatar}') center/cover; border-radius:4px;"></div>
-                <div class="flex-grow-1">
-                    <strong>${t.fromUsername}</strong> wants to transfer <strong>${t.characterName}</strong> to you.
-                    <div class="small text-muted mt-1">Reason: ${t.reason || 'None'}</div>
-                </div>
-                <button class="btn btn-sm btn-success">Accept</button>
-            </div>`;
-        }).join('');
+        if (currentSection === 'transfers') {
+            if (transfersData.length === 0) { 
+                area.innerHTML = `<div class="empty-state">You have no pending transfers.</div>`; 
+                return; 
+            }
+            
+            area.innerHTML = transfersData.map(d => {
+                const t = d.data();
+                return `
+                <div class="notif-item">
+                    <div style="width:60px; height:60px; background:url('${t.characterAvatar || ''}') center/cover; border-radius:4px; border:1px solid #ddd;"></div>
+                    <div class="flex-grow-1">
+                        <strong>${t.fromUsername || 'Someone'}</strong> wants to transfer <strong>${t.characterName || 'a character'}</strong> to you.
+                        <div class="small text-muted mt-1">Reason: ${t.reason || 'None provided'}</div>
+                    </div>
+                    <button class="btn btn-sm btn-success">Accept</button>
+                    <button class="btn btn-sm btn-danger ms-2">Decline</button>
+                </div>`;
+            }).join('');
+            
+        } else {
+            // Filter general notifications based on the current section
+            const filtered = generalNotifsData.filter(d => {
+                const type = d.data().type;
+                if(currentSection === 'subscriptions') return type === 'subscription';
+                if(currentSection === 'updates') return type === 'update' || type === 'favorite';
+                if(currentSection === 'comments') return type === 'comment';
+                return false;
+            });
+
+            if (filtered.length === 0) { 
+                area.innerHTML = `<div class="empty-state">No notifications here.</div>`; 
+                return; 
+            }
+
+            area.innerHTML = filtered.map(d => {
+                const n = d.data();
+                const isUnread = n.read === false;
+                
+                let iconClass, message;
+                
+                if (n.type === 'subscription') {
+                    iconClass = 'icon-sub fa-user-plus';
+                    message = `<strong>${n.fromUsername}</strong> subscribed to you!`;
+                } else if (n.type === 'favorite') {
+                    iconClass = 'icon-fav fa-heart';
+                    message = `<strong>${n.fromUsername}</strong> favorited ${n.characterName || 'your character'}`;
+                } else if (n.type === 'comment') {
+                    iconClass = 'icon-comment fa-comment';
+                    message = `<strong>${n.fromUsername}</strong> commented on your profile`;
+                } else {
+                    iconClass = 'icon-update fa-sync';
+                    message = `Update regarding ${n.characterName || 'your character'}`;
+                }
+                
+                return `
+                <div class="notif-item ${isUnread ? 'unread' : ''}">
+                    <div class="notif-icon ${iconClass.split(' ')[0]}"><i class="fa ${iconClass.split(' ')[1]}"></i></div>
+                    <div>${message}</div>
+                </div>`;
+            }).join('');
+        }
     }
 
-    function renderGeneralNotifs(snap) {
-        const area = document.getElementById('notif-display-area');
-        const filtered = snap.docs.filter(d => {
-            const type = d.data().type;
-            if(currentSection === 'subscriptions') return type === 'subscription';
-            if(currentSection === 'updates') return type === 'update' || type === 'favorite';
-            if(currentSection === 'comments') return type === 'comment';
+    // New Function: Clears active notifications for the current section
+    window.clearCurrentSection = async () => {
+        if (currentSection === 'transfers' || !currentUserUid) return;
+
+        // Find all UNREAD notifications that belong in the CURRENT section
+        const unreadDocsToClear = generalNotifsData.filter(d => {
+            const data = d.data();
+            if (data.read === true) return false;
+            
+            if(currentSection === 'subscriptions') return data.type === 'subscription';
+            if(currentSection === 'updates') return data.type === 'update' || data.type === 'favorite';
+            if(currentSection === 'comments') return data.type === 'comment';
             return false;
         });
 
-        if (filtered.length === 0) { area.innerHTML = `<div class="empty-state">No active notifications here.</div>`; return; }
+        if (unreadDocsToClear.length === 0) return; // Nothing to clear
 
-        area.innerHTML = filtered.map(d => {
-            const n = d.data();
-            let iconClass = n.type === 'subscription' ? 'icon-sub fa-user-plus' : (n.type === 'favorite' ? 'icon-fav fa-heart' : 'icon-update fa-sync');
-            let message = n.type === 'subscription' ? `<strong>${n.fromUsername}</strong> subscribed to you!` : `<strong>${n.fromUsername}</strong> favorited ${n.characterName}`;
-            
-            return `<div class="notif-item">
-                <div class="notif-icon ${iconClass.split(' ')[0]}"><i class="fa ${iconClass.split(' ')[1]}"></i></div>
-                <div>${message}</div>
-            </div>`;
-        }).join('');
-    }
+        const btn = document.getElementById('btn-clear');
+        btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Clearing...`;
+
+        // Batch update them to read: true
+        const batch = writeBatch(db);
+        unreadDocsToClear.forEach(d => {
+            batch.update(d.ref, { read: true });
+        });
+
+        await batch.commit();
+
+        btn.innerHTML = `<i class="fa fa-check"></i> Cleared`;
+        setTimeout(() => { btn.innerHTML = `<i class="fa fa-check"></i> Mark Section as Read`; }, 2000);
+    };
 </script>
 </body>
 </html>
