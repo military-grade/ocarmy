@@ -4,23 +4,48 @@
     <title>OCARMY | Welcome</title>
     <style>
         body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: #222; color: white; display: flex; flex-direction: column; min-height: 100vh; }
-        .hero { background: #333; padding: 100px 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
         
-        /* New styling for your mascot logo */
+        /* The hero container handles the main centering */
+        .hero { 
+            background: #333; 
+            padding: 60px 20px; 
+            text-align: center; 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center;
+            overflow: hidden; /* Prevents horizontal scroll if the image nudges off-screen */
+        }
+        
+        /* This container is the secret to centering the TEXT inside the image */
+        .mascot-container {
+            display: inline-block;
+            margin: 0 auto;
+            /* Adjust this margin-left to "nudge" the mascot so the text looks centered */
+            /* 40px - 60px is usually the sweet spot for this specific artwork */
+            margin-left: 55px; 
+        }
+
         .mascot-logo { 
-            max-width: 350px; /* Adjust this value to make the logo bigger or smaller */
+            max-width: 550px; /* Made it larger as requested */
+            width: 100%;
             height: auto; 
-            margin: 0 auto; 
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.2)); /* Gives the image a subtle glow */
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.15));
             transition: transform 0.3s ease;
         }
+
         .mascot-logo:hover {
-            transform: scale(1.02); /* Slight zoom when hovering over the mascot */
+            transform: scale(1.03);
         }
 
-        .sub-text { color: #888; margin-top: 15px; font-size: 14px; }
+        .sub-text { 
+            color: #888; 
+            margin-top: 25px; 
+            font-size: 14px; 
+            /* We reset the margin here so the text below isn't off-center */
+            margin-left: -55px; 
+        }
 
-        /* Updated Auth Bar with "Why Join Us" */
         .auth-bar { background: #1a1a1a; padding: 25px; text-align: center; border-bottom: 4px solid #2c3e50; }
         .auth-bar a { color: #eee; text-decoration: none; margin: 0 20px; font-size: 15px; transition: 0.3s; }
         .auth-bar a:hover { color: #3498db; text-shadow: 0 0 8px #3498db; }
@@ -36,8 +61,10 @@
 <body>
 
     <div class="hero">
-        <img src="Illustration226.png" alt="OCARMY Mascot" class="mascot-logo">
-        <p class="sub-text">OCARMY is in invite beta. Check back later!</p>
+        <div class="mascot-container">
+            <img src="Illustration226.png" alt="OCARMY Mascot" class="mascot-logo">
+            <p class="sub-text">OCARMY is in invite beta. Check back later!</p>
+        </div>
     </div>
 
     <div class="auth-bar">
@@ -71,7 +98,7 @@
     appId: "1:848883355194:web:51254de3c4992d7750af03"
   };
 
-  const app = initializeApp(firebaseConfig);
+  initializeApp(firebaseConfig);
   const auth = getAuth();
 
   onAuthStateChanged(auth, (user) => {
