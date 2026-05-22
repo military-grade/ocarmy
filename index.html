@@ -5,7 +5,6 @@
     <style>
         body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: #222; color: white; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* The hero container handles the main centering */
         .hero { 
             background: #333; 
             padding: 60px 20px; 
@@ -14,20 +13,18 @@
             display: flex; 
             flex-direction: column; 
             justify-content: center;
-            overflow: hidden; /* Prevents horizontal scroll if the image nudges off-screen */
+            overflow: hidden; 
         }
         
-        /* This container is the secret to centering the TEXT inside the image */
-        .mascot-container {
-            display: inline-block;
+        /* New wrapper just for the image so we can nudge it safely */
+        .mascot-wrapper {
             margin: 0 auto;
-            /* Adjust this margin-left to "nudge" the mascot so the text looks centered */
-            /* 40px - 60px is usually the sweet spot for this specific artwork */
-            margin-left: 55px; 
+            /* Dialed this back to 20px! If it's still slightly off, just change this one number. */
+            transform: translateX(20px); 
         }
 
         .mascot-logo { 
-            max-width: 550px; /* Made it larger as requested */
+            max-width: 550px; 
             width: 100%;
             height: auto; 
             filter: drop-shadow(0 0 20px rgba(255,255,255,0.15));
@@ -38,12 +35,12 @@
             transform: scale(1.03);
         }
 
+        /* Text is completely separated now and will naturally center */
         .sub-text { 
             color: #888; 
-            margin-top: 25px; 
+            margin-top: 20px; 
             font-size: 14px; 
-            /* We reset the margin here so the text below isn't off-center */
-            margin-left: -55px; 
+            text-align: center;
         }
 
         .auth-bar { background: #1a1a1a; padding: 25px; text-align: center; border-bottom: 4px solid #2c3e50; }
@@ -61,10 +58,10 @@
 <body>
 
     <div class="hero">
-        <div class="mascot-container">
+        <div class="mascot-wrapper">
             <img src="Illustration226.png" alt="OCARMY Mascot" class="mascot-logo">
-            <p class="sub-text">Welcome to OCARMY! An OC archiving website made by Doc.</p>
         </div>
+        <p class="sub-text">OCARMY is in invite beta. Check back later!</p>
     </div>
 
     <div class="auth-bar">
