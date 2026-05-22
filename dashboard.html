@@ -15,12 +15,15 @@
         .nav-left a, .nav-item-btn { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
         .nav-left a:hover, .nav-item-btn:hover { color: white; background: rgba(255,255,255,0.1); }
         
+        /* Logo styling */
+        .nav-logo-link { display: flex; align-items: center; padding-right: 15px !important; }
+        .nav-logo-img { height: 32px; width: auto; display: block; }
+
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
         .dropdown-content { display: none; position: absolute; top: 50px; background: white; border: 1px solid var(--border); min-width: 160px; box-shadow: 0 6px 12px rgba(0,0,0,.175); z-index: 3000; padding: 5px 0; border-radius: 0 0 4px 4px; }
         .dropdown-content a { display: block; padding: 8px 20px; color: #333 !important; text-decoration: none; font-size: 13px; width: 100%; text-align: left; }
         .show { display: block !important; }
 
-        /* Notif Bar Update based on screenshot */
         .notif-bar { display: flex; align-items: center; gap: 4px; margin-right: 10px; }
         .notif-item { 
             padding: 4px 8px; 
@@ -30,13 +33,11 @@
             display: flex; 
             align-items: center; 
             gap: 5px; 
-            background: #3b5998; /* Muted blue */
+            background: #3b5998; 
             text-decoration: none; 
             transition: 0.2s;
         }
         .notif-item:hover { color: white; }
-        
-        /* Active Notification Highlight (Cyan) */
         .notif-item.active-alert {
             background: #00ffff;
             color: #000;
@@ -44,7 +45,6 @@
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
         }
 
-        /* Sidebar & Layout */
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
         .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -54,7 +54,6 @@
 
         .creator-crown { color: #ffd700; margin-left: 5px; text-shadow: 0 0 3px rgba(0,0,0,0.2); }
 
-        /* Character Grid */
         .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; padding: 20px 0; }
         .char-card { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; text-decoration: none; background: #fff; transition: 0.2s; }
         .char-thumb { width: 100%; aspect-ratio: 1/1; background-size: cover; background-position: center; background-color: #eee; }
@@ -68,7 +67,10 @@
 
 <nav class="navbar">
     <div class="nav-left">
-        <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
+        <a href="dashboard.html" class="nav-logo-link">
+            <img src="Illustration226.png" alt="OCARMY" class="nav-logo-img">
+        </a>
+        
         <a href="browse.html"><i class="fa fa-eye"></i> Browse</a>
         <div class="dropdown">
             <button class="nav-item-btn" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></button>
@@ -145,9 +147,6 @@
     </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, query, where, onSnapshot, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -214,31 +213,23 @@
             }
         });
         
-        // Live Notification Listeners for Active Alerts
-        // Check for general notifications (Subscriptions, Favorites, Updates)
         const notifQuery = query(collection(db, "notifications"), where("toUserId", "==", authUid), where("read", "==", false));
         onSnapshot(notifQuery, (snap) => {
             let socialCount = 0;
             let favsCount = 0;
-            
             snap.forEach(doc => {
                 const type = doc.data().type;
                 if(type === 'subscription' || type === 'comment') socialCount++;
                 if(type === 'update' || type === 'favorite') favsCount++;
             });
-            
-            // Update Social Box
             document.getElementById('badge-social').innerText = socialCount;
             if(socialCount > 0) document.getElementById('btn-social').classList.add('active-alert');
             else document.getElementById('btn-social').classList.remove('active-alert');
-            
-            // Update Favs Box
             document.getElementById('badge-favs').innerText = favsCount;
             if(favsCount > 0) document.getElementById('btn-favs').classList.add('active-alert');
             else document.getElementById('btn-favs').classList.remove('active-alert');
         });
         
-        // Check for active Character Transfers (Worlds/Globe box)
         const transferQuery = query(collection(db, "transfers"), where("toUserId", "==", authUid), where("status", "==", "pending"));
         onSnapshot(transferQuery, (snap) => {
             document.getElementById('badge-worlds').innerText = snap.size;
@@ -249,26 +240,14 @@
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = "login.html"; return; }
-
-        console.log("Auth User Email:", user.email);
-
         const emailQuery = query(collection(db, "users"), where("email", "==", user.email.toLowerCase()));
         const emailSnap = await getDocs(emailQuery);
-
         if (!emailSnap.empty) {
-            console.log("Success: Found user by email.");
             renderDashboard(emailSnap.docs[0].data(), emailSnap.docs[0].id, user.uid);
         } else {
-            console.log("Email search failed. Trying UID lookup...");
             const uidDoc = await getDoc(doc(db, "users", user.uid));
-            
             if (uidDoc.exists()) {
-                console.log("Success: Found user by UID.");
                 renderDashboard(uidDoc.data(), uidDoc.id, user.uid);
-            } else {
-                console.error("Critical: No profile found for this user in Firestore.");
-                document.getElementById('nav-username').innerText = "Profile Missing";
-                alert("Your profile data was not found. Please ensure you are registered correctly.");
             }
         }
     });
