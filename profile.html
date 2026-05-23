@@ -14,12 +14,13 @@
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
         .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; }
         .side-avatar { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
-        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
         .creator-crown { color: #ffd700; margin-left: 5px; }
         .main { flex: 1; padding: 30px; }
-        .btn-sub { background: rgba(255,255,255,0.2); font-weight: bold; }
+        .btn-sub { background: rgba(255,255,255,0.2); font-weight: bold; transition: 0.2s; }
         .btn-sub:hover { background: rgba(255,255,255,0.3); }
+        .btn-sub.subscribed { background: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body>
@@ -47,7 +48,6 @@
             <a id="lnk-profile"><i class="fa fa-user"></i> Profile</a>
             <a id="lnk-bulletins"><i class="fa fa-comment"></i> Bulletins</a>
             <a id="lnk-chars"><i class="fa fa-users"></i> Characters</a>
-            
             <div class="side-label">Interaction</div>
             <a id="lnk-comments"><i class="fa fa-comments"></i> Comments</a>
             <a id="lnk-subscribe" class="btn-sub"><i class="fa fa-plus"></i> Subscribe</a>
@@ -62,18 +62,23 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
-
-    // FIX: Look for 'user' instead of 'id' to match your URL structure
+    const auth = getAuth();
+    
     const urlParams = new URLSearchParams(window.location.search);
     const targetUid = urlParams.get('user'); 
+    let currentUser = null;
 
     if (!targetUid) {
-        document.getElementById('profile-content').innerHTML = "No user ID specified in URL.";
+        document.getElementById('profile-content').innerHTML = "No user ID specified.";
     } else {
         fetchUserData();
+        onAuthStateChanged(auth, (user) => {
+            if (user) { currentUser = user; checkSubStatus(); }
+        });
     }
 
     async function fetchUserData() {
@@ -82,24 +87,45 @@
             const data = userDoc.data();
             document.getElementById('side-username').innerText = data.username || "User";
             if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+            if (data.username?.toLowerCase() === 'militarygrade') document.getElementById('side-name-container').innerHTML += ` <i class="fa fa-crown creator-crown"></i>`;
             
-            // 👑 Militarygrade Crown
-            if (data.username?.toLowerCase() === 'militarygrade') {
-                document.getElementById('side-name-container').innerHTML += ` <i class="fa fa-crown creator-crown"></i>`;
-            }
-
-            // Update Link IDs
-            const links = { 'lnk-profile': 'profile.html', 'lnk-bulletins': 'bulletins.html', 'lnk-chars': 'characters.html', 'lnk-comments': 'profile_comments.html', 'lnk-subscribe': 'subscribe.html', 'lnk-message': 'message_user.html' };
-            for (let id in links) { document.getElementById(id).href = `${links[id]}?user=${targetUid}`; }
-
-            // Subscriber Count
             const subSnap = await getDocs(collection(db, "users", targetUid, "subscribers"));
             document.getElementById('side-sub-count').innerText = `${subSnap.size} subscribers`;
-
             document.getElementById('profile-content').innerHTML = data.profileHTML || "This user hasn't set up their profile yet.";
-        } else {
-            document.getElementById('profile-content').innerHTML = "User not found.";
         }
+    }
+
+    async function checkSubStatus() {
+        if(currentUser.uid === targetUid) return document.getElementById('lnk-subscribe').style.display = 'none';
+        const subDoc = await getDoc(doc(db, "users", targetUid, "subscribers", currentUser.uid));
+        const btn = document.getElementById('lnk-subscribe');
+        if (subDoc.exists()) {
+            btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`;
+            btn.classList.add('subscribed');
+        }
+        btn.onclick = toggleSub;
+    }
+
+    async function toggleSub() {
+        const btn = document.getElementById('lnk-subscribe');
+        const subRef = doc(db, "users", targetUid, "subscribers", currentUser.uid);
+        const isSubbed = btn.classList.contains('subscribed');
+
+        btn.style.pointerEvents = "none";
+        if (isSubbed) {
+            await deleteDoc(subRef);
+            btn.innerHTML = `<i class="fa fa-plus"></i> Subscribe`;
+            btn.classList.remove('subscribed');
+        } else {
+            await setDoc(subRef, { at: serverTimestamp() });
+            // Notification logic
+            await setDoc(doc(collection(db, "notifications")), {
+                toUserId: targetUid, fromUserId: currentUser.uid, type: "subscription", read: false, createdAt: serverTimestamp()
+            });
+            btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`;
+            btn.classList.add('subscribed');
+        }
+        btn.style.pointerEvents = "auto";
     }
 </script>
 </body>
