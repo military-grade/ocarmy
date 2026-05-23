@@ -1,120 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Create Character | OCARMY</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
-    <style>
-        :root { --th-blue: #4e92ac; --th-bg: #f7f7f7; --border: #ddd; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .wrapper { display: flex; max-width: 1200px; margin: 0 auto; background: white; border: 1px solid var(--border); min-height: 100vh; }
-        
-        /* Sidebar */
-        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
-        .side-user-info { padding: 12px 15px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
-        .side-nav a { display: block; padding: 12px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-
-        .main { flex: 1; padding: 30px; }
-        .th-section { border: 1px solid var(--border); border-radius: 4px; margin-bottom: 25px; }
-        .th-section-header { background: #f9f9f9; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); font-size: 14px; }
-        .th-section-body { padding: 20px; }
-
-        /* Cropper */
-        #cropper-wrap { width: 220px; height: 220px; border: 1px solid #ccc; overflow: hidden; position: relative; background: #eee; cursor: move; }
-        #avatar-img { position: absolute; width: 100%; top: 0; left: 0; pointer-events: none; }
-        
-        .tag-pill { background: var(--th-blue); color: white; padding: 2px 10px; border-radius: 20px; font-size: 11px; margin: 2px; display: inline-flex; align-items: center; }
-        .valid-user { color: #5cb85c; font-size: 11px; font-weight: bold; display: none; }
-        .invalid-user { color: #d9534f; font-size: 11px; font-weight: bold; display: none; }
-    </style>
-</head>
-<body>
-<div class="wrapper">
-    <aside class="sidebar">
-        <div class="side-user-info">
-            <div class="side-avatar" id="side-pfp"></div>
-            <a href="dashboard.html" id="side-username" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
-        </div>
-        <div class="side-nav">
-            <a href="dashboard.html"><i class="fa fa-arrow-left"></i> Back to Dashboard</a>
-            <a href="create_character.html" style="background: rgba(255,255,255,0.1);"><i class="fa fa-plus"></i> Character</a>
-        </div>
-    </aside>
-
-    <main class="main">
-        <h2 class="mb-4">Create Character</h2>
-
-        <div class="th-section">
-            <div class="th-section-header">Avatar & Ref Sheet</div>
-            <div class="th-section-body d-flex gap-4">
-                <div id="cropper-wrap" onmousedown="startDrag(event)">
-                    <img id="avatar-img" src="">
-                </div>
-                <div class="flex-grow-1">
-                    <label class="form-label fw-bold small">Upload File</label>
-                    <input type="file" id="char-file" class="form-control mb-3" onchange="previewAvatar(event)">
-                    <label class="form-label fw-bold small">Zoom</label>
-                    <input type="range" id="zoom-slider" class="form-range" min="100" max="500" value="100" oninput="applyZoom()">
-                    <hr>
-                    <label class="form-label fw-bold small">Ref Sheet URL (Optional)</label>
-                    <input type="url" id="ref-sheet" class="form-control" placeholder="https://...">
-                </div>
-            </div>
-        </div>
-
-        <div class="th-section">
-            <div class="th-section-header">Basics</div>
-            <div class="th-section-body row g-3">
-                <div class="col-md-6"><label class="small fw-bold">Name</label><input type="text" id="char-name" class="form-control"></div>
-                <div class="col-md-6"><label class="small fw-bold">Worth ($)</label><input type="number" id="char-worth" class="form-control" value="0.00"></div>
-                <div class="col-md-12">
-                    <label class="small fw-bold">Tags (Press Enter)</label>
-                    <div id="tag-container" class="mb-2"></div>
-                    <input type="text" id="tag-input" class="form-control">
-                </div>
-            </div>
-        </div>
-
-        <div class="th-section">
-            <div class="th-section-header">Credit</div>
-            <div class="th-section-body">
-                <div class="btn-group w-100 mb-2">
-                    <button class="btn btn-outline-secondary active" id="btn-self" onclick="setCredit('self')">Me</button>
-                    <button class="btn btn-outline-secondary" id="btn-onsite" onclick="setCredit('onsite')">On-Site</button>
-                </div>
-                <div id="onsite-input-div" style="display:none;">
-                    <input type="text" id="designer-name" class="form-control" placeholder="Username..." onkeyup="validateUser()">
-                    <div id="user-success" class="valid-user">Found!</div>
-                    <div id="user-error" class="invalid-user">User not found.</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="th-section">
-            <div class="th-section-header">Description</div>
-            <div class="th-section-body"><textarea id="char-desc"></textarea></div>
-        </div>
-
-        <button class="btn btn-primary w-100 p-3 fw-bold" id="submit-btn" style="background:var(--th-blue); border:none;">CREATE CHARACTER</button>
-    </main>
-</div>
-<canvas id="crop-canvas" width="220" height="220" style="display:none;"></canvas>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, query, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
 
+    // Re-initialize TinyMCE for the bio
     tinymce.init({ selector: '#char-desc', height: 300, menubar: false, plugins: 'code link lists', toolbar: 'bold italic underline | bullist numlist | link code' });
 
     let currentTags = [], creditMode = 'self', isDragging = false, startX, startY, imgX = 0, imgY = 0, recipientId = null;
 
+    // Keep Sidebar Updated
     onAuthStateChanged(auth, async (u) => {
         if(!u) return;
         const s = await getDoc(doc(db, "users", u.uid));
@@ -124,16 +21,30 @@
         }
     });
 
+    // --- Original Avatar & Cropper Logic ---
     window.previewAvatar = (e) => {
         const reader = new FileReader();
         reader.onload = () => { document.getElementById('avatar-img').src = reader.result; };
         reader.readAsDataURL(e.target.files[0]);
     };
-    window.applyZoom = () => { document.getElementById('avatar-img').style.width = document.getElementById('zoom-slider').value + "%"; };
-    window.startDrag = (e) => { isDragging = true; startX = e.clientX - imgX; startY = e.clientY - imgY; };
-    window.onmousemove = (e) => { if(isDragging) { imgX = e.clientX - startX; imgY = e.clientY - startY; document.getElementById('avatar-img').style.transform = `translate(${imgX}px, ${imgY}px)`; } };
+    window.applyZoom = () => { 
+        document.getElementById('avatar-img').style.width = document.getElementById('zoom-slider').value + "%"; 
+    };
+    window.startDrag = (e) => { 
+        isDragging = true; 
+        startX = e.clientX - imgX; 
+        startY = e.clientY - imgY; 
+    };
+    window.onmousemove = (e) => { 
+        if(isDragging) { 
+            imgX = e.clientX - startX; 
+            imgY = e.clientY - startY; 
+            document.getElementById('avatar-img').style.transform = `translate(${imgX}px, ${imgY}px)`; 
+        } 
+    };
     window.onmouseup = () => { isDragging = false; };
 
+    // --- Original Tag Logic ---
     document.getElementById('tag-input').onkeydown = (e) => {
         if(e.key === 'Enter'){
             e.preventDefault();
@@ -142,9 +53,12 @@
             e.target.value = '';
         }
     };
-    function renderTags() { document.getElementById('tag-container').innerHTML = currentTags.map(t => `<span class="tag-pill">${t} <i class="fa fa-times" onclick="removeTag('${t}')"></i></span>`).join(''); }
+    function renderTags() { 
+        document.getElementById('tag-container').innerHTML = currentTags.map(t => `<span class="tag-pill">${t} <i class="fa fa-times" onclick="removeTag('${t}')"></i></span>`).join(''); 
+    }
     window.removeTag = (t) => { currentTags = currentTags.filter(x => x !== t); renderTags(); };
 
+    // --- Original Credit UI Logic ---
     window.setCredit = (m) => {
         creditMode = m;
         document.getElementById('btn-self').classList.toggle('active', m==='self');
@@ -162,32 +76,53 @@
         if(f) recipientId = f.id;
     };
 
+    // --- Final Submission (With Security Hook) ---
     document.getElementById('submit-btn').onclick = async () => {
         const user = auth.currentUser;
         if(!user) return;
+        
+        // Finalize Avatar Crop
         const canvas = document.getElementById('crop-canvas');
         const ctx = canvas.getContext('2d');
         const img = document.getElementById('avatar-img');
         const zoom = document.getElementById('zoom-slider').value / 100;
         ctx.drawImage(img, imgX, imgY, img.naturalWidth * zoom, img.naturalHeight * zoom);
         
-        const charRef = await addDoc(collection(db, "characters"), {
+        // Prepare character data
+        const charData = {
             ownerId: user.uid,
             name: document.getElementById('char-name').value,
             avatar: canvas.toDataURL("image/jpeg"),
             refSheet: document.getElementById('ref-sheet').value,
             tags: currentTags,
             worth: document.getElementById('char-worth').value,
-            designer: creditMode === 'self' ? user.displayName : document.getElementById('designer-name').value,
             description: tinymce.get('char-desc').getContent(),
-            createdAt: serverTimestamp()
-        });
+            createdAt: serverTimestamp(),
+            // Only add credit data if on-site
+            creditedTo: creditMode === 'onsite' ? recipientId : user.uid,
+            isCreditPending: creditMode === 'onsite'
+        };
 
-        if(creditMode === 'onsite' && recipientId){
-            await addDoc(collection(db, "notifications"), { toUserId: recipientId, type: "credit", characterId: charRef.id, createdAt: serverTimestamp() });
+        const charRef = await addDoc(collection(db, "characters"), charData);
+
+        // Conditional notification: Only if credit is onsite and NOT to self
+        if(creditMode === 'onsite' && recipientId && recipientId !== user.uid){
+            await addDoc(collection(db, "notifications"), { 
+                toUserId: recipientId, 
+                fromUserId: user.uid,
+                fromUsername: document.getElementById('side-username').innerText,
+                type: "credit_request", 
+                characterId: charRef.id, 
+                characterName: charData.name,
+                read: false,
+                status: 'pending',
+                createdAt: serverTimestamp() 
+            });
+            alert("Character created! Credit request sent to designer.");
+        } else {
+            alert("Character created successfully!");
         }
+        
         window.location.href = `character.html?id=${charRef.id}`;
     };
 </script>
-</body>
-</html>
