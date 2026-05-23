@@ -11,7 +11,6 @@
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
 
-        /* Sidebar Styling */
         .sidebar { width: 220px; background: #f4f4f4; border-right: 1px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; }
         .side-header { background: var(--th-blue); color: white; padding: 10px 15px; font-weight: bold; font-size: 14px; }
         .side-user { padding: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
@@ -20,29 +19,23 @@
         .side-nav a:hover { background: #eee; }
         .side-nav a.active { background: #e0e0e0; font-weight: bold; color: #333; border-left: 3px solid var(--th-blue); }
 
-        /* Creator Badge */
         .creator-crown { color: var(--creator-gold); margin-left: 4px; cursor: help; text-shadow: 0 0 3px rgba(0,0,0,0.1); }
         .creator-crown:hover::after { content: "OCARMY Creator"; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; white-space: nowrap; z-index: 100; margin-left: 10px; }
 
-        /* Content Area */
         .main { flex: 1; padding: 25px; }
         .breadcrumb { background: #f9f9f9; padding: 10px 15px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; margin-bottom: 20px; color: #777; }
-        
         .page-title-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
         .page-title { font-size: 22px; margin: 0; }
         .btn-clear { background: #eee; color: #555; border: 1px solid #ccc; padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; display: none; }
         .btn-clear:hover { background: #ddd; }
 
-        /* Notification Card Styling */
         .notif-item { border: 1px solid var(--border); border-radius: 4px; padding: 15px; margin-bottom: 12px; background: white; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
         .notif-item.unread { background: #f0fbff; border-left: 3px solid var(--th-blue); }
         .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-        
         .icon-sub { background: #e8f5e9; color: #4caf50; }
         .icon-fav { background: #ffebee; color: #f44336; }
         .icon-update { background: #e3f2fd; color: #2196f3; }
         .icon-comment { background: #fff3e0; color: #ff9800; }
-        
         .empty-state { padding: 40px; text-align: center; color: #999; font-style: italic; }
     </style>
 </head>
@@ -75,211 +68,126 @@
 
     <main class="main">
         <div class="breadcrumb">Account Management / <span id="bread-current">Transfers</span></div>
-        
         <div class="page-title-container">
             <h2 class="page-title" id="page-title">Character Transfers</h2>
             <button class="btn-clear" id="btn-clear" onclick="clearCurrentSection()"><i class="fa fa-check"></i> Mark Section as Read</button>
         </div>
-
-        <div id="notif-display-area">
-            <div class="empty-state">Checking for alerts...</div>
-        </div>
+        <div id="notif-display-area"><div class="empty-state">Checking for alerts...</div></div>
     </main>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, query, where, onSnapshot, getDoc, doc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, onSnapshot, getDoc, doc, getDocs, writeBatch, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
 
-    let currentSection = 'transfers';
-    
-    let transfersData = [];
-    let generalNotifsData = [];
-    let searchIds = []; 
+    let currentSection = 'transfers', transfersData = [], generalNotifsData = [], searchIds = [];
+
+    window.handleCredit = async (notifId, charId, action) => {
+        const charRef = doc(db, "characters", charId);
+        if (action === 'accept') { await updateDoc(charRef, { isCreditPending: false }); alert("Credit accepted!"); }
+        else { await updateDoc(charRef, { creditedTo: null, isCreditPending: false }); alert("Credit declined."); }
+        await deleteDoc(doc(db, "notifications", notifId));
+        location.reload();
+    };
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) return window.location.href = "login.html";
-
-        let dbId = user.uid;
-        let userData = null;
-
+        let dbId = user.uid, userData = null;
         const emailQuery = query(collection(db, "users"), where("email", "==", user.email.toLowerCase()));
         const emailSnap = await getDocs(emailQuery);
-
-        if (!emailSnap.empty) {
-            dbId = emailSnap.docs[0].id;
-            userData = emailSnap.docs[0].data();
-        } else {
-            const uidDoc = await getDoc(doc(db, "users", user.uid));
-            if (uidDoc.exists()) {
-                userData = uidDoc.data();
-            }
-        }
-
+        if (!emailSnap.empty) { dbId = emailSnap.docs[0].id; userData = emailSnap.docs[0].data(); } 
+        else { const uidDoc = await getDoc(doc(db, "users", user.uid)); if (uidDoc.exists()) userData = uidDoc.data(); }
         searchIds = [...new Set([user.uid, dbId])];
-
         if (userData) {
             document.getElementById('side-username').innerText = userData.username || "User";
             if(userData.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${userData.pfp}')`;
-            
-            if ((userData.username || "").toLowerCase() === 'militarygrade') {
-                document.getElementById('side-crown').innerHTML = `<i class="fa fa-crown creator-crown"></i>`;
-            }
-
+            if ((userData.username || "").toLowerCase() === 'militarygrade') document.getElementById('side-crown').innerHTML = `<i class="fa fa-crown creator-crown"></i>`;
             const subSnap = await getDocs(collection(db, "users", dbId, "subscribers"));
             document.getElementById('side-subs').innerText = `${subSnap.size} subscribers`;
         }
-
-        const transfersQ = query(collection(db, "transfers"), where("toUserId", "in", searchIds), where("status", "==", "pending"));
-        onSnapshot(transfersQ, (snap) => {
-            transfersData = snap.docs;
-            document.getElementById('count-transfers').innerText = `(${snap.size})`;
+        onSnapshot(query(collection(db, "transfers"), where("toUserId", "in", searchIds), where("status", "==", "pending")), (snap) => {
+            transfersData = snap.docs; document.getElementById('count-transfers').innerText = `(${snap.size})`;
             if(currentSection === 'transfers') renderDisplay();
-        }, (error) => {
-            console.error("Transfers Error:", error);
         });
-
-        // FIX: Removed orderBy() from the query to bypass Firebase index requirements
-        const notifsQ = query(collection(db, "notifications"), where("toUserId", "in", searchIds));
-        onSnapshot(notifsQ, (snap) => {
-            
-            // FIX: Manually sort the notifications newest-first using JavaScript
-            generalNotifsData = snap.docs.sort((a, b) => {
-                const timeA = a.data().createdAt?.toMillis?.() || 0;
-                const timeB = b.data().createdAt?.toMillis?.() || 0;
-                return timeB - timeA;
-            });
-            
+        onSnapshot(query(collection(db, "notifications"), where("toUserId", "in", searchIds)), (snap) => {
+            generalNotifsData = snap.docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
             const counts = { subscriptions: 0, updates: 0, comments: 0 };
             generalNotifsData.forEach(d => {
                 const data = d.data();
                 if (!data.read) {
-                    const type = data.type;
-                    if(type === 'subscription') counts.subscriptions++;
-                    if(type === 'update' || type === 'favorite') counts.updates++;
-                    if(type === 'comment') counts.comments++;
+                    if(data.type === 'subscription') counts.subscriptions++;
+                    if(data.type === 'update' || data.type === 'favorite' || data.type === 'credit_request') counts.updates++;
+                    if(data.type === 'comment') counts.comments++;
                 }
             });
-
             document.getElementById('count-subscriptions').innerText = `(${counts.subscriptions})`;
             document.getElementById('count-updates').innerText = `(${counts.updates})`;
             document.getElementById('count-comments').innerText = `(${counts.comments})`;
-
             if(currentSection !== 'transfers') renderDisplay();
-        }, (error) => {
-            console.error("Notifications Error:", error);
         });
     });
 
     window.showSection = (section) => {
         currentSection = section;
         const titles = { transfers: 'Character Transfers', subscriptions: 'Subscriptions', updates: 'Character Updates', comments: 'Subscribers & Comments' };
-        
         document.getElementById('page-title').innerText = titles[section];
         document.getElementById('bread-current').innerText = titles[section];
-        
         document.querySelectorAll('.side-nav a').forEach(a => a.classList.remove('active'));
         document.getElementById(`nav-${section}`).classList.add('active');
-        
-        if(section === 'transfers') document.getElementById('btn-clear').style.display = 'none';
-        else document.getElementById('btn-clear').style.display = 'block';
-        
+        document.getElementById('btn-clear').style.display = section === 'transfers' ? 'none' : 'block';
         renderDisplay();
     };
 
     function renderDisplay() {
         const area = document.getElementById('notif-display-area');
-        
         if (currentSection === 'transfers') {
-            if (transfersData.length === 0) { 
-                area.innerHTML = `<div class="empty-state">You have no pending transfers.</div>`; 
-                return; 
-            }
-            
+            if (transfersData.length === 0) { area.innerHTML = `<div class="empty-state">You have no pending transfers.</div>`; return; }
             area.innerHTML = transfersData.map(d => {
                 const t = d.data();
-                return `
-                <div class="notif-item">
-                    <div style="width:60px; height:60px; background:url('${t.characterAvatar || ''}') center/cover; border-radius:4px; border:1px solid #ddd;"></div>
-                    <div class="flex-grow-1">
-                        <strong>${t.fromUsername || 'Someone'}</strong> wants to transfer <strong>${t.characterName || 'a character'}</strong> to you.
-                        <div class="small text-muted mt-1">Reason: ${t.reason || 'None provided'}</div>
-                    </div>
-                    <button class="btn btn-sm btn-success">Accept</button>
-                    <button class="btn btn-sm btn-danger ms-2">Decline</button>
-                </div>`;
+                return `<div class="notif-item"><div style="width:60px; height:60px; background:url('${t.characterAvatar || ''}') center/cover; border-radius:4px; border:1px solid #ddd;"></div><div class="flex-grow-1"><strong>${t.fromUsername || 'Someone'}</strong> wants to transfer <strong>${t.characterName || 'a character'}</strong> to you.<div class="small text-muted mt-1">Reason: ${t.reason || 'None provided'}</div></div><button class="btn btn-sm btn-success">Accept</button><button class="btn btn-sm btn-danger ms-2">Decline</button></div>`;
             }).join('');
-            
         } else {
             const filtered = generalNotifsData.filter(d => {
                 const type = d.data().type;
                 if(currentSection === 'subscriptions') return type === 'subscription';
-                if(currentSection === 'updates') return type === 'update' || type === 'favorite';
+                if(currentSection === 'updates') return type === 'update' || type === 'favorite' || type === 'credit_request';
                 if(currentSection === 'comments') return type === 'comment';
                 return false;
             });
-
-            if (filtered.length === 0) { 
-                area.innerHTML = `<div class="empty-state">No notifications here.</div>`; 
-                return; 
-            }
-
+            if (filtered.length === 0) { area.innerHTML = `<div class="empty-state">No notifications here.</div>`; return; }
             area.innerHTML = filtered.map(d => {
                 const n = d.data();
                 const isUnread = n.read === false;
+                if (n.type === 'credit_request') return `<div class="notif-item ${isUnread ? 'unread' : ''}"><div class="notif-icon icon-comment"><i class="fa fa-pen-nib"></i></div><div class="flex-grow-1"><strong>${n.fromUsername || 'Someone'}</strong> wants to credit you for <strong>${n.characterName}</strong>.</div><button class="btn btn-sm btn-success" onclick="handleCredit('${d.id}', '${n.characterId}', 'accept')">Accept</button><button class="btn btn-sm btn-danger ms-2" onclick="handleCredit('${d.id}', '${n.characterId}', 'decline')">Decline</button></div>`;
                 let iconClass, message;
-                
-                if (n.type === 'subscription') {
-                    iconClass = 'icon-sub fa-user-plus';
-                    message = `<strong>${n.fromUsername}</strong> subscribed to you!`;
-                } else if (n.type === 'favorite') {
-                    iconClass = 'icon-fav fa-heart';
-                    message = `<strong>${n.fromUsername}</strong> favorited ${n.characterName || 'your character'}`;
-                } else if (n.type === 'comment') {
-                    iconClass = 'icon-comment fa-comment';
-                    message = `<strong>${n.fromUsername}</strong> commented on your profile`;
-                } else {
-                    iconClass = 'icon-update fa-sync';
-                    message = `Update regarding ${n.characterName || 'your character'}`;
-                }
-                
-                return `
-                <div class="notif-item ${isUnread ? 'unread' : ''}">
-                    <div class="notif-icon ${iconClass.split(' ')[0]}"><i class="fa ${iconClass.split(' ')[1]}"></i></div>
-                    <div>${message}</div>
-                </div>`;
+                if (n.type === 'subscription') { iconClass = 'icon-sub fa-user-plus'; message = `<strong>${n.fromUsername || 'Someone'}</strong> subscribed to you!`; }
+                else if (n.type === 'favorite') { iconClass = 'icon-fav fa-heart'; message = `<strong>${n.fromUsername}</strong> favorited ${n.characterName || 'your character'}`; }
+                else if (n.type === 'comment') { iconClass = 'icon-comment fa-comment'; message = `<strong>${n.fromUsername}</strong> commented on your profile`; }
+                else { iconClass = 'icon-update fa-sync'; message = `Update regarding ${n.characterName || 'your character'}`; }
+                return `<div class="notif-item ${isUnread ? 'unread' : ''}"><div class="notif-icon ${iconClass.split(' ')[0]}"><i class="fa ${iconClass.split(' ')[1]}"></i></div><div>${message}</div></div>`;
             }).join('');
         }
     }
 
     window.clearCurrentSection = async () => {
-        if (currentSection === 'transfers' || searchIds.length === 0) return;
-
-        const unreadDocsToClear = generalNotifsData.filter(d => {
+        const unread = generalNotifsData.filter(d => {
             const data = d.data();
             if (data.read === true) return false;
             if(currentSection === 'subscriptions') return data.type === 'subscription';
-            if(currentSection === 'updates') return data.type === 'update' || data.type === 'favorite';
+            if(currentSection === 'updates') return data.type === 'update' || data.type === 'favorite' || data.type === 'credit_request';
             if(currentSection === 'comments') return data.type === 'comment';
             return false;
         });
-
-        if (unreadDocsToClear.length === 0) return;
-
+        if (unread.length === 0) return;
         const btn = document.getElementById('btn-clear');
         btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Clearing...`;
-
         const batch = writeBatch(db);
-        unreadDocsToClear.forEach(d => {
-            batch.update(d.ref, { read: true });
-        });
-
+        unread.forEach(d => batch.update(d.ref, { read: true }));
         await batch.commit();
-
         btn.innerHTML = `<i class="fa fa-check"></i> Cleared`;
         setTimeout(() => { btn.innerHTML = `<i class="fa fa-check"></i> Mark Section as Read`; }, 2000);
     };
