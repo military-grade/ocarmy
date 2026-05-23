@@ -67,18 +67,15 @@
 
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
-    
     const urlParams = new URLSearchParams(window.location.search);
     const targetUid = urlParams.get('user'); 
     let currentUser = null;
 
     if (!targetUid) {
-        document.getElementById('profile-content').innerHTML = "No user ID specified.";
+        document.getElementById('profile-content').innerHTML = "No user ID specified in URL.";
     } else {
         fetchUserData();
-        onAuthStateChanged(auth, (user) => {
-            if (user) { currentUser = user; checkSubStatus(); }
-        });
+        onAuthStateChanged(auth, (user) => { if (user) { currentUser = user; checkSubStatus(); } });
     }
 
     async function fetchUserData() {
@@ -88,7 +85,10 @@
             document.getElementById('side-username').innerText = data.username || "User";
             if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
             if (data.username?.toLowerCase() === 'militarygrade') document.getElementById('side-name-container').innerHTML += ` <i class="fa fa-crown creator-crown"></i>`;
-            
+
+            const links = { 'lnk-profile': 'profile.html', 'lnk-bulletins': 'bulletins.html', 'lnk-chars': 'characters.html', 'lnk-comments': 'profile_comments.html', 'lnk-subscribe': 'subscribe.html', 'lnk-message': 'message_user.html' };
+            for (let id in links) { document.getElementById(id).href = `${links[id]}?user=${targetUid}`; }
+
             const subSnap = await getDocs(collection(db, "users", targetUid, "subscribers"));
             document.getElementById('side-sub-count').innerText = `${subSnap.size} subscribers`;
             document.getElementById('profile-content').innerHTML = data.profileHTML || "This user hasn't set up their profile yet.";
@@ -99,10 +99,7 @@
         if(currentUser.uid === targetUid) return document.getElementById('lnk-subscribe').style.display = 'none';
         const subDoc = await getDoc(doc(db, "users", targetUid, "subscribers", currentUser.uid));
         const btn = document.getElementById('lnk-subscribe');
-        if (subDoc.exists()) {
-            btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`;
-            btn.classList.add('subscribed');
-        }
+        if (subDoc.exists()) { btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`; btn.classList.add('subscribed'); }
         btn.onclick = toggleSub;
     }
 
@@ -110,7 +107,6 @@
         const btn = document.getElementById('lnk-subscribe');
         const subRef = doc(db, "users", targetUid, "subscribers", currentUser.uid);
         const isSubbed = btn.classList.contains('subscribed');
-
         btn.style.pointerEvents = "none";
         if (isSubbed) {
             await deleteDoc(subRef);
@@ -118,9 +114,8 @@
             btn.classList.remove('subscribed');
         } else {
             await setDoc(subRef, { at: serverTimestamp() });
-            // Notification logic
             await setDoc(doc(collection(db, "notifications")), {
-                toUserId: targetUid, fromUserId: currentUser.uid, type: "subscription", read: false, createdAt: serverTimestamp()
+                toUserId: targetUid, fromUserId: currentUser.uid, fromUsername: document.getElementById('side-username').innerText, type: "subscription", read: false, createdAt: serverTimestamp()
             });
             btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`;
             btn.classList.add('subscribed');
