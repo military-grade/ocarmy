@@ -70,13 +70,23 @@
     const auth = getAuth();
     const urlParams = new URLSearchParams(window.location.search);
     const targetUid = urlParams.get('user'); 
+    
     let currentUser = null;
+    let viewerUsername = "User"; 
 
     if (!targetUid) {
         document.getElementById('profile-content').innerHTML = "No user ID specified.";
     } else {
         fetchUserData();
-        onAuthStateChanged(auth, (user) => { if (user) { currentUser = user; checkSubStatus(); } });
+        onAuthStateChanged(auth, async (user) => { 
+            if (user) { 
+                currentUser = user; 
+                checkSubStatus();
+                // Get the VIEWER's username for notifications
+                const viewerDoc = await getDoc(doc(db, "users", user.uid));
+                if (viewerDoc.exists()) viewerUsername = viewerDoc.data().username || "User";
+            } 
+        });
     }
 
     async function fetchUserData() {
@@ -86,11 +96,10 @@
             document.getElementById('side-username').innerText = data.username || "User";
             if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
             if (data.username?.toLowerCase() === 'militarygrade') document.getElementById('side-name-container').innerHTML += ` <i class="fa fa-crown creator-crown"></i>`;
-
-            // REMOVED 'lnk-subscribe' from the link map so the button uses the toggleSub function instead of a link
+            
             const links = { 'lnk-profile': 'profile.html', 'lnk-bulletins': 'bulletins.html', 'lnk-chars': 'characters.html', 'lnk-comments': 'profile_comments.html', 'lnk-message': 'message_user.html' };
             for (let id in links) { document.getElementById(id).href = `${links[id]}?user=${targetUid}`; }
-
+            
             const subSnap = await getDocs(collection(db, "users", targetUid, "subscribers"));
             document.getElementById('side-sub-count').innerText = `${subSnap.size} subscribers`;
             document.getElementById('profile-content').innerHTML = data.profileHTML || "This user hasn't set up their profile yet.";
@@ -101,38 +110,26 @@
         if(currentUser.uid === targetUid) return document.getElementById('lnk-subscribe').style.display = 'none';
         const subDoc = await getDoc(doc(db, "users", targetUid, "subscribers", currentUser.uid));
         const btn = document.getElementById('lnk-subscribe');
-        if (subDoc.exists()) { 
-            btn.classList.add('subscribed');
-            btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`; 
-        }
+        if (subDoc.exists()) { btn.classList.add('subscribed'); btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`; }
         btn.onclick = toggleSub;
     }
 
     async function toggleSub() {
         const btn = document.getElementById('lnk-subscribe');
         const subRef = doc(db, "users", targetUid, "subscribers", currentUser.uid);
-        const isSubbed = btn.classList.contains('subscribed');
         
         btn.style.pointerEvents = "none";
+        const subDoc = await getDoc(subRef);
         
-        if (isSubbed) {
+        if (subDoc.exists()) {
             await deleteDoc(subRef);
             btn.innerHTML = `<i class="fa fa-plus"></i> Subscribe`;
             btn.classList.remove('subscribed');
         } else {
             await setDoc(subRef, { at: serverTimestamp() });
-            
-            // Force create a NEW notification document each time
-            const notifRef = doc(collection(db, "notifications"));
-            await setDoc(notifRef, {
-                toUserId: targetUid, 
-                fromUserId: currentUser.uid, 
-                fromUsername: document.getElementById('side-username').innerText || "A user", 
-                type: "subscription", 
-                read: false, 
-                createdAt: serverTimestamp()
+            await setDoc(doc(collection(db, "notifications")), {
+                toUserId: targetUid, fromUserId: currentUser.uid, fromUsername: viewerUsername, type: "subscription", read: false, createdAt: serverTimestamp()
             });
-            
             btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`;
             btn.classList.add('subscribed');
         }
