@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inbox | OCARMY</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            background: #f7f7f7; 
+            padding: 50px; 
+            color: #333;
+        }
+        .inbox-container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+        }
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        h2 { margin: 0; color: #222; }
+        .compose-btn {
+            background: #4e92ac; 
+            color: white; 
+            text-decoration: none; 
+            padding: 8px 16px; 
+            border-radius: 4px; 
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .compose-btn:hover { background: #3d7a91; }
+        
+        .message-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .message-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+        }
+        .message-item:last-child { border-bottom: none; }
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .sender-name { font-weight: bold; color: #4e92ac; }
+        .msg-date { color: #888; font-size: 12px; }
+        .msg-subject { font-weight: bold; margin-bottom: 5px; }
+        .msg-body { color: #555; line-height: 1.5; font-size: 14px; }
+        
+        .loading { text-align: center; color: #888; padding: 20px; }
+        .empty-inbox { text-align: center; color: #888; padding: 40px 20px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div class="inbox-container">
+        <div class="header-actions">
+            <h2>Your Inbox</h2>
+            <a href="messages.html" class="compose-btn">+ Compose New</a>
+        </div>
+
+        <div id="messages-container">
+            <div class="loading">Loading messages...</div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", 
+        authDomain: "ocarmy-db.firebaseapp.com", 
+        projectId: "ocarmy-db" 
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+
+    const messagesContainer = document.getElementById('messages-container');
+
+    // Listen for user authentication
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            fetchMessages(user.uid);
+        } else {
+            messagesContainer.innerHTML = '<div class="empty-inbox">You must be logged in to view your inbox.</div>';
+        }
+    });
+
+    async function fetchMessages(userId) {
+        try {
+            // Query the messages collection where the receiverId matches the logged-in user
+            const q = query(
+                collection(db, "messages"), 
+                where("receiverId", "==", userId)
+            );
+            
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                messagesContainer.innerHTML = '<div class="empty-inbox">No messages yet! It\'s quiet in here.</div>';
+                return;
+            }
+
+            // Sort messages by timestamp locally (descending order)
+            const messagesList = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                messagesList.push({ id: doc.id, ...data });
+            });
+            
+            messagesList.sort((a, b) => {
+                const timeA = a.timestamp ? a.timestamp.toMillis() : 0;
+                const timeB = b.timestamp ? b.timestamp.toMillis() : 0;
+                return timeB - timeA;
+            });
+
+            // Render the messages
+            let htmlString = '<ul class="message-list">';
+            messagesList.forEach(msg => {
+                const dateString = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleDateString() : 'Just now';
+                
+                htmlString += `
+                    <li class="message-item">
+                        <div class="message-header">
+                            <span class="sender-name">From: ${msg.senderName}</span>
+                            <span class="msg-date">${dateString}</span>
+                        </div>
+                        <div class="msg-subject">${msg.subject}</div>
+                        <div class="msg-body">${msg.body}</div>
+                    </li>
+                `;
+            });
+            htmlString += '</ul>';
+            
+            messagesContainer.innerHTML = htmlString;
+
+        } catch (error) {
+            console.error("Error fetching messages: ", error);
+            messagesContainer.innerHTML = '<div class="empty-inbox" style="color: red;">Error loading messages. Please refresh.</div>';
+        }
+    }
+</script>
+</body>
+</html>
