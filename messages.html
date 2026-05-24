@@ -2,50 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Messages | OCARMY</title>
+    <title>Inbox | OCARMY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
-        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; }
-        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
-        .sidebar { width: 220px; background: #f4f4f4; border-right: 1px solid var(--border); padding: 20px; }
-        .main { flex: 1; padding: 30px; }
-        .msg-item { border-bottom: 1px solid #eee; padding: 15px 0; }
-        .tabs { margin-bottom: 20px; border-bottom: 2px solid var(--border); }
-        .tabs span { padding: 10px 20px; cursor: pointer; display: inline-block; }
-        .tabs span.active { border-bottom: 2px solid var(--th-blue); font-weight: bold; }
-        input, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        button { background: var(--th-blue); color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; }
+        body { font-family: sans-serif; background: #f7f7f7; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border: 1px solid #ddd; }
+        .tabs { border-bottom: 2px solid #eee; margin-bottom: 20px; display: flex; gap: 20px; }
+        .tab { cursor: pointer; padding: 10px 0; font-weight: bold; color: #888; }
+        .tab.active { border-bottom: 2px solid #4e92ac; color: #4e92ac; }
+        .msg-item { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 4px; }
+        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #4e92ac; color: white; border: none; padding: 10px 20px; cursor: pointer; }
     </style>
 </head>
 <body>
-
-<nav class="navbar"><a href="dashboard.html" style="color:white; text-decoration:none; font-weight:bold;">OCARMY</a></nav>
-
-<div class="wrapper">
-    <aside class="sidebar">
-        <h4>Messages</h4>
+    <div class="container">
         <div class="tabs">
-            <span class="active" onclick="showTab('inbox')">Inbox</span>
-            <span onclick="showTab('compose')">Compose</span>
+            <div class="tab active" onclick="showTab('inbox')">Inbox</div>
+            <div class="tab" onclick="showTab('compose')">Compose</div>
         </div>
-    </aside>
-    <main class="main" id="main-content">
+
         <div id="inbox-view">
-            <h3>Inbox</h3>
-            <div id="message-list">Loading messages...</div>
+            <div id="message-list">Loading inbox...</div>
         </div>
+
         <div id="compose-view" style="display:none;">
-            <h3>New Message</h3>
             <input type="text" id="to-user" placeholder="Recipient Username">
             <input type="text" id="subject" placeholder="Subject">
             <textarea id="message-body" style="height: 150px;" placeholder="Message..."></textarea>
             <button onclick="sendMessage()">Send Message</button>
         </div>
-    </main>
-</div>
+    </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -54,56 +41,45 @@
 
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
-    let currentUser = null;
-
-    onAuthStateChanged(auth, (user) => {
-        if (!user) window.location.href = "login.html";
-        currentUser = user;
-        loadInbox();
-    });
 
     window.showTab = (tab) => {
         document.getElementById('inbox-view').style.display = tab === 'inbox' ? 'block' : 'none';
         document.getElementById('compose-view').style.display = tab === 'compose' ? 'block' : 'none';
-        document.querySelectorAll('.tabs span').forEach(s => s.classList.toggle('active', s.innerText.toLowerCase() === tab));
+        document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.innerText.toLowerCase() === tab));
     };
 
-    async function loadInbox() {
-        const q = query(collection(db, "messages"), where("receiverId", "==", currentUser.uid), orderBy("timestamp", "desc"));
+    onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+        const q = query(collection(db, "messages"), where("receiverId", "==", user.uid), orderBy("timestamp", "desc"));
         onSnapshot(q, (snap) => {
             const list = document.getElementById('message-list');
-            list.innerHTML = snap.empty ? "No new messages." : "";
+            list.innerHTML = snap.empty ? "No messages yet." : "";
             snap.forEach(d => {
                 const m = d.data();
-                list.innerHTML += `<div class="msg-item"><strong>From: ${m.senderName}</strong><br><strong>Subject: ${m.subject}</strong><br>${m.body}</div>`;
+                list.innerHTML += `<div class="msg-item"><strong>From: ${m.senderName}</strong><br><strong>${m.subject}</strong><p>${m.body}</p></div>`;
             });
         });
-    }
+    });
 
     window.sendMessage = async () => {
         const username = document.getElementById('to-user').value;
-        const subject = document.getElementById('subject').value;
-        const body = document.getElementById('message-body').value;
         const userQuery = query(collection(db, "users"), where("username", "==", username));
         const userSnap = await getDocs(userQuery);
         if (userSnap.empty) return alert("User not found!");
         
         const recipientId = userSnap.docs[0].id;
-        const senderDoc = await getDoc(doc(db, "users", currentUser.uid));
-        const senderName = senderDoc.exists() ? senderDoc.data().username : "Unknown";
-
-        // Add to messages
+        const sender = await getDoc(doc(db, "users", auth.currentUser.uid));
+        
         await addDoc(collection(db, "messages"), {
-            senderId: currentUser.uid, senderName, receiverId: recipientId, subject, body, timestamp: serverTimestamp()
+            senderId: auth.currentUser.uid, senderName: sender.data().username, receiverId: recipientId,
+            subject: document.getElementById('subject').value, body: document.getElementById('message-body').value,
+            timestamp: serverTimestamp()
         });
 
-        // Add to notifications
         await addDoc(collection(db, "notifications"), {
-            toUserId: recipientId, fromUserId: currentUser.uid, fromUsername: senderName, type: "message", read: false, createdAt: serverTimestamp()
+            toUserId: recipientId, fromUsername: sender.data().username, type: "message", read: false, createdAt: serverTimestamp()
         });
-
-        alert("Message Sent!");
-        location.reload();
+        alert("Message sent!");
     };
 </script>
 </body>
