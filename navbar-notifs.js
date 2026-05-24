@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = { 
@@ -12,30 +12,42 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // 1. WATCH CHARACTER TRANSFERS (Inbox Badge)
+        let dbId = user.uid;
+        
+        // Find user ID by email
+        const emailQuery = query(collection(db, "users"), where("email", "==", user.email.toLowerCase()));
+        const emailSnap = await getDocs(emailQuery);
+        if (!emailSnap.empty) { 
+            dbId = emailSnap.docs[0].id; 
+        }
+
+        // 1. WATCH MESSAGES
+        const messageQ = query(collection(db, "messages"), where("recipientId", "==", dbId), where("isRead", "==", false));
+        onSnapshot(messageQ, (snap) => {
+            updateBadge('badge-messages', snap.size);
+        });
+
+        // 2. WATCH CHARACTER TRANSFERS (Worlds Badge)
         const transferQ = query(collection(db, "transfers"), where("toUserId", "==", user.uid), where("status", "==", "pending"));
         onSnapshot(transferQ, (snap) => {
-            updateBadge('badge-inbox', snap.size);
+            updateBadge('badge-worlds', snap.size);
         });
 
-        // 2. WATCH SOCIAL NOTIFICATIONS (Favorites & Subscriptions)
-        const notifQ = query(collection(db, "notifications"), where("toUserId", "==", user.uid), where("status", "==", "unread"));
+        // 3. WATCH SOCIAL NOTIFICATIONS (Favorites & Subscriptions)
+        const notifQ = query(collection(db, "notifications"), where("toUserId", "==", user.uid), where("read", "==", false));
         onSnapshot(notifQ, (snap) => {
             let favCount = 0;
-            let subCount = 0;
+            let socialCount = 0;
             snap.forEach(doc => {
                 const data = doc.data();
-                if (data.type === 'favorite') favCount++;
-                if (data.type === 'subscription') subCount++;
+                if (data.type === 'favorite' || data.type === 'update') favCount++;
+                if (data.type === 'subscription' || data.type === 'comment') socialCount++;
             });
             updateBadge('badge-favs', favCount);
-            updateBadge('badge-social', subCount);
+            updateBadge('badge-social', socialCount);
         });
-
-        // 3. WATCH WORLD REQUESTS (Keep at 0 for now)
-        updateBadge('badge-worlds', 0);
     }
 });
 
@@ -45,11 +57,9 @@ function updateBadge(id, count) {
         el.innerText = count;
         const parentBtn = el.parentElement;
         if (count > 0) {
-            parentBtn.style.opacity = "1";
-            parentBtn.classList.remove('btn-secondary'); // Make it "pop"
-            parentBtn.classList.add('btn-primary');
+            parentBtn.classList.add('active-alert');
         } else {
-            parentBtn.style.opacity = "0.6";
+            parentBtn.classList.remove('active-alert');
         }
     }
 }
