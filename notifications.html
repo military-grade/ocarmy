@@ -9,6 +9,7 @@
         :root { --th-blue: #0093b5; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; --creator-gold: #ffd700; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
         .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .navbar a { color: white; text-decoration: none; font-weight: bold; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
 
         .sidebar { width: 220px; background: #f4f4f4; border-right: 1px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; }
@@ -20,7 +21,6 @@
         .side-nav a.active { background: #e0e0e0; font-weight: bold; color: #333; border-left: 3px solid var(--th-blue); }
 
         .creator-crown { color: var(--creator-gold); margin-left: 4px; cursor: help; text-shadow: 0 0 3px rgba(0,0,0,0.1); }
-        .creator-crown:hover::after { content: "OCARMY Creator"; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; white-space: nowrap; z-index: 100; margin-left: 10px; }
 
         .main { flex: 1; padding: 25px; }
         .breadcrumb { background: #f9f9f9; padding: 10px 15px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; margin-bottom: 20px; color: #777; }
@@ -28,15 +28,53 @@
         .page-title { font-size: 22px; margin: 0; }
         .btn-clear { background: #eee; color: #555; border: 1px solid #ccc; padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; display: none; }
         .btn-clear:hover { background: #ddd; }
+        .btn-compose { background: var(--th-blue); color: white; border: none; padding: 8px 15px; font-size: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-compose:hover { background: #007a9b; }
 
-        .notif-item { border: 1px solid var(--border); border-radius: 4px; padding: 15px; margin-bottom: 12px; background: white; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
+        .notif-item { border: 1px solid var(--border); border-radius: 4px; padding: 15px; margin-bottom: 12px; background: white; display: flex; align-items: center; gap: 15px; transition: 0.2s; cursor: pointer; }
+        .notif-item:hover { background: #f9f9f9; }
         .notif-item.unread { background: #f0fbff; border-left: 3px solid var(--th-blue); }
+        .notif-item.message-item { align-items: flex-start; }
         .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
         .icon-sub { background: #e8f5e9; color: #4caf50; }
         .icon-fav { background: #ffebee; color: #f44336; }
         .icon-update { background: #e3f2fd; color: #2196f3; }
         .icon-comment { background: #fff3e0; color: #ff9800; }
+        .icon-message { background: #f3e5f5; color: #9c27b0; }
+        .notif-content { flex: 1; }
+        .notif-sender { font-weight: bold; color: var(--th-blue); cursor: pointer; text-decoration: none; }
+        .notif-sender:hover { text-decoration: underline; }
+        .notif-preview { font-size: 12px; color: #666; margin-top: 5px; }
+        .notif-time { font-size: 11px; color: #999; }
         .empty-state { padding: 40px; text-align: center; color: #999; font-style: italic; }
+
+        /* Modal for composing messages */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 4px; padding: 25px; max-width: 500px; width: 90%; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .modal-header h3 { margin: 0; font-size: 18px; }
+        .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #999; }
+        .modal-form input, .modal-form textarea { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; }
+        .modal-form textarea { resize: vertical; min-height: 120px; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-send { background: var(--th-blue); color: white; }
+        .btn-send:hover { background: #007a9b; }
+        .btn-cancel { background: #eee; color: #555; }
+        .btn-cancel:hover { background: #ddd; }
+
+        /* Message view modal */
+        .message-view-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .message-view-modal.active { display: flex; }
+        .message-view-content { background: white; border-radius: 4px; width: 90%; max-width: 600px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .message-view-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .message-view-from { font-weight: bold; color: var(--th-blue); }
+        .message-view-body { flex: 1; padding: 15px; overflow-y: auto; background: #f9f9f9; }
+        .message-view-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        .message-view-footer textarea { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical; min-height: 80px; font-family: inherit; }
+        .message-view-footer button { padding: 10px 15px; background: var(--th-blue); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .message-view-footer button:hover { background: #007a9b; }
     </style>
 </head>
 <body>
@@ -59,7 +97,8 @@
             </div>
         </div>
         <div class="side-nav">
-            <a onclick="showSection('transfers')" id="nav-transfers" class="active">Character Transfers <span id="count-transfers">(0)</span></a>
+            <a onclick="showSection('messages')" id="nav-messages" class="active">Messages <span id="count-messages">(0)</span></a>
+            <a onclick="showSection('transfers')" id="nav-transfers">Character Transfers <span id="count-transfers">(0)</span></a>
             <a onclick="showSection('subscriptions')" id="nav-subscriptions">Subscriptions <span id="count-subscriptions">(0)</span></a>
             <a onclick="showSection('updates')" id="nav-updates">Character Updates <span id="count-updates">(0)</span></a>
             <a onclick="showSection('comments')" id="nav-comments">Subscribers & Comments <span id="count-comments">(0)</span></a>
@@ -67,40 +106,213 @@
     </aside>
 
     <main class="main">
-        <div class="breadcrumb">Account Management / <span id="bread-current">Transfers</span></div>
+        <div class="breadcrumb">Account Management / <span id="bread-current">Messages</span></div>
         <div class="page-title-container">
-            <h2 class="page-title" id="page-title">Character Transfers</h2>
-            <button class="btn-clear" id="btn-clear" onclick="clearCurrentSection()"><i class="fa fa-check"></i> Mark Section as Read</button>
+            <h2 class="page-title" id="page-title">Messages</h2>
+            <div>
+                <button class="btn-clear" id="btn-clear" onclick="clearCurrentSection()" style="display: none;"><i class="fa fa-check"></i> Mark Section as Read</button>
+                <button class="btn-compose" id="btn-compose" onclick="openComposeModal()" style="margin-left: 10px;"><i class="fa fa-pen"></i> New Message</button>
+            </div>
         </div>
         <div id="notif-display-area"><div class="empty-state">Checking for alerts...</div></div>
     </main>
 </div>
 
+<!-- Compose Message Modal -->
+<div class="modal-overlay" id="compose-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>New Message</h3>
+            <button class="modal-close" onclick="closeComposeModal()"><i class="fa fa-times"></i></button>
+        </div>
+        <form class="modal-form" onsubmit="sendMessage(event)">
+            <input type="text" id="compose-recipient" placeholder="Recipient Username" required>
+            <input type="text" id="compose-subject" placeholder="Subject" required>
+            <textarea id="compose-body" placeholder="Write your message..." required></textarea>
+            <div class="modal-buttons">
+                <button type="submit" class="btn-send"><i class="fa fa-paper-plane"></i> Send</button>
+                <button type="button" class="btn-cancel" onclick="closeComposeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Message View Modal -->
+<div class="message-view-modal" id="message-view-modal">
+    <div class="message-view-content">
+        <div class="message-view-header">
+            <div>
+                <div class="message-view-from" id="message-view-from"></div>
+                <div style="font-size: 12px; color: #999;" id="message-view-date"></div>
+            </div>
+            <button style="background: none; border: none; cursor: pointer; font-size: 20px; color: #999;" onclick="closeMessageView()"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="message-view-body">
+            <div style="margin-bottom: 20px;">
+                <div style="font-weight: bold; margin-bottom: 10px;" id="message-view-subject"></div>
+                <div id="message-view-text"></div>
+            </div>
+            <div id="message-view-replies"></div>
+        </div>
+        <div class="message-view-footer">
+            <textarea id="reply-text" placeholder="Write your reply..."></textarea>
+            <button onclick="sendReply()"><i class="fa fa-reply"></i> Reply</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, query, where, onSnapshot, getDoc, doc, getDocs, writeBatch, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, onSnapshot, getDoc, doc, getDocs, writeBatch, updateDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
 
-    let currentSection = 'transfers', transfersData = [], generalNotifsData = [], searchIds = [];
+    let currentSection = 'messages', messagesData = [], transfersData = [], generalNotifsData = [], searchIds = [];
+    let currentUser = null, currentUserData = null, currentMessageId = null;
 
-    window.handleCredit = async (notifId, charId, action) => {
-        const charRef = doc(db, "characters", charId);
-        if (action === 'accept') { await updateDoc(charRef, { isCreditPending: false }); alert("Credit accepted!"); }
-        else { await updateDoc(charRef, { creditedTo: null, isCreditPending: false }); alert("Credit declined."); }
-        await deleteDoc(doc(db, "notifications", notifId));
-        location.reload();
+    window.openComposeModal = () => {
+        document.getElementById('compose-modal').classList.add('active');
+    };
+
+    window.closeComposeModal = () => {
+        document.getElementById('compose-modal').classList.remove('active');
+        document.getElementById('compose-recipient').value = '';
+        document.getElementById('compose-subject').value = '';
+        document.getElementById('compose-body').value = '';
+    };
+
+    window.sendMessage = async (e) => {
+        e.preventDefault();
+        const recipient = document.getElementById('compose-recipient').value.trim();
+        const subject = document.getElementById('compose-subject').value.trim();
+        const body = document.getElementById('compose-body').value.trim();
+
+        if (!recipient || !subject || !body) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        // Find recipient by username
+        const userQuery = query(collection(db, "users"), where("username", "==", recipient));
+        const userSnap = await getDocs(userQuery);
+
+        if (userSnap.empty) {
+            alert("User not found!");
+            return;
+        }
+
+        const recipientId = userSnap.docs[0].id;
+        const recipientData = userSnap.docs[0].data();
+
+        try {
+            // Create a conversation thread
+            await addDoc(collection(db, "messages"), {
+                senderId: currentUser.uid,
+                senderUsername: currentUserData.username,
+                senderPfp: currentUserData.pfp || "",
+                recipientId: recipientId,
+                recipientUsername: recipientData.username,
+                subject: subject,
+                body: body,
+                isRead: false,
+                timestamp: serverTimestamp(),
+                replies: []
+            });
+
+            alert("Message sent!");
+            closeComposeModal();
+            location.reload();
+        } catch (error) {
+            alert("Error sending message: " + error.message);
+        }
+    };
+
+    window.closeMessageView = () => {
+        document.getElementById('message-view-modal').classList.remove('active');
+        currentMessageId = null;
+        document.getElementById('reply-text').value = '';
+    };
+
+    window.sendReply = async () => {
+        const replyText = document.getElementById('reply-text').value.trim();
+        if (!replyText) {
+            alert('Please write a reply');
+            return;
+        }
+
+        if (!currentMessageId) return;
+
+        const messageRef = doc(db, "messages", currentMessageId);
+        const messageSnap = await getDoc(messageRef);
+        const messageData = messageSnap.data();
+
+        try {
+            const newReplies = messageData.replies || [];
+            newReplies.push({
+                authorId: currentUser.uid,
+                authorUsername: currentUserData.username,
+                authorPfp: currentUserData.pfp || "",
+                text: replyText,
+                timestamp: new Date()
+            });
+
+            await updateDoc(messageRef, {
+                replies: newReplies,
+                isRead: false
+            });
+
+            document.getElementById('reply-text').value = '';
+            alert('Reply sent!');
+            location.reload();
+        } catch (error) {
+            alert("Error sending reply: " + error.message);
+        }
+    };
+
+    window.openMessage = async (msgId) => {
+        currentMessageId = msgId;
+        const messageSnap = await getDoc(doc(db, "messages", msgId));
+        const msgData = messageSnap.data();
+
+        // Mark as read
+        await updateDoc(doc(db, "messages", msgId), { isRead: true });
+
+        const fromUser = msgData.senderId === currentUser.uid ? msgData.recipientUsername : msgData.senderUsername;
+        document.getElementById('message-view-from').innerText = fromUser;
+        document.getElementById('message-view-subject').innerText = msgData.subject;
+        document.getElementById('message-view-text').innerText = msgData.body;
+        document.getElementById('message-view-date').innerText = msgData.timestamp?.toDate?.().toLocaleString() || 'Unknown date';
+
+        let repliesHTML = '';
+        if (msgData.replies && msgData.replies.length > 0) {
+            repliesHTML = '<div style="border-top: 1px solid #ddd; margin-top: 20px; padding-top: 20px;"><strong>Replies:</strong>';
+            msgData.replies.forEach(reply => {
+                repliesHTML += `
+                    <div style="margin-top: 15px; padding: 12px; background: white; border: 1px solid #ddd; border-radius: 4px;">
+                        <div style="font-weight: bold;"><a href="profile.html?user=${reply.authorId}" style="color: var(--th-blue); text-decoration: none;">${reply.authorUsername}</a></div>
+                        <div style="font-size: 12px; color: #999; margin-bottom: 8px;">${new Date(reply.timestamp.seconds * 1000).toLocaleString()}</div>
+                        <div>${reply.text}</div>
+                    </div>
+                `;
+            });
+            repliesHTML += '</div>';
+        }
+        document.getElementById('message-view-replies').innerHTML = repliesHTML;
+
+        document.getElementById('message-view-modal').classList.add('active');
     };
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) return window.location.href = "login.html";
+        currentUser = user;
         let dbId = user.uid, userData = null;
         const emailQuery = query(collection(db, "users"), where("email", "==", user.email.toLowerCase()));
         const emailSnap = await getDocs(emailQuery);
         if (!emailSnap.empty) { dbId = emailSnap.docs[0].id; userData = emailSnap.docs[0].data(); } 
         else { const uidDoc = await getDoc(doc(db, "users", user.uid)); if (uidDoc.exists()) userData = uidDoc.data(); }
+        currentUserData = userData;
         searchIds = [...new Set([user.uid, dbId])];
         if (userData) {
             document.getElementById('side-username').innerText = userData.username || "User";
@@ -109,10 +321,22 @@
             const subSnap = await getDocs(collection(db, "users", dbId, "subscribers"));
             document.getElementById('side-subs').innerText = `${subSnap.size} subscribers`;
         }
+
+        // Watch Messages
+        onSnapshot(query(collection(db, "messages"), where("recipientId", "==", searchIds[0] || user.uid)), (snap) => {
+            messagesData = snap.docs.sort((a, b) => (b.data().timestamp?.toMillis?.() || 0) - (a.data().timestamp?.toMillis?.() || 0));
+            const unreadCount = messagesData.filter(d => !d.data().isRead).length;
+            document.getElementById('count-messages').innerText = `(${unreadCount})`;
+            if(currentSection === 'messages') renderDisplay();
+        });
+
+        // Watch Transfers
         onSnapshot(query(collection(db, "transfers"), where("toUserId", "in", searchIds), where("status", "==", "pending")), (snap) => {
             transfersData = snap.docs; document.getElementById('count-transfers').innerText = `(${snap.size})`;
             if(currentSection === 'transfers') renderDisplay();
         });
+
+        // Watch General Notifications
         onSnapshot(query(collection(db, "notifications"), where("toUserId", "in", searchIds)), (snap) => {
             generalNotifsData = snap.docs.sort((a, b) => (b.data().createdAt?.toMillis?.() || 0) - (a.data().createdAt?.toMillis?.() || 0));
             const counts = { subscriptions: 0, updates: 0, comments: 0 };
@@ -127,28 +351,51 @@
             document.getElementById('count-subscriptions').innerText = `(${counts.subscriptions})`;
             document.getElementById('count-updates').innerText = `(${counts.updates})`;
             document.getElementById('count-comments').innerText = `(${counts.comments})`;
-            if(currentSection !== 'transfers') renderDisplay();
+            if(currentSection !== 'transfers' && currentSection !== 'messages') renderDisplay();
         });
     });
 
     window.showSection = (section) => {
         currentSection = section;
-        const titles = { transfers: 'Character Transfers', subscriptions: 'Subscriptions', updates: 'Character Updates', comments: 'Subscribers & Comments' };
+        const titles = { messages: 'Messages', transfers: 'Character Transfers', subscriptions: 'Subscriptions', updates: 'Character Updates', comments: 'Subscribers & Comments' };
         document.getElementById('page-title').innerText = titles[section];
         document.getElementById('bread-current').innerText = titles[section];
         document.querySelectorAll('.side-nav a').forEach(a => a.classList.remove('active'));
         document.getElementById(`nav-${section}`).classList.add('active');
-        document.getElementById('btn-clear').style.display = section === 'transfers' ? 'none' : 'block';
+        document.getElementById('btn-clear').style.display = section === 'messages' || section === 'transfers' ? 'none' : 'block';
+        document.getElementById('btn-compose').style.display = section === 'messages' ? 'inline-block' : 'none';
         renderDisplay();
     };
 
     function renderDisplay() {
         const area = document.getElementById('notif-display-area');
-        if (currentSection === 'transfers') {
+        if (currentSection === 'messages') {
+            if (messagesData.length === 0) { area.innerHTML = `<div class="empty-state">You have no messages.</div>`; return; }
+            area.innerHTML = messagesData.map(d => {
+                const m = d.data();
+                const isUnread = m.isRead === false;
+                const isReceived = m.recipientId === currentUser.uid;
+                const senderName = isReceived ? m.senderUsername : m.recipientUsername;
+                const senderId = isReceived ? m.senderId : m.recipientId;
+                const preview = m.body.substring(0, 50) + (m.body.length > 50 ? '...' : '');
+                const dateStr = m.timestamp?.toDate?.().toLocaleString() || 'Unknown';
+                return `
+                    <div class="notif-item message-item ${isUnread ? 'unread' : ''}" onclick="openMessage('${d.id}')">
+                        <div class="notif-icon icon-message"><i class="fa fa-envelope"></i></div>
+                        <div class="notif-content">
+                            <div><a href="profile.html?user=${senderId}" class="notif-sender" onclick="event.stopPropagation()">${senderName}</a></div>
+                            <div style="font-weight: bold; color: #333; margin-top: 3px;">${m.subject}</div>
+                            <div class="notif-preview">${preview}</div>
+                            <div class="notif-time">${dateStr}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else if (currentSection === 'transfers') {
             if (transfersData.length === 0) { area.innerHTML = `<div class="empty-state">You have no pending transfers.</div>`; return; }
             area.innerHTML = transfersData.map(d => {
                 const t = d.data();
-                return `<div class="notif-item"><div style="width:60px; height:60px; background:url('${t.characterAvatar || ''}') center/cover; border-radius:4px; border:1px solid #ddd;"></div><div class="flex-grow-1"><strong>${t.fromUsername || 'Someone'}</strong> wants to transfer <strong>${t.characterName || 'a character'}</strong> to you.<div class="small text-muted mt-1">Reason: ${t.reason || 'None provided'}</div></div><button class="btn btn-sm btn-success">Accept</button><button class="btn btn-sm btn-danger ms-2">Decline</button></div>`;
+                return `<div class="notif-item"><div style="width:60px; height:60px; background:url('${t.characterAvatar || ''}') center/cover; border-radius:4px; border:1px solid #ddd;"></div><div><strong>${t.characterName || 'Character'}</strong><br/><span style="font-size:12px; color:#666;">Transfer pending from ${t.fromUsername}</span><br/><button onclick="handleCredit('${d.id}', '${t.characterId}', 'accept')" style="margin-top:8px; background:#4caf50; color:white; border:none; padding:5px 10px; border-radius:3px; font-size:11px; cursor:pointer;">Accept</button> <button onclick="handleCredit('${d.id}', '${t.characterId}', 'decline')" style="margin-top:8px; background:#f44336; color:white; border:none; padding:5px 10px; border-radius:3px; font-size:11px; cursor:pointer;">Decline</button></div></div>`;
             }).join('');
         } else {
             const filtered = generalNotifsData.filter(d => {
@@ -162,7 +409,7 @@
             area.innerHTML = filtered.map(d => {
                 const n = d.data();
                 const isUnread = n.read === false;
-                if (n.type === 'credit_request') return `<div class="notif-item ${isUnread ? 'unread' : ''}"><div class="notif-icon icon-comment"><i class="fa fa-pen-nib"></i></div><div class="flex-grow-1"><strong>${n.fromUsername || 'Someone'}</strong> wants to credit you for <strong>${n.characterName}</strong>.</div><button class="btn btn-sm btn-success" onclick="handleCredit('${d.id}', '${n.characterId}', 'accept')">Accept</button><button class="btn btn-sm btn-danger ms-2" onclick="handleCredit('${d.id}', '${n.characterId}', 'decline')">Decline</button></div>`;
+                if (n.type === 'credit_request') return `<div class="notif-item ${isUnread ? 'unread' : ''}"><div class="notif-icon icon-comment"><i class="fa fa-pen-nib"></i></div><div><strong>${n.fromUsername || 'Someone'}</strong> requested credit for ${n.characterName || 'a character'}<br/><button onclick="handleCredit('${d.id}', '${n.characterId}', 'accept')" style="margin-top:8px; background:#4caf50; color:white; border:none; padding:5px 10px; border-radius:3px; font-size:11px; cursor:pointer;">Accept</button> <button onclick="handleCredit('${d.id}', '${n.characterId}', 'decline')" style="margin-top:8px; background:#f44336; color:white; border:none; padding:5px 10px; border-radius:3px; font-size:11px; cursor:pointer;">Decline</button></div></div>`;
                 let iconClass, message;
                 if (n.type === 'subscription') { iconClass = 'icon-sub fa-user-plus'; message = `<strong>${n.fromUsername || 'Someone'}</strong> subscribed to you!`; }
                 else if (n.type === 'favorite') { iconClass = 'icon-fav fa-heart'; message = `<strong>${n.fromUsername}</strong> favorited ${n.characterName || 'your character'}`; }
@@ -172,6 +419,14 @@
             }).join('');
         }
     }
+
+    window.handleCredit = async (notifId, charId, action) => {
+        const charRef = doc(db, "characters", charId);
+        if (action === 'accept') { await updateDoc(charRef, { isCreditPending: false }); alert("Credit accepted!"); }
+        else { await updateDoc(charRef, { creditedTo: null, isCreditPending: false }); alert("Credit declined."); }
+        await deleteDoc(doc(db, "notifications", notifId));
+        location.reload();
+    };
 
     window.clearCurrentSection = async () => {
         const unread = generalNotifsData.filter(d => {
