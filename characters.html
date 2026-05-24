@@ -8,46 +8,62 @@
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 1000; }
+        .nav-left { display: flex; gap: 5px; align-items: center; height: 100%; }
+        .nav-left a { color: #ccc; text-decoration: none; font-size: 13px; padding: 0 10px; cursor: pointer; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
-
-        /* Left Sidebar */
-        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; display: flex; flex-direction: column; }
-        .side-header { background: #427e95; padding: 10px 15px; font-weight: bold; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.1); }
-        .side-user-info { padding: 12px 15px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); }
-        .side-avatar { width: 35px; height: 35px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
+        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; }
+        .side-avatar { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; background-position: center; }
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .side-nav a:hover, .side-nav a.active { background: rgba(0,0,0,0.1); }
         .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
-
-        /* Main Content */
+        .creator-crown { color: #ffd700; margin-left: 5px; }
         .main { flex: 1; padding: 25px; }
         .folder-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Character Grid */
         .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .char-card { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; text-decoration: none; color: inherit; transition: 0.2s; background: #fff; }
         .char-card:hover { border-color: var(--th-blue); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
         .char-thumb { width: 100%; aspect-ratio: 1/1; background: #eee; background-size: cover; background-position: center; }
         .char-name { padding: 10px; font-weight: bold; font-size: 13px; color: var(--th-blue); text-align: center; }
+        .btn-sub { background: rgba(255,255,255,0.2); font-weight: bold; transition: 0.2s; cursor: pointer; }
+        .btn-sub:hover { background: rgba(255,255,255,0.3); }
+        .btn-sub.subscribed { background: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body>
 
-<nav class="navbar"><div class="fw-bold px-2">OCARMY</div></nav>
+<nav class="navbar">
+    <div class="nav-left">
+        <a onclick="window.history.back()"><i class="fa fa-arrow-left"></i> Back</a>
+        <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
+        <a href="browse.html"><i class="fa fa-eye"></i> Browse</a>
+        <a href="search.html"><i class="fa fa-search"></i> Search</a>
+    </div>
+</nav>
 
 <div class="wrapper">
     <aside class="sidebar">
-        <div class="side-header"><i class="fa fa-users"></i> Characters</div>
-        <div class="side-user-info">
+        <div class="side-user-header">
             <div class="side-avatar" id="side-pfp"></div>
-            <a href="#" id="side-username" style="color:white; text-decoration:none; font-weight:bold; font-size:13px;">User</a>
-        </div>
-        <div class="side-nav" id="folder-list">
-            <a onclick="loadCharacters('all')" id="all-link"><i class="fa fa-folder"></i> All Characters</a>
-            <a onclick="loadCharacters('unsorted')" id="unsorted-link"><i class="fa fa-folder-open"></i> Unsorted</a>
-            <div class="side-label">Folders</div>
+            <div>
+                <div id="side-name-container" style="font-weight: bold; display:flex; align-items:center;">
+                    <span id="side-username">Loading...</span>
+                </div>
+                <div style="font-size: 11px; opacity: 0.8;" id="side-sub-count">0 subscribers</div>
             </div>
+        </div>
+        <div class="side-nav">
+            <a id="lnk-profile"><i class="fa fa-user"></i> Profile</a>
+            <a id="lnk-bulletins"><i class="fa fa-comment"></i> Bulletins</a>
+            <a id="lnk-chars"><i class="fa fa-users"></i> Characters</a>
+            <div class="side-label">Portfolio</div>
+            <a id="lnk-designs"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a id="lnk-art"><i class="fa fa-image"></i> Art</a>
+            <div class="side-label">Interaction</div>
+            <a id="lnk-comments"><i class="fa fa-comments"></i> Comments</a>
+            <a id="lnk-subscribe" class="btn-sub"><i class="fa fa-plus"></i> Subscribe</a>
+            <a id="lnk-message"><i class="fa fa-envelope"></i> Message</a>
+        </div>
     </aside>
 
     <main class="main">
@@ -76,10 +92,13 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     let targetUserId = urlParams.get('user');
-    let targetName = urlParams.get('name'); // This captures the name from your new 404 redirect
+    let targetName = urlParams.get('name');
+    let currentUser = null;
+    let viewerUsername = "User";
 
     onAuthStateChanged(auth, async (user) => {
-        // 1. Resolve User ID from Name if needed
+        currentUser = user;
+        
         if (!targetUserId && targetName) {
             const userQ = query(collection(db, "users"), where("username", "==", targetName));
             const userSnap = await getDocs(userQ);
@@ -88,47 +107,97 @@
             }
         }
 
-        // 2. Default to logged in user if still no target
         if (!targetUserId && user) targetUserId = user.uid;
         
         if (targetUserId) {
-            setupProfile(targetUserId);
+            fetchUserData(targetUserId);
             loadCharacters('all');
             loadFolders(targetUserId);
             
             if (user && user.uid === targetUserId) {
                 document.getElementById('owner-tools').style.display = "block";
             }
+            
+            if (user) {
+                const viewerDoc = await getDoc(doc(db, "users", user.uid));
+                if (viewerDoc.exists()) viewerUsername = viewerDoc.data().username || "User";
+                checkSubStatus(targetUserId, user.uid);
+            }
         } else {
             document.getElementById('character-display').innerHTML = "<div class='p-3'>Please log in or specify a user profile.</div>";
         }
     });
 
-    async function setupProfile(uid) {
-        const snap = await getDoc(doc(db, "users", uid));
-        if (snap.exists()) {
-            const data = snap.data();
-            document.getElementById('side-username').innerText = data.username;
-            document.getElementById('side-username').href = `profile.html?user=${uid}`;
+    async function fetchUserData(uid) {
+        const userDoc = await getDoc(doc(db, "users", uid));
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            document.getElementById('side-username').innerText = data.username || "User";
             if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+            if (data.username?.toLowerCase() === 'militarygrade') document.getElementById('side-name-container').innerHTML += ` <i class="fa fa-crown creator-crown"></i>`;
+            
+            const links = { 
+                'lnk-profile': 'profile.html', 
+                'lnk-bulletins': 'bulletins.html', 
+                'lnk-chars': 'characters.html',
+                'lnk-designs': 'designs.html',
+                'lnk-art': 'art.html',
+                'lnk-comments': 'profile_comments.html', 
+                'lnk-message': 'message_user.html'
+            };
+            for (let id in links) { document.getElementById(id).href = `${links[id]}?user=${uid}`; }
+            
+            const subSnap = await getDocs(collection(db, "users", uid, "subscribers"));
+            document.getElementById('side-sub-count').innerText = `${subSnap.size} subscribers`;
         }
+    }
+
+    async function checkSubStatus(targetUid, currentUserUid) {
+        if(currentUserUid === targetUid) return document.getElementById('lnk-subscribe').style.display = 'none';
+        const subDoc = await getDoc(doc(db, "users", targetUid, "subscribers", currentUserUid));
+        const btn = document.getElementById('lnk-subscribe');
+        if (subDoc.exists()) { btn.classList.add('subscribed'); btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`; }
+        btn.onclick = () => toggleSub(targetUid, currentUserUid);
+    }
+
+    async function toggleSub(targetUid, currentUserUid) {
+        const { deleteDoc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+        const btn = document.getElementById('lnk-subscribe');
+        const subRef = doc(db, "users", targetUid, "subscribers", currentUserUid);
+        
+        btn.style.pointerEvents = "none";
+        const subDoc = await getDoc(subRef);
+        
+        if (subDoc.exists()) {
+            await deleteDoc(subRef);
+            btn.innerHTML = `<i class="fa fa-plus"></i> Subscribe`;
+            btn.classList.remove('subscribed');
+        } else {
+            await setDoc(subRef, { at: serverTimestamp() });
+            await setDoc(doc(collection(db, "notifications")), {
+                toUserId: targetUid, fromUserId: currentUserUid, fromUsername: viewerUsername, type: "subscription", read: false, createdAt: serverTimestamp()
+            });
+            btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`;
+            btn.classList.add('subscribed');
+        }
+        btn.style.pointerEvents = "auto";
     }
 
     async function loadFolders(uid) {
         const q = query(collection(db, "folders"), where("ownerId", "==", uid));
         const snap = await getDocs(q);
-        const list = document.getElementById('folder-list');
+        const navElement = document.querySelector('.side-nav');
         snap.forEach(doc => {
             const folder = doc.data();
-            list.innerHTML += `<a onclick="loadCharacters('${doc.id}', '${folder.name}')"><i class="fa fa-folder"></i> ${folder.name}</a>`;
+            const link = document.createElement('a');
+            link.onclick = () => loadCharacters(doc.id, folder.name);
+            link.innerHTML = `<i class="fa fa-folder"></i> ${folder.name}`;
+            navElement.appendChild(link);
         });
     }
 
     window.loadCharacters = async (folderId, folderName = "All Characters") => {
-        // UI Handling
         document.getElementById('folder-title').innerText = folderId === "unsorted" ? "Unsorted" : folderName;
-        document.querySelectorAll('.side-nav a').forEach(a => a.classList.remove('active'));
-        
         const grid = document.getElementById('character-display');
         grid.innerHTML = "<div class='text-muted'>Loading characters...</div>";
 
@@ -136,7 +205,6 @@
         if (folderId === 'all') {
             q = query(collection(db, "characters"), where("ownerId", "==", targetUserId));
         } else if (folderId === 'unsorted') {
-            // FIX: Filters for characters with no folder set
             q = query(collection(db, "characters"), where("ownerId", "==", targetUserId), where("folderId", "==", ""));
         } else {
             q = query(collection(db, "characters"), where("ownerId", "==", targetUserId), where("folderId", "==", folderId));

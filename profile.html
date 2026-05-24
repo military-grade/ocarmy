@@ -8,7 +8,7 @@
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 2000; }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 20; }
         .nav-left a { color: #ccc; text-decoration: none; font-size: 13px; padding: 0 10px; cursor: pointer; }
         .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
         .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
@@ -49,6 +49,9 @@
             <a id="lnk-profile"><i class="fa fa-user"></i> Profile</a>
             <a id="lnk-bulletins"><i class="fa fa-comment"></i> Bulletins</a>
             <a id="lnk-chars"><i class="fa fa-users"></i> Characters</a>
+            <div class="side-label">Portfolio</div>
+            <a id="lnk-designs"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a id="lnk-art"><i class="fa fa-image"></i> Art</a>
             <div class="side-label">Interaction</div>
             <a id="lnk-comments"><i class="fa fa-comments"></i> Comments</a>
             <a id="lnk-subscribe" class="btn-sub"><i class="fa fa-plus"></i> Subscribe</a>
@@ -82,7 +85,6 @@
             if (user) { 
                 currentUser = user; 
                 checkSubStatus();
-                // Get the VIEWER's username for notifications
                 const viewerDoc = await getDoc(doc(db, "users", user.uid));
                 if (viewerDoc.exists()) viewerUsername = viewerDoc.data().username || "User";
             } 
@@ -97,7 +99,7 @@
             if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
             if (data.username?.toLowerCase() === 'militarygrade') document.getElementById('side-name-container').innerHTML += ` <i class="fa fa-crown creator-crown"></i>`;
             
-            const links = { 'lnk-profile': 'profile.html', 'lnk-bulletins': 'bulletins.html', 'lnk-chars': 'characters.html', 'lnk-comments': 'profile_comments.html', 'lnk-message': 'message_user.html' };
+            const links = { 'lnk-profile': 'profile.html', 'lnk-bulletins': 'bulletins.html', 'lnk-chars': 'characters.html', 'lnk-designs': 'designs.html', 'lnk-art': 'art.html', 'lnk-comments': 'profile_comments.html', 'lnk-message': 'message_user.html' };
             for (let id in links) { document.getElementById(id).href = `${links[id]}?user=${targetUid}`; }
             
             const subSnap = await getDocs(collection(db, "users", targetUid, "subscribers"));

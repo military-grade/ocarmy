@@ -8,34 +8,60 @@
     <style>
         :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 2000; }
-        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border: 1px solid var(--border); border-top: none; min-height: calc(100vh - 50px); }
-        .sidebar { width: 200px; background: var(--th-blue); color: white; flex-shrink: 0; }
-        .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 20; }
+        .nav-left { display: flex; gap: 5px; align-items: center; height: 100%; }
+        .nav-left a { color: #ccc; text-decoration: none; font-size: 13px; padding: 0 10px; cursor: pointer; }
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
+        .sidebar { width: 220px; background: var(--th-blue); color: white; flex-shrink: 0; }
+        .side-user-header { background: #427e95; padding: 15px; display: flex; align-items: center; gap: 10px; }
         .side-avatar { width: 45px; height: 45px; background: #eee; border-radius: 2px; background-size: cover; }
         .side-nav a { display: block; padding: 10px 15px; color: white; text-decoration: none; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        
+        .side-label { font-size: 10px; font-weight: bold; padding: 15px 15px 5px; text-transform: uppercase; opacity: 0.7; }
+        .creator-crown { color: #ffd700; margin-left: 5px; }
         .main { flex: 1; padding: 30px; background: white; }
         .bulletin-post { display: flex; gap: 15px; border: 1px solid var(--border); margin-bottom: 20px; background: #fff; }
         .b-avatar-img { width: 150px; aspect-ratio: 1/1; background: #eee; background-size: cover; border-right: 1px solid var(--border); }
         .b-content { flex: 1; padding: 15px; }
         .b-title { font-size: 18px; color: #0088cc; font-weight: bold; text-decoration: none; }
         .btn-action { padding: 2px 8px; font-size: 11px; border-radius: 3px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+        .btn-sub { background: rgba(255,255,255,0.2); font-weight: bold; transition: 0.2s; cursor: pointer; }
+        .btn-sub:hover { background: rgba(255,255,255,0.3); }
+        .btn-sub.subscribed { background: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a onclick="window.history.back()"><i class="fa fa-arrow-left"></i> Back</a>
+        <a href="dashboard.html" style="font-weight: bold; color: white; font-size: 16px;">OCARMY</a>
+        <a href="browse.html"><i class="fa fa-eye"></i> Browse</a>
+        <a href="search.html"><i class="fa fa-search"></i> Search</a>
+    </div>
+</nav>
 
 <div class="wrapper">
     <aside class="sidebar">
         <div class="side-user-header">
             <div class="side-avatar" id="side-pfp"></div>
-            <div style="font-weight: bold;" id="side-user-text">User</div>
+            <div>
+                <div id="side-name-container" style="font-weight: bold; display:flex; align-items:center;">
+                    <span id="side-username">Loading...</span>
+                </div>
+                <div style="font-size: 11px; opacity: 0.8;" id="side-sub-count">0 subscribers</div>
+            </div>
         </div>
-        <div class="side-nav" id="sidebar-links">
-            <a href="dashboard.html" data-base="profile.html"><i class="fa fa-user"></i> Profile</a>
-            <a href="bulletins.html" data-base="bulletins.html" style="background:rgba(0,0,0,0.1);"><i class="fa fa-comment"></i> Bulletins</a>
-            <a href="characters.html" data-base="characters.html"><i class="fa fa-users"></i> Characters</a>
-            <a href="art.html" data-base="art.html"><i class="fa fa-image"></i> Art</a>
+        <div class="side-nav">
+            <a id="lnk-profile"><i class="fa fa-user"></i> Profile</a>
+            <a id="lnk-bulletins"><i class="fa fa-comment"></i> Bulletins</a>
+            <a id="lnk-chars"><i class="fa fa-users"></i> Characters</a>
+            <div class="side-label">Portfolio</div>
+            <a id="lnk-designs"><i class="fa fa-paint-brush"></i> Designs</a>
+            <a id="lnk-art"><i class="fa fa-image"></i> Art</a>
+            <div class="side-label">Interaction</div>
+            <a id="lnk-comments"><i class="fa fa-comments"></i> Comments</a>
+            <a id="lnk-subscribe" class="btn-sub"><i class="fa fa-plus"></i> Subscribe</a>
+            <a id="lnk-message"><i class="fa fa-envelope"></i> Message</a>
         </div>
     </aside>
 
@@ -47,7 +73,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, collection, query, where, getDocs, getDoc, deleteDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" };
@@ -57,54 +83,106 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     let targetUserId = urlParams.get('user');
+    let currentUser = null;
+    let viewerUsername = "User";
 
     onAuthStateChanged(auth, async (authUser) => {
+        currentUser = authUser;
         if (!targetUserId && authUser) targetUserId = authUser.uid;
 
         if (targetUserId) {
-            // Force sidebar links to stay on this user
-            document.querySelectorAll('#sidebar-links a').forEach(link => {
-                const base = link.getAttribute('data-base');
-                link.href = `${base}?user=${targetUserId}`;
-            });
-
-            // Load Target User Info
-            onSnapshot(doc(db, "users", targetUserId), (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    document.getElementById('side-user-text').innerText = data.username;
-                    document.getElementById('page-title').innerText = `${data.username}'s Bulletins`;
-                    if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
-                }
-            });
-
-            // Load Bulletins
-            const q = query(collection(db, "bulletins"), where("ownerId", "==", targetUserId));
-            const snap = await getDocs(q);
-            const list = document.getElementById('bulletin-list');
-            list.innerHTML = snap.empty ? "No bulletins found." : "";
-
-            snap.forEach(d => {
-                const b = d.data();
-                const isOwner = authUser && authUser.uid === b.ownerId;
-                list.innerHTML += `
-                    <div class="bulletin-post" id="b-${d.id}">
-                        <div class="b-avatar-img" style="background-image:url('${b.userPfp || ''}')"></div>
-                        <div class="b-content">
-                            <div class="d-flex justify-content-between">
-                                <a href="#" class="b-title">${b.subject}</a>
-                                ${isOwner ? `<div>
-                                    <button class="btn-action" onclick="window.location.href='edit_bulletin.html?id=${d.id}'"><i class="fa fa-pencil"></i> Edit</button>
-                                    <button class="btn-action text-danger" onclick="deleteB('${d.id}')"><i class="fa fa-trash"></i> Delete</button>
-                                </div>` : ''}
-                            </div>
-                            <div style="font-size:11px; color:#666; margin-bottom:10px;">Posted by <strong>${b.ownerName}</strong></div>
-                            <div style="font-size:14px; border:1px solid #eee; padding:15px; border-radius:4px;">${b.content}</div>
-                        </div>
-                    </div>`;
-            });
+            fetchUserData(targetUserId);
+            loadBulletins(targetUserId);
+            
+            if (authUser) {
+                const viewerDoc = await getDoc(doc(db, "users", authUser.uid));
+                if (viewerDoc.exists()) viewerUsername = viewerDoc.data().username || "User";
+                checkSubStatus(targetUserId, authUser.uid);
+            }
         }
     });
+
+    async function fetchUserData(uid) {
+        const userDoc = await getDoc(doc(db, "users", uid));
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            document.getElementById('side-username').innerText = data.username || "User";
+            if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
+            if (data.username?.toLowerCase() === 'militarygrade') document.getElementById('side-name-container').innerHTML += ` <i class="fa fa-crown creator-crown"></i>`;
+            
+            const links = { 
+                'lnk-profile': 'profile.html', 
+                'lnk-bulletins': 'bulletins.html', 
+                'lnk-chars': 'characters.html',
+                'lnk-designs': 'designs.html',
+                'lnk-art': 'art.html',
+                'lnk-comments': 'profile_comments.html', 
+                'lnk-message': 'message_user.html'
+            };
+            for (let id in links) { document.getElementById(id).href = `${links[id]}?user=${uid}`; }
+            
+            const subSnap = await getDocs(collection(db, "users", uid, "subscribers"));
+            document.getElementById('side-sub-count').innerText = `${subSnap.size} subscribers`;
+            document.getElementById('page-title').innerText = `${data.username || 'User'}'s Bulletins`;
+        }
+    }
+
+    async function checkSubStatus(targetUid, currentUserUid) {
+        if(currentUserUid === targetUid) return document.getElementById('lnk-subscribe').style.display = 'none';
+        const subDoc = await getDoc(doc(db, "users", targetUid, "subscribers", currentUserUid));
+        const btn = document.getElementById('lnk-subscribe');
+        if (subDoc.exists()) { btn.classList.add('subscribed'); btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`; }
+        btn.onclick = () => toggleSub(targetUid, currentUserUid);
+    }
+
+    async function toggleSub(targetUid, currentUserUid) {
+        const btn = document.getElementById('lnk-subscribe');
+        const subRef = doc(db, "users", targetUid, "subscribers", currentUserUid);
+        
+        btn.style.pointerEvents = "none";
+        const subDoc = await getDoc(subRef);
+        
+        if (subDoc.exists()) {
+            await deleteDoc(subRef);
+            btn.innerHTML = `<i class="fa fa-plus"></i> Subscribe`;
+            btn.classList.remove('subscribed');
+        } else {
+            await setDoc(subRef, { at: serverTimestamp() });
+            await setDoc(doc(collection(db, "notifications")), {
+                toUserId: targetUid, fromUserId: currentUserUid, fromUsername: viewerUsername, type: "subscription", read: false, createdAt: serverTimestamp()
+            });
+            btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`;
+            btn.classList.add('subscribed');
+        }
+        btn.style.pointerEvents = "auto";
+    }
+
+    async function loadBulletins(uid) {
+        const q = query(collection(db, "bulletins"), where("ownerId", "==", uid));
+        const snap = await getDocs(q);
+        const list = document.getElementById('bulletin-list');
+        list.innerHTML = snap.empty ? "No bulletins found." : "";
+
+        snap.forEach(d => {
+            const b = d.data();
+            const isOwner = currentUser && currentUser.uid === b.ownerId;
+            list.innerHTML += `
+                <div class="bulletin-post" id="b-${d.id}">
+                    <div class="b-avatar-img" style="background-image:url('${b.userPfp || ''}')"></div>
+                    <div class="b-content">
+                        <div class="d-flex justify-content-between">
+                            <a href="#" class="b-title">${b.subject}</a>
+                            ${isOwner ? `<div>
+                                <button class="btn-action" onclick="window.location.href='edit_bulletin.html?id=${d.id}'"><i class="fa fa-pencil"></i> Edit</button>
+                                <button class="btn-action text-danger" onclick="deleteB('${d.id}')"><i class="fa fa-trash"></i> Delete</button>
+                            </div>` : ''}
+                        </div>
+                        <div style="font-size:11px; color:#666; margin-bottom:10px;">Posted by <strong>${b.ownerName}</strong></div>
+                        <div style="font-size:14px; border:1px solid #eee; padding:15px; border-radius:4px;">${b.content}</div>
+                    </div>
+                </div>`;
+        });
+    }
 
     window.deleteB = async (id) => {
         if(confirm("Delete this bulletin?")) {
