@@ -10,7 +10,7 @@
         body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
 
         /* Navbar Styles */
-        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 2000; }
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 20; }
         .nav-left { display: flex; gap: 5px; align-items: center; height: 100%; }
         .nav-left a, .nav-item-btn { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
         .nav-left a:hover, .nav-item-btn:hover { color: white; background: rgba(255,255,255,0.1); }
@@ -20,7 +20,7 @@
         .nav-logo-img { height: 32px; width: auto; display: block; }
 
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
-        .dropdown-content { display: none; position: absolute; top: 50px; background: white; border: 1px solid var(--border); min-width: 160px; box-shadow: 0 6px 12px rgba(0,0,0,.175); z-index: 3000; padding: 5px 0; border-radius: 0 0 4px 4px; }
+        .dropdown-content { display: none; position: absolute; top: 50px; background: white; border: 1px solid var(--border); min-width: 160px; box-shadow: 0 6px 12px rgba(0,0,0,.175); z-index: 30; }
         .dropdown-content a { display: block; padding: 8px 20px; color: #333 !important; text-decoration: none; font-size: 13px; width: 100%; text-align: left; }
         .show { display: block !important; }
 
@@ -88,7 +88,7 @@
             <a href="notifications.html" class="notif-item" id="btn-worlds"><i class="fa fa-globe"></i> <span id="badge-worlds">0</span></a>
             <a href="notifications.html" class="notif-item" id="btn-social"><i class="fa fa-user"></i> <span id="badge-social">0</span></a>
             <a href="notifications.html" class="notif-item" id="btn-favs"><i class="fa fa-star"></i> <span id="badge-favs">0</span></a>
-            <a href="notifications.html" class="notif-item" id="btn-inbox"><i class="fa fa-envelope"></i> <span id="badge-inbox">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-messages"><i class="fa fa-envelope"></i> <span id="badge-messages">0</span></a>
         </div>
 
         <div class="dropdown">
@@ -132,7 +132,7 @@
             <div class="side-label">Interaction</div>
             <a href="profile_comments.html"><i class="fa fa-comments"></i> Comments</a>
             <a href="notifications.html"><i class="fa fa-bell"></i> Notifications</a>
-            <a href="messages.html"><i class="fa fa-envelope"></i> Inbox</a>
+            <a href="notifications.html"><i class="fa fa-envelope"></i> Inbox</a>
         </div>
     </aside>
 
@@ -211,6 +211,15 @@
                         <div class="char-name">${d.data().name || 'Unnamed'}</div>
                     </a>`).join('');
             }
+        });
+        
+        // Watch Messages
+        const messagesQuery = query(collection(db, "messages"), where("recipientId", "==", authUid), where("isRead", "==", false));
+        onSnapshot(messagesQuery, (snap) => {
+            const unreadMessages = snap.size;
+            document.getElementById('badge-messages').innerText = unreadMessages;
+            if(unreadMessages > 0) document.getElementById('btn-messages').classList.add('active-alert');
+            else document.getElementById('btn-messages').classList.remove('active-alert');
         });
         
         const notifQuery = query(collection(db, "notifications"), where("toUserId", "==", authUid), where("read", "==", false));
