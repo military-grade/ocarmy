@@ -23,7 +23,7 @@ onAuthStateChanged(auth, async (user) => {
             dbId = emailSnap.docs[0].id; 
         }
 
-        // 1. WATCH MESSAGES
+        // 1. WATCH MESSAGES (using consistent recipientId field)
         const messageQ = query(collection(db, "messages"), where("recipientId", "==", dbId), where("isRead", "==", false));
         onSnapshot(messageQ, (snap) => {
             updateBadge('badge-messages', snap.size);
@@ -43,7 +43,7 @@ onAuthStateChanged(auth, async (user) => {
             snap.forEach(doc => {
                 const data = doc.data();
                 if (data.type === 'favorite' || data.type === 'update') favCount++;
-                if (data.type === 'subscription' || data.type === 'comment') socialCount++;
+                if (data.type === 'subscription' || data.type === 'comment' || data.type === 'message') socialCount++;
             });
             updateBadge('badge-favs', favCount);
             updateBadge('badge-social', socialCount);
