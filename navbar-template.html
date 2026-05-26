@@ -1,0 +1,51 @@
+<!-- Standardized Navbar Template -->
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="dashboard.html" class="nav-logo-link">
+            <img src="Illustration226.png" alt="OCARMY" class="nav-logo-img">
+        </a>
+        
+        <a href="browse.html"><i class="fa fa-eye"></i> Browse</a>
+        <div class="dropdown">
+            <button class="nav-item-btn" onclick="toggleDrop('drop-submit')"><i class="fa fa-plus"></i> Submit <i class="fa fa-caret-down"></i></button>
+            <div id="drop-submit" class="dropdown-content">
+                <a href="create_character.html"><i class="fa fa-user"></i> Character</a>
+                <a href="create_folder.html"><i class="fa fa-folder"></i> Folder</a>
+                <a href="create_bulletin.html"><i class="fa fa-newspaper"></i> Bulletin</a>
+            </div>
+        </div>
+        <a href="search.html"><i class="fa fa-search"></i> Search</a>
+    </div>
+
+    <div style="display: flex; align-items: center; height: 100%;">
+        <div class="notif-bar">
+            <a href="notifications.html" class="notif-item" id="btn-worlds" title="Character Transfers">
+                <i class="fa fa-globe"></i> <span id="badge-worlds">0</span>
+            </a>
+            <a href="notifications.html" class="notif-item" id="btn-social" title="Social">
+                <i class="fa fa-user"></i> <span id="badge-social">0</span>
+            </a>
+            <a href="notifications.html" class="notif-item" id="btn-favs" title="Favorites & Updates">
+                <i class="fa fa-star"></i> <span id="badge-favs">0</span>
+            </a>
+            <a href="notifications.html" class="notif-item" id="btn-messages" title="Messages">
+                <i class="fa fa-envelope"></i> <span id="badge-messages">0</span>
+            </a>
+        </div>
+
+        <div class="dropdown">
+            <button class="nav-item-btn" onclick="toggleDrop('drop-user')">
+                <span id="nav-username">Loading...</span>
+                <div id="nav-avatar" style="width:30px; height:30px; background:#eee; border-radius:2px; background-size:cover; margin-left:8px;"></div>
+                <i class="fa fa-caret-down" style="margin-left:5px; font-size:10px;"></i>
+            </button>
+            <div id="drop-user" class="dropdown-content" style="right:0;">
+                <a href="dashboard.html">Dashboard</a>
+                <a id="nav-public-profile" href="#">Public Profile</a>
+                <a href="settings.html">Settings</a>
+                <div style="border-top:1px solid #eee; margin: 5px 0;"></div>
+                <a href="#" id="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
