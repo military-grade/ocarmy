@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Message User | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
+        
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 20; }
+        .nav-left { display: flex; gap: 5px; align-items: center; height: 100%; }
+        .nav-left a, .nav-item-btn { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
+        .nav-left a:hover, .nav-item-btn:hover { color: white; background: rgba(255,255,255,0.1); }
+        .nav-logo-link { display: flex; align-items: center; padding-right: 15px !important; }
+        .nav-logo-img { height: 32px; width: auto; display: block; }
+        .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
+        .dropdown-content { display: none; position: absolute; top: 50px; background: white; border: 1px solid var(--border); min-width: 160px; box-shadow: 0 6px 12px rgba(0,0,0,.175); z-index: 30; }
+        .dropdown-content a { display: block; padding: 8px 20px; color: #333 !important; text-decoration: none; font-size: 13px; }
+        .show { display: block !important; }
+        .notif-bar { display: flex; align-items: center; gap: 4px; margin-right: 10px; }
+        .notif-item { padding: 4px 8px; font-size: 11px; border-radius: 3px; color: #ccc; display: flex; align-items: center; gap: 5px; background: #3b5998; text-decoration: none; transition: 0.2s; }
+        .notif-item.active-alert { background: #00ffff; color: #000; font-weight: bold; }
+
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
+        .sidebar { width: 220px; background: #f4f4f4; border-right: 1px solid var(--border); flex-shrink: 0; }
+        .side-header { background: var(--th-blue); color: white; padding: 15px; font-weight: bold; }
+        .side-avatar { width: 50px; height: 50px; background: #eee; border-radius: 4px; background-size: cover; margin-bottom: 15px; }
+        .side-info { font-weight: bold; margin-bottom: 15px; color: var(--th-blue); }
+        .main { flex: 1; padding: 30px; }
+
+        .compose-card { background: white; border: 1px solid var(--border); border-radius: 4px; padding: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
+        .form-input, .form-textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; box-sizing: border-box; }
+        .form-textarea { resize: vertical; min-height: 200px; }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--th-blue); box-shadow: 0 0 0 2px rgba(78, 146, 172, 0.1); }
+
+        .button-group { display: flex; gap: 10px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; }
+        .btn-send { background: var(--th-blue); color: white; flex: 1; }
+        .btn-send:hover { background: #3a7a8f; }
+        .btn-cancel { background: #eee; color: #555; }
+        .btn-cancel:hover { background: #ddd; }
+
+        .alert { padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+        .alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .alert-error { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="dashboard.html" class="nav-logo-link">
+            <img src="Illustration226.png" alt="OCARMY" class="nav-logo-img">
+        </a>
+        <a href="browse.html"><i class="fa fa-eye"></i> Browse</a>
+        <a href="search.html"><i class="fa fa-search"></i> Search</a>
+    </div>
+    
+    <div style="display: flex; align-items: center;">
+        <div class="notif-bar">
+            <a href="notifications.html" class="notif-item" id="btn-worlds"><i class="fa fa-globe"></i> <span id="badge-worlds">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-social"><i class="fa fa-user"></i> <span id="badge-social">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-favs"><i class="fa fa-star"></i> <span id="badge-favs">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-messages"><i class="fa fa-envelope"></i> <span id="badge-messages">0</span></a>
+        </div>
+
+        <div class="dropdown">
+            <button class="nav-item-btn" onclick="window.toggleDrop('drop-user')">
+                <span id="nav-username">Loading...</span>
+                <div id="nav-avatar" style="width:30px; height:30px; background:#eee; border-radius:2px; background-size:cover; margin-left:8px;"></div>
+                <i class="fa fa-caret-down" style="margin-left:5px; font-size:10px;"></i>
+            </button>
+            <div id="drop-user" class="dropdown-content" style="right:0;">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="inbox.html">Inbox</a>
+                <a href="settings.html">Settings</a>
+                <div style="border-top:1px solid #eee; margin: 5px 0;"></div>
+                <a href="#" id="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="wrapper">
+    <aside class="sidebar">
+        <div class="side-header"><i class="fa fa-envelope"></i> New Message</div>
+        <div style="padding: 15px;">
+            <div class="side-avatar" id="recipient-pfp"></div>
+            <div class="side-info" id="recipient-name">User</div>
+            <div style="font-size: 12px; color: #888; margin-bottom: 15px;" id="recipient-subs">0 subscribers</div>
+            <a href="#" id="recipient-profile" class="btn" style="display: block; padding: 8px 12px; background: var(--th-blue); color: white; text-decoration: none; text-align: center; border-radius: 4px; font-size: 12px;">View Profile</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <h2 style="margin-top: 0; color: #333;"><i class="fa fa-pen"></i> Send a Message</h2>
+        
+        <div id="alert-container"></div>
+
+        <div class="compose-card">
+            <form onsubmit="sendMessage(event)">
+                <div class="form-group">
+                    <label class="form-label">To:</label>
+                    <input type="text" class="form-input" id="recipient-username" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Subject *</label>
+                    <input type="text" class="form-input" id="message-subject" placeholder="Message subject" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Message *</label>
+                    <textarea class="form-textarea" id="message-body" placeholder="Write your message..." required></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-send"><i class="fa fa-paper-plane"></i> Send Message</button>
+                    <button type="button" class="btn btn-cancel" onclick="window.history.back()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, query, where, getDoc, doc, getDocs, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
+    const auth = getAuth();
+    
+    let currentUser = null, currentUserData = null, targetUserData = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetUserId = urlParams.get('user');
+
+    window.toggleDrop = (id) => {
+        document.querySelectorAll('.dropdown-content').forEach(d => { if(d.id !== id) d.classList.remove('show'); });
+        document.getElementById(id).classList.toggle('show');
+    };
+
+    document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href="login.html");
+
+    function showAlert(message, type) {
+        const container = document.getElementById('alert-container');
+        container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        if (type === 'success') {
+            setTimeout(() => { container.innerHTML = ''; }, 3000);
+        }
+    }
+
+    window.sendMessage = async (e) => {
+        e.preventDefault();
+        
+        if (!targetUserData) {
+            showAlert('User not found', 'error');
+            return;
+        }
+
+        const subject = document.getElementById('message-subject').value.trim();
+        const body = document.getElementById('message-body').value.trim();
+
+        if (!subject || !body) {
+            showAlert('Please fill in all fields', 'error');
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "messages"), {
+                senderId: currentUser.uid,
+                senderUsername: currentUserData.username,
+                senderPfp: currentUserData.pfp || "",
+                recipientId: targetUserData.id,
+                recipientUsername: targetUserData.username,
+                recipientPfp: targetUserData.pfp || "",
+                subject: subject,
+                body: body,
+                isRead: false,
+                timestamp: serverTimestamp(),
+                replies: []
+            });
+
+            await addDoc(collection(db, "notifications"), {
+                toUserId: targetUserData.id,
+                fromUserId: currentUser.uid,
+                fromUsername: currentUserData.username,
+                type: "message",
+                read: false,
+                createdAt: serverTimestamp()
+            });
+
+            showAlert('Message sent successfully!', 'success');
+            document.getElementById('message-subject').value = '';
+            document.getElementById('message-body').value = '';
+            
+            setTimeout(() => {
+                window.location.href = 'inbox.html';
+            }, 2000);
+        } catch (error) {
+            console.error("Error:", error);
+            showAlert('Error sending message: ' + error.message, 'error');
+        }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        currentUser = user;
+
+        const uidDoc = await getDoc(doc(db, "users", user.uid));
+        if (uidDoc.exists()) {
+            currentUserData = uidDoc.data();
+            document.getElementById('nav-username').innerText = currentUserData.username || "User";
+            if (currentUserData.pfp) {
+                document.getElementById('nav-avatar').style.backgroundImage = `url('${currentUserData.pfp}')`;
+            }
+        }
+
+        if (targetUserId) {
+            const targetDoc = await getDoc(doc(db, "users", targetUserId));
+            if (targetDoc.exists()) {
+                targetUserData = { id: targetUserId, ...targetDoc.data() };
+                document.getElementById('recipient-username').value = targetUserData.username;
+                document.getElementById('recipient-name').innerText = targetUserData.username;
+                document.getElementById('recipient-profile').href = `profile.html?user=${targetUserId}`;
+                if (targetUserData.pfp) {
+                    document.getElementById('recipient-pfp').style.backgroundImage = `url('${targetUserData.pfp}')`;
+                }
+                
+                const subSnap = await getDocs(collection(db, "users", targetUserId, "subscribers"));
+                document.getElementById('recipient-subs').innerText = `${subSnap.size} subscribers`;
+            } else {
+                showAlert('User not found', 'error');
+            }
+        }
+
+        onSnapshot(query(collection(db, "notifications"), where("toUserId", "==", user.uid), where("read", "==", false)), (snap) => {
+            let socialCount = 0, favsCount = 0;
+            snap.forEach(doc => {
+                const type = doc.data().type;
+                if (type === 'subscription' || type === 'comment') socialCount++;
+                if (type === 'update' || type === 'favorite') favsCount++;
+            });
+            document.getElementById('badge-social').innerText = socialCount;
+            if (socialCount > 0) document.getElementById('btn-social').classList.add('active-alert');
+            document.getElementById('badge-favs').innerText = favsCount;
+            if (favsCount > 0) document.getElementById('btn-favs').classList.add('active-alert');
+        });
+
+        onSnapshot(query(collection(db, "messages"), where("recipientId", "==", user.uid), where("isRead", "==", false)), (snap) => {
+            document.getElementById('badge-messages').innerText = snap.size;
+            if (snap.size > 0) document.getElementById('btn-messages').classList.add('active-alert');
+        });
+
+        onSnapshot(query(collection(db, "transfers"), where("toUserId", "==", user.uid), where("status", "==", "pending")), (snap) => {
+            document.getElementById('badge-worlds').innerText = snap.size;
+            if (snap.size > 0) document.getElementById('btn-worlds').classList.add('active-alert');
+        });
+    });
+</script>
+</body>
+</html>

@@ -3,160 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <title>Inbox | OCARMY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { 
-            font-family: sans-serif; 
-            background: #f7f7f7; 
-            padding: 50px; 
-            color: #333;
-        }
-        .inbox-container { 
-            max-width: 800px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 30px; 
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
-        }
-        .header-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        h2 { margin: 0; color: #222; }
-        .compose-btn {
-            background: #4e92ac; 
-            color: white; 
-            text-decoration: none; 
-            padding: 8px 16px; 
-            border-radius: 4px; 
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .compose-btn:hover { background: #3d7a91; }
+        :root { --th-blue: #4e92ac; --th-dark: #222; --th-bg: #f7f7f7; --border: #ddd; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--th-bg); color: #333; }
         
-        .message-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .message-item {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            flex-direction: column;
-        }
-        .message-item:last-child { border-bottom: none; }
-        .message-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        .sender-name { font-weight: bold; color: #4e92ac; }
-        .msg-date { color: #888; font-size: 12px; }
-        .msg-subject { font-weight: bold; margin-bottom: 5px; }
-        .msg-body { color: #555; line-height: 1.5; font-size: 14px; }
-        
-        .loading { text-align: center; color: #888; padding: 20px; }
-        .empty-inbox { text-align: center; color: #888; padding: 40px 20px; font-style: italic; }
+        /* Navbar */
+        .navbar { background: var(--th-dark); color: white; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 20; }
+        .nav-left { display: flex; gap: 5px; align-items: center; height: 100%; }
+        .nav-left a, .nav-item-btn { color: #ccc; text-decoration: none; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; height: 100%; padding: 0 10px; border: none; background: none; }
+        .nav-left a:hover, .nav-item-btn:hover { color: white; background: rgba(255,255,255,0.1); }
+        .nav-logo-link { display: flex; align-items: center; padding-right: 15px !important; }
+        .nav-logo-img { height: 32px; width: auto; display: block; }
+        .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
+        .dropdown-content { display: none; position: absolute; top: 50px; background: white; border: 1px solid var(--border); min-width: 160px; box-shadow: 0 6px 12px rgba(0,0,0,.175); z-index: 30; }
+        .dropdown-content a { display: block; padding: 8px 20px; color: #333 !important; text-decoration: none; font-size: 13px; width: 100%; text-align: left; }
+        .show { display: block !important; }
+        .notif-bar { display: flex; align-items: center; gap: 4px; margin-right: 10px; }
+        .notif-item { padding: 4px 8px; font-size: 11px; border-radius: 3px; color: #ccc; display: flex; align-items: center; gap: 5px; background: #3b5998; text-decoration: none; transition: 0.2s; }
+        .notif-item:hover { color: white; }
+        .notif-item.active-alert { background: #00ffff; color: #000; font-weight: bold; box-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
+
+        /* Layout */
+        .wrapper { display: flex; max-width: 1140px; margin: 0 auto; background: white; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: calc(100vh - 50px); }
+        .sidebar { width: 220px; background: #f4f4f4; border-right: 1px solid var(--border); flex-shrink: 0; }
+        .side-header { background: var(--th-blue); color: white; padding: 15px; font-weight: bold; font-size: 14px; }
+        .side-nav a { display: block; padding: 10px 15px; color: var(--th-blue); text-decoration: none; font-size: 13px; border-bottom: 1px solid var(--border); cursor: pointer; }
+        .side-nav a:hover, .side-nav a.active { background: #e0e0e0; }
+        .main { flex: 1; padding: 30px; }
+
+        /* Page Title */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--th-blue); padding-bottom: 15px; }
+        .page-title { font-size: 24px; margin: 0; color: #333; }
+        .btn-compose { background: var(--th-blue); color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .btn-compose:hover { background: #3a7a8f; }
+
+        /* Message List */
+        .message-list { list-style: none; padding: 0; margin: 0; }
+        .message-item { display: flex; align-items: flex-start; gap: 15px; padding: 15px; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 12px; background: white; cursor: pointer; transition: 0.2s; }
+        .message-item:hover { background: #f9f9f9; }
+        .message-item.unread { background: #f0fbff; border-left: 4px solid var(--th-blue); }
+        .message-avatar { width: 50px; height: 50px; border-radius: 4px; background: #eee; background-size: cover; background-position: center; flex-shrink: 0; }
+        .message-content { flex: 1; }
+        .message-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+        .message-from { font-weight: bold; color: var(--th-blue); }
+        .message-date { font-size: 11px; color: #999; }
+        .message-subject { font-weight: 600; color: #333; margin-bottom: 5px; }
+        .message-preview { font-size: 13px; color: #666; line-height: 1.4; }
+        .unread-badge { display: inline-block; width: 8px; height: 8px; background: var(--th-blue); border-radius: 50%; margin-left: 8px; }
+
+        /* Empty State */
+        .empty-state { padding: 60px 30px; text-align: center; color: #999; }
+        .empty-icon { font-size: 48px; margin-bottom: 15px; color: #ddd; }
+        .empty-text { font-size: 16px; margin-bottom: 10px; }
+        .empty-sub { font-size: 13px; color: #bbb; }
+
+        /* Compose Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 4px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; font-size: 20px; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .modal-form input, .modal-form textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; box-sizing: border-box; }
+        .modal-form textarea { resize: vertical; min-height: 120px; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-send { background: var(--th-blue); color: white; }
+        .btn-send:hover { background: #3a7a8f; }
+        .btn-cancel { background: #eee; color: #555; }
+        .btn-cancel:hover { background: #ddd; }
+
+        /* Thread View Modal */
+        .thread-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .thread-modal.active { display: flex; }
+        .thread-content { background: white; border-radius: 4px; width: 90%; max-width: 700px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .thread-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .thread-from { font-weight: bold; color: var(--th-blue); font-size: 16px; }
+        .thread-date { font-size: 12px; color: #999; }
+        .thread-body { flex: 1; padding: 20px; overflow-y: auto; background: #f9f9f9; }
+        .message-bubble { margin-bottom: 20px; padding: 15px; background: white; border: 1px solid #ddd; border-radius: 4px; }
+        .bubble-from { font-weight: bold; color: var(--th-blue); font-size: 13px; margin-bottom: 8px; }
+        .bubble-date { font-size: 11px; color: #999; margin-bottom: 10px; }
+        .bubble-text { line-height: 1.5; }
+        .thread-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: white; }
+        .thread-footer textarea { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical; min-height: 80px; font-family: inherit; }
+        .thread-footer button { padding: 10px 15px; background: var(--th-blue); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .thread-footer button:hover { background: #3a7a8f; }
     </style>
 </head>
 <body>
 
-    <div class="inbox-container">
-        <div class="header-actions">
-            <h2>Your Inbox</h2>
-            <a href="messages.html" class="compose-btn">+ Compose New</a>
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="dashboard.html" class="nav-logo-link">
+            <img src="Illustration226.png" alt="OCARMY" class="nav-logo-img">
+        </a>
+        <a href="browse.html"><i class="fa fa-eye"></i> Browse</a>
+        <a href="search.html"><i class="fa fa-search"></i> Search</a>
+    </div>
+    
+    <div style="display: flex; align-items: center;">
+        <div class="notif-bar">
+            <a href="notifications.html" class="notif-item" id="btn-worlds"><i class="fa fa-globe"></i> <span id="badge-worlds">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-social"><i class="fa fa-user"></i> <span id="badge-social">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-favs"><i class="fa fa-star"></i> <span id="badge-favs">0</span></a>
+            <a href="notifications.html" class="notif-item" id="btn-messages"><i class="fa fa-envelope"></i> <span id="badge-messages">0</span></a>
         </div>
 
-        <div id="messages-container">
-            <div class="loading">Loading messages...</div>
+        <div class="dropdown">
+            <button class="nav-item-btn" onclick="window.toggleDrop('drop-user')">
+                <span id="nav-username">Loading...</span>
+                <div id="nav-avatar" style="width:30px; height:30px; background:#eee; border-radius:2px; background-size:cover; margin-left:8px;"></div>
+                <i class="fa fa-caret-down" style="margin-left:5px; font-size:10px;"></i>
+            </button>
+            <div id="drop-user" class="dropdown-content" style="right:0;">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="settings.html">Settings</a>
+                <a href="notifications.html">Notifications</a>
+                <div style="border-top:1px solid #eee; margin: 5px 0;"></div>
+                <a href="#" id="logout-btn">Logout</a>
+            </div>
         </div>
     </div>
+</nav>
+
+<div class="wrapper">
+    <aside class="sidebar">
+        <div class="side-header"><i class="fa fa-inbox"></i> Inbox</div>
+        <div class="side-nav">
+            <a onclick="filterMessages('all')" class="filter-link active" data-filter="all">All Messages</a>
+            <a onclick="filterMessages('unread')" class="filter-link" data-filter="unread">Unread <span id="unread-count" style="color:#ff6b6b;">(0)</span></a>
+            <a onclick="filterMessages('sent')" class="filter-link" data-filter="sent">Sent</a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="page-header">
+            <h2 class="page-title">Messages</h2>
+            <button class="btn-compose" onclick="openComposeModal()"><i class="fa fa-pen"></i> New Message</button>
+        </div>
+
+        <div id="messages-display">
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fa fa-inbox"></i></div>
+                <div class="empty-text">No messages</div>
+                <div class="empty-sub">Start a conversation by sending a new message</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Compose Modal -->
+<div class="modal-overlay" id="compose-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>New Message</h3>
+            <button class="modal-close" onclick="closeComposeModal()"><i class="fa fa-times"></i></button>
+        </div>
+        <form class="modal-form" onsubmit="sendMessage(event)">
+            <input type="text" id="compose-recipient" placeholder="Recipient Username" required>
+            <input type="text" id="compose-subject" placeholder="Subject" required>
+            <textarea id="compose-body" placeholder="Write your message..." required></textarea>
+            <div class="modal-buttons">
+                <button type="submit" class="btn-send"><i class="fa fa-paper-plane"></i> Send</button>
+                <button type="button" class="btn-cancel" onclick="closeComposeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Thread View Modal -->
+<div class="thread-modal" id="thread-modal">
+    <div class="thread-content">
+        <div class="thread-header">
+            <div>
+                <div class="thread-from" id="thread-from"></div>
+                <div class="thread-date" id="thread-date"></div>
+            </div>
+            <button style="background: none; border: none; cursor: pointer; font-size: 20px; color: #999;" onclick="closeThreadModal()"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="thread-body" id="thread-body"></div>
+        <div class="thread-footer">
+            <textarea id="reply-text" placeholder="Write your reply..."></textarea>
+            <button onclick="sendReply()"><i class="fa fa-reply"></i> Reply</button>
+        </div>
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, onSnapshot, getDoc, doc, getDocs, updateDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = { 
-        apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", 
-        authDomain: "ocarmy-db.firebaseapp.com", 
-        projectId: "ocarmy-db" 
-    };
-    
-    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDjlYDxJziqS2sHw46BkAl-PCRszDs1p4k", authDomain: "ocarmy-db.firebaseapp.com", projectId: "ocarmy-db" }));
     const auth = getAuth();
-    const db = getFirestore(app);
+    
+    let currentUser = null, currentUserData = null, currentThreadId = null;
+    let allMessages = [], filteredMessages = [], currentFilter = 'all';
 
-    const messagesContainer = document.getElementById('messages-container');
+    window.toggleDrop = (id) => {
+        document.querySelectorAll('.dropdown-content').forEach(d => { if(d.id !== id) d.classList.remove('show'); });
+        document.getElementById(id).classList.toggle('show');
+    };
 
-    // Listen for user authentication
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            fetchMessages(user.uid);
-        } else {
-            messagesContainer.innerHTML = '<div class="empty-inbox">You must be logged in to view your inbox.</div>';
+    document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href="login.html");
+
+    window.openComposeModal = () => {
+        document.getElementById('compose-modal').classList.add('active');
+    };
+
+    window.closeComposeModal = () => {
+        document.getElementById('compose-modal').classList.remove('active');
+        document.getElementById('compose-recipient').value = '';
+        document.getElementById('compose-subject').value = '';
+        document.getElementById('compose-body').value = '';
+    };
+
+    window.sendMessage = async (e) => {
+        e.preventDefault();
+        const recipient = document.getElementById('compose-recipient').value.trim();
+        const subject = document.getElementById('compose-subject').value.trim();
+        const body = document.getElementById('compose-body').value.trim();
+
+        if (!recipient || !subject || !body) {
+            alert('Please fill in all fields');
+            return;
         }
-    });
 
-    async function fetchMessages(userId) {
         try {
-            // Query the messages collection where the receiverId matches the logged-in user
-            const q = query(
-                collection(db, "messages"), 
-                where("receiverId", "==", userId)
-            );
-            
-            const querySnapshot = await getDocs(q);
-            
-            if (querySnapshot.empty) {
-                messagesContainer.innerHTML = '<div class="empty-inbox">No messages yet! It\'s quiet in here.</div>';
+            const userQuery = query(collection(db, "users"), where("username", "==", recipient));
+            const userSnap = await getDocs(userQuery);
+
+            if (userSnap.empty) {
+                alert("User not found!");
                 return;
             }
 
-            // Sort messages by timestamp locally (descending order)
-            const messagesList = [];
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                messagesList.push({ id: doc.id, ...data });
-            });
-            
-            messagesList.sort((a, b) => {
-                const timeA = a.timestamp ? a.timestamp.toMillis() : 0;
-                const timeB = b.timestamp ? b.timestamp.toMillis() : 0;
-                return timeB - timeA;
+            const recipientId = userSnap.docs[0].id;
+            const recipientData = userSnap.docs[0].data();
+
+            await addDoc(collection(db, "messages"), {
+                senderId: currentUser.uid,
+                senderUsername: currentUserData.username,
+                senderPfp: currentUserData.pfp || "",
+                recipientId: recipientId,
+                recipientUsername: recipientData.username,
+                recipientPfp: recipientData.pfp || "",
+                subject: subject,
+                body: body,
+                isRead: false,
+                timestamp: serverTimestamp(),
+                replies: []
             });
 
-            // Render the messages
-            let htmlString = '<ul class="message-list">';
-            messagesList.forEach(msg => {
-                const dateString = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleDateString() : 'Just now';
-                
-                htmlString += `
-                    <li class="message-item">
-                        <div class="message-header">
-                            <span class="sender-name">From: ${msg.senderName}</span>
-                            <span class="msg-date">${dateString}</span>
-                        </div>
-                        <div class="msg-subject">${msg.subject}</div>
-                        <div class="msg-body">${msg.body}</div>
-                    </li>
-                `;
+            await addDoc(collection(db, "notifications"), {
+                toUserId: recipientId,
+                fromUserId: currentUser.uid,
+                fromUsername: currentUserData.username,
+                type: "message",
+                read: false,
+                createdAt: serverTimestamp()
             });
-            htmlString += '</ul>';
-            
-            messagesContainer.innerHTML = htmlString;
 
+            closeComposeModal();
+            alert("Message sent!");
         } catch (error) {
-            console.error("Error fetching messages: ", error);
-            messagesContainer.innerHTML = '<div class="empty-inbox" style="color: red;">Error loading messages. Please refresh.</div>';
+            console.error("Error:", error);
+            alert("Error sending message: " + error.message);
         }
+    };
+
+    window.filterMessages = (filter) => {
+        currentFilter = filter;
+        document.querySelectorAll('.filter-link').forEach(a => a.classList.remove('active'));
+        document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+        renderMessages();
+    };
+
+    window.openThread = async (msgId) => {
+        currentThreadId = msgId;
+        const msgSnap = await getDoc(doc(db, "messages", msgId));
+        const msg = msgSnap.data();
+
+        await updateDoc(doc(db, "messages", msgId), { isRead: true });
+
+        const isReceived = msg.recipientId === currentUser.uid;
+        const fromName = isReceived ? msg.senderUsername : msg.recipientUsername;
+        const dateStr = msg.timestamp?.toDate?.().toLocaleString() || 'Unknown';
+
+        document.getElementById('thread-from').innerText = fromName;
+        document.getElementById('thread-date').innerText = dateStr;
+
+        let threadHTML = `<div class="message-bubble"><div class="bubble-from">${msg.subject}</div><div class="bubble-date">${dateStr}</div><div class="bubble-text">${msg.body}</div></div>`;
+
+        if (msg.replies && msg.replies.length > 0) {
+            msg.replies.forEach(reply => {
+                const replyDate = reply.timestamp?.seconds ? new Date(reply.timestamp.seconds * 1000).toLocaleString() : 'Unknown';
+                threadHTML += `<div class="message-bubble"><div class="bubble-from">${reply.authorUsername}</div><div class="bubble-date">${replyDate}</div><div class="bubble-text">${reply.text}</div></div>`;
+            });
+        }
+
+        document.getElementById('thread-body').innerHTML = threadHTML;
+        document.getElementById('reply-text').value = '';
+        document.getElementById('thread-modal').classList.add('active');
+    };
+
+    window.closeThreadModal = () => {
+        document.getElementById('thread-modal').classList.remove('active');
+        currentThreadId = null;
+        renderMessages();
+    };
+
+    window.sendReply = async () => {
+        const replyText = document.getElementById('reply-text').value.trim();
+        if (!replyText || !currentThreadId) return;
+
+        try {
+            const msgRef = doc(db, "messages", currentThreadId);
+            const msgSnap = await getDoc(msgRef);
+            const msg = msgSnap.data();
+
+            const newReplies = msg.replies || [];
+            newReplies.push({
+                authorId: currentUser.uid,
+                authorUsername: currentUserData.username,
+                text: replyText,
+                timestamp: serverTimestamp()
+            });
+
+            await updateDoc(msgRef, { replies: newReplies, isRead: false });
+            document.getElementById('reply-text').value = '';
+            alert('Reply sent!');
+            closeThreadModal();
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error sending reply: " + error.message);
+        }
+    };
+
+    function renderMessages() {
+        const display = document.getElementById('messages-display');
+        
+        if (filteredMessages.length === 0) {
+            display.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa fa-inbox"></i></div><div class="empty-text">No messages</div><div class="empty-sub">Start a conversation by sending a new message</div></div>`;
+            return;
+        }
+
+        let html = '<ul class="message-list">';
+        filteredMessages.forEach(msg => {
+            const isReceived = msg.recipientId === currentUser.uid;
+            const fromName = isReceived ? msg.senderUsername : msg.recipientUsername;
+            const pfp = isReceived ? msg.senderPfp : msg.recipientPfp;
+            const preview = msg.body.substring(0, 60) + (msg.body.length > 60 ? '...' : '');
+            const dateStr = msg.timestamp?.toDate?.().toLocaleDateString() || '';
+            const unreadClass = msg.isRead === false ? 'unread' : '';
+
+            html += `<li class="message-item ${unreadClass}" onclick="openThread('${msg.id}')">
+                <div class="message-avatar" style="background-image: url('${pfp}')"></div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-from">${fromName}</span>
+                        <span class="message-date">${dateStr}</span>
+                    </div>
+                    <div class="message-subject">${msg.subject}</div>
+                    <div class="message-preview">${preview}</div>
+                </div>
+                ${msg.isRead === false ? '<div class="unread-badge"></div>' : ''}
+            </li>`;
+        });
+        html += '</ul>';
+        display.innerHTML = html;
     }
+
+    function updateMessagesList() {
+        filteredMessages = allMessages;
+
+        if (currentFilter === 'unread') {
+            filteredMessages = allMessages.filter(m => m.isRead === false);
+        } else if (currentFilter === 'sent') {
+            filteredMessages = allMessages.filter(m => m.senderId === currentUser.uid);
+        }
+
+        renderMessages();
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        currentUser = user;
+
+        const uidDoc = await getDoc(doc(db, "users", user.uid));
+        if (uidDoc.exists()) {
+            currentUserData = uidDoc.data();
+            document.getElementById('nav-username').innerText = currentUserData.username || "User";
+            if (currentUserData.pfp) {
+                document.getElementById('nav-avatar').style.backgroundImage = `url('${currentUserData.pfp}')`;
+            }
+        }
+
+        onSnapshot(query(collection(db, "messages"), where("recipientId", "==", user.uid)), (snap) => {
+            allMessages = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0));
+            const unreadCount = allMessages.filter(m => m.isRead === false).length;
+            document.getElementById('unread-count').innerText = `(${unreadCount})`;
+            document.getElementById('badge-messages').innerText = unreadCount;
+            if (unreadCount > 0) document.getElementById('btn-messages').classList.add('active-alert');
+            else document.getElementById('btn-messages').classList.remove('active-alert');
+            updateMessagesList();
+        });
+
+        onSnapshot(query(collection(db, "notifications"), where("toUserId", "==", user.uid), where("read", "==", false)), (snap) => {
+            let socialCount = 0, favsCount = 0;
+            snap.forEach(doc => {
+                const type = doc.data().type;
+                if (type === 'subscription' || type === 'comment') socialCount++;
+                if (type === 'update' || type === 'favorite') favsCount++;
+            });
+            document.getElementById('badge-social').innerText = socialCount;
+            if (socialCount > 0) document.getElementById('btn-social').classList.add('active-alert');
+            else document.getElementById('btn-social').classList.remove('active-alert');
+            document.getElementById('badge-favs').innerText = favsCount;
+            if (favsCount > 0) document.getElementById('btn-favs').classList.add('active-alert');
+            else document.getElementById('btn-favs').classList.remove('active-alert');
+        });
+
+        onSnapshot(query(collection(db, "transfers"), where("toUserId", "==", user.uid), where("status", "==", "pending")), (snap) => {
+            document.getElementById('badge-worlds').innerText = snap.size;
+            if (snap.size > 0) document.getElementById('btn-worlds').classList.add('active-alert');
+            else document.getElementById('btn-worlds').classList.remove('active-alert');
+        });
+    });
 </script>
 </body>
 </html>
