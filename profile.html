@@ -72,7 +72,7 @@
         </div>
 
         <div class="dropdown">
-            <button class="nav-item-btn" onclick="toggleDrop('drop-user')">
+            <button class="nav-item-btn" onclick="window.toggleDrop('drop-user')">
                 <span id="nav-username">Loading...</span>
                 <div id="nav-avatar" style="width:30px; height:30px; background:#eee; border-radius:2px; background-size:cover; margin-left:8px;"></div>
                 <i class="fa fa-caret-down" style="margin-left:5px; font-size:10px;"></i>
@@ -139,34 +139,67 @@
 
     document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href="login.html");
 
-    if (!targetUid) {
-        document.getElementById('profile-content').innerHTML = "No user ID specified.";
-    } else {
-        fetchUserData();
-    }
+    // Load target user's public profile data
+    async function fetchTargetUserData() {
+        if (!targetUid) {
+            document.getElementById('profile-content').innerHTML = "No user ID specified.";
+            return;
+        }
 
-    async function fetchUserData() {
         const userDoc = await getDoc(doc(db, "users", targetUid));
         if (userDoc.exists()) {
             const data = userDoc.data();
+            
+            // Update sidebar with target user info
             document.getElementById('side-username').innerText = data.username || "User";
             if (data.pfp) document.getElementById('side-pfp').style.backgroundImage = `url('${data.pfp}')`;
-            if (data.username?.toLowerCase() === 'militarygrade') document.getElementById('side-name-container').innerHTML += ` <i class="fa fa-crown creator-crown"></i>`;
+            if (data.username?.toLowerCase() === 'militarygrade') {
+                const container = document.getElementById('side-name-container');
+                if (!container.querySelector('.fa-crown')) {
+                    container.innerHTML += ` <i class="fa fa-crown creator-crown"></i>`;
+                }
+            }
             
-            const links = { 'lnk-profile': 'profile.html', 'lnk-bulletins': 'bulletins.html', 'lnk-chars': 'characters.html', 'lnk-designs': 'designs.html', 'lnk-art': 'art.html', 'lnk-comments': 'profile_comments.html', 'lnk-message': 'messages.html' };
-            for (let id in links) { document.getElementById(id).href = `${links[id]}?user=${targetUid}`; }
+            // Update navigation links to include target user ID
+            const links = { 
+                'lnk-profile': 'profile.html', 
+                'lnk-bulletins': 'bulletins.html', 
+                'lnk-chars': 'characters.html', 
+                'lnk-designs': 'designs.html', 
+                'lnk-art': 'art.html', 
+                'lnk-comments': 'profile_comments.html', 
+                'lnk-message': 'message_user.html'
+            };
+            for (let id in links) { 
+                const element = document.getElementById(id);
+                if (element) {
+                    element.href = `${links[id]}?user=${targetUid}`;
+                }
+            }
             
+            // Update subscriber count
             const subSnap = await getDocs(collection(db, "users", targetUid, "subscribers"));
             document.getElementById('side-sub-count').innerText = `${subSnap.size} subscribers`;
+            
+            // Display profile content
             document.getElementById('profile-content').innerHTML = data.profileHTML || "This user hasn't set up their profile yet.";
+        } else {
+            document.getElementById('profile-content').innerHTML = "User not found.";
         }
     }
 
     async function checkSubStatus() {
-        if(currentUser.uid === targetUid) return document.getElementById('lnk-subscribe').style.display = 'none';
+        if (!currentUser || currentUser.uid === targetUid) {
+            document.getElementById('lnk-subscribe').style.display = 'none';
+            return;
+        }
+
         const subDoc = await getDoc(doc(db, "users", targetUid, "subscribers", currentUser.uid));
         const btn = document.getElementById('lnk-subscribe');
-        if (subDoc.exists()) { btn.classList.add('subscribed'); btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`; }
+        if (subDoc.exists()) { 
+            btn.classList.add('subscribed'); 
+            btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`; 
+        }
         btn.onclick = toggleSub;
     }
 
@@ -184,44 +217,18 @@
         } else {
             await setDoc(subRef, { at: serverTimestamp() });
             await setDoc(doc(collection(db, "notifications")), {
-                toUserId: targetUid, fromUserId: currentUser.uid, fromUsername: currentUserData.username, type: "subscription", read: false, createdAt: serverTimestamp()
+                toUserId: targetUid, 
+                fromUserId: currentUser.uid, 
+                fromUsername: currentUserData.username, 
+                type: "subscription", 
+                read: false, 
+                createdAt: serverTimestamp()
             });
             btn.innerHTML = `<i class="fa fa-check"></i> Subscribed`;
             btn.classList.add('subscribed');
         }
         btn.style.pointerEvents = "auto";
     }
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) { 
-            currentUser = user;
-            
-            // Get viewer user data
-            const emailQuery = query(collection(db, "users"), where("email", "==", user.email.toLowerCase()));
-            const emailSnap = await getDocs(emailQuery);
-            if (!emailSnap.empty) {
-                currentUserData = emailSnap.docs[0].data();
-            } else {
-                const uidDoc = await getDoc(doc(db, "users", user.uid));
-                if (uidDoc.exists()) currentUserData = uidDoc.data();
-            }
-            
-            // Setup navbar user info
-            if (currentUserData) {
-                document.getElementById('nav-username').innerText = currentUserData.username || "User";
-                document.getElementById('nav-public-profile').href = `profile.html?user=${user.uid}`;
-                if (currentUserData.pfp) {
-                    document.getElementById('nav-avatar').style.backgroundImage = `url('${currentUserData.pfp}')`;
-                }
-            }
-            
-            // Check subscription status if viewing another user
-            if (targetUid && targetUid !== user.uid) {
-                checkSubStatus();
-                loadNotifications(user.uid);
-            }
-        }
-    });
 
     function loadNotifications(userId) {
         // Watch Messages
@@ -259,6 +266,41 @@
             else document.getElementById('btn-worlds').classList.remove('active-alert');
         });
     }
+
+    // Monitor authentication state
+    onAuthStateChanged(auth, async (user) => {
+        if (user) { 
+            currentUser = user;
+            
+            // Get current user's data
+            const uidDoc = await getDoc(doc(db, "users", user.uid));
+            if (uidDoc.exists()) {
+                currentUserData = uidDoc.data();
+                
+                // Update navbar with current user info
+                document.getElementById('nav-username').innerText = currentUserData.username || "User";
+                document.getElementById('nav-public-profile').href = `profile.html?user=${user.uid}`;
+                if (currentUserData.pfp) {
+                    document.getElementById('nav-avatar').style.backgroundImage = `url('${currentUserData.pfp}')`;
+                }
+            }
+            
+            // Load notifications
+            loadNotifications(user.uid);
+            
+            // Check subscription status if viewing another user
+            if (targetUid && targetUid !== user.uid) {
+                checkSubStatus();
+            }
+        } else {
+            // User not logged in
+            document.getElementById('nav-username').innerText = "Login";
+            document.getElementById('nav-public-profile').href = "login.html";
+        }
+    });
+
+    // Load target user profile on page load
+    fetchTargetUserData();
 </script>
 </body>
 </html>
