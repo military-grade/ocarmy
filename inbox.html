@@ -162,9 +162,9 @@
             <button class="modal-close" onclick="closeComposeModal()"><i class="fa fa-times"></i></button>
         </div>
         <form class="modal-form" onsubmit="sendMessage(event)">
-            <input type="text" id="compose-recipient" placeholder="Recipient Username" required>
-            <input type="text" id="compose-subject" placeholder="Subject" required>
-            <textarea id="compose-body" placeholder="Write your message..." required></textarea>
+            <input type="text" id="recipient-input" placeholder="Recipient Username" required>
+            <input type="text" id="subject-input" placeholder="Subject" required>
+            <textarea id="body-input" placeholder="Write your message..." required></textarea>
             <div class="modal-buttons">
                 <button type="submit" class="btn-send"><i class="fa fa-paper-plane"></i> Send</button>
                 <button type="button" class="btn-cancel" onclick="closeComposeModal()">Cancel</button>
@@ -215,16 +215,16 @@
 
     window.closeComposeModal = () => {
         document.getElementById('compose-modal').classList.remove('active');
-        document.getElementById('compose-recipient').value = '';
-        document.getElementById('compose-subject').value = '';
-        document.getElementById('compose-body').value = '';
+        document.getElementById('recipient-input').value = '';
+        document.getElementById('subject-input').value = '';
+        document.getElementById('body-input').value = '';
     };
 
     window.sendMessage = async (e) => {
         e.preventDefault();
-        const recipient = document.getElementById('compose-recipient').value.trim();
-        const subject = document.getElementById('compose-subject').value.trim();
-        const body = document.getElementById('compose-body').value.trim();
+        const recipient = document.getElementById('recipient-input').value.trim();
+        const subject = document.getElementById('subject-input').value.trim();
+        const body = document.getElementById('body-input').value.trim();
 
         if (!recipient || !subject || !body) {
             alert('Please fill in all fields');
@@ -359,18 +359,7 @@
             const dateStr = msg.timestamp?.toDate?.().toLocaleDateString() || '';
             const unreadClass = msg.isRead === false ? 'unread' : '';
 
-            html += `<li class="message-item ${unreadClass}" onclick="openThread('${msg.id}')">
-                <div class="message-avatar" style="background-image: url('${pfp}')"></div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-from">${fromName}</span>
-                        <span class="message-date">${dateStr}</span>
-                    </div>
-                    <div class="message-subject">${msg.subject}</div>
-                    <div class="message-preview">${preview}</div>
-                </div>
-                ${msg.isRead === false ? '<div class="unread-badge"></div>' : ''}
-            </li>`;
+            html += `<li class="message-item ${unreadClass}" onclick="openThread('${msg.id}')"><div class="message-avatar" style="background-image: url('${pfp}')"></div><div class="message-content"><div class="message-header"><span class="message-from">${fromName}</span><span class="message-date">${dateStr}</span></div><div class="message-subject">${msg.subject}</div><div class="message-preview">${preview}</div></div>${msg.isRead === false ? '<div class="unread-badge"></div>' : ''}</li>`;
         });
         html += '</ul>';
         display.innerHTML = html;
